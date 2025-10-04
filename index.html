@@ -122,7 +122,6 @@
             border-radius: 10px;
             max-width: 80%;
             text-align: left;
-            z-index: 100;
         }
     </style>
 </head>
@@ -165,8 +164,7 @@
         <h3>操作方法</h3>
         <p><b>移動:</b> W/A/S/D or 矢印キー or 左下ジョイスティック</p>
         <p><b>走る:</b> Shiftキー長押し or 右下「走る」ボタン長押し</p>
-        <p><b>視点:</b></p>
-        <p>- 自由視点モード時: マウスドラッグ or 画面スワイプ</p>
+        <p><b>視点操作:</b> マウスドラッグ or 画面スワイプ</p>
         <p><b>テレポート:</b></p>
         <p>1. UIの「テレポートモード」にチェックを入れる</p>
         <p>2. 右上のマップで行きたい場所をクリック</p>
@@ -189,9 +187,8 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 
-        let scene, renderer, character, orbitControls, playerGroup, stats, composer, sky, sun;
+        let scene, renderer, character, orbitControls, playerGroup, stats, composer, sky, sun, pmremGenerator;
         let cameras = {}, currentCamera, currentCameraIndex = 0;
         const cameraTypes = ['Third Person', 'First Person', 'Free Look'];
         let keys = { w:false, a:false, s:false, d:false, Shift:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
@@ -214,6 +211,12 @@
         let isRunning = false;
         
         let targetQuaternion = new THREE.Quaternion();
+        
+        // ★視点操作用変数
+        let isPointerDown = false;
+        let pointerPosition = new THREE.Vector2();
+        const cameraOffsetSpherical = new THREE.Spherical(8, Math.PI / 2.5, 0); // radius, phi, theta
+        const firstPersonEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
         function init() {
             scene = new THREE.Scene();
@@ -222,10 +225,12 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // ★リアルな影
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.outputColorSpace = THREE.SRGBColorSpace;
             document.body.appendChild(renderer.domElement);
             
+            pmremGenerator = new THREE.PMREMGenerator(renderer); // ★環境マップ用
+
             stats = new Stats();
             document.body.appendChild(stats.dom);
             
@@ -233,7 +238,6 @@
             cameras.thirdPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
             cameras.firstPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
             cameras.freeLook = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
-            cameras.thirdPerson.position.set(0, 5, 8);
             cameras.freeLook.position.set(10, 10, 15);
             currentCamera = cameras.thirdPerson;
 
@@ -247,13 +251,12 @@
             directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
             directionalLight.position.set(32, 64, 32);
             directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.width = 2048; // ★影の解像度向上
             directionalLight.shadow.mapSize.height = 2048;
             directionalLight.shadow.camera.left = -MAP_WORLD_SIZE/2;
             directionalLight.shadow.camera.right = MAP_WORLD_SIZE/2;
             directionalLight.shadow.camera.top = MAP_WORLD_SIZE/2;
             directionalLight.shadow.camera.bottom = -MAP_WORLD_SIZE/2;
-            directionalLight.shadow.bias = -0.001;
             scene.add(directionalLight);
             
             initSky();
@@ -286,7 +289,7 @@
 
         function initSky() {
             sky = new Sky();
-            sky.scale.setScalar(MAP_WORLD_SIZE * 4);
+            sky.scale.setScalar(MAP_WORLD_SIZE * 2);
             scene.add(sky);
             sun = new THREE.Vector3();
         }
@@ -296,16 +299,8 @@
             const renderPass = new RenderPass(scene, currentCamera);
             composer.addPass(renderPass);
 
-            const ssaoPass = new SSAOPass(scene, currentCamera, window.innerWidth, window.innerHeight);
-            ssaoPass.kernelRadius = 16;
-            ssaoPass.minDistance = 0.005;
-            ssaoPass.maxDistance = 0.1;
-            composer.addPass(ssaoPass);
-
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-            bloomPass.threshold = 0.6;
-            bloomPass.strength = 0.4;
-            bloomPass.radius = 0.2;
+            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.5, 0.5, 0.85);
+            bloomPass.threshold = 0.8;
             composer.addPass(bloomPass);
         }
 
@@ -328,36 +323,14 @@
 
             mapCanvas.addEventListener('click', handleMapClick);
             setupMobileControls();
+            
+            // ★視点操作用イベントリスナー
+            renderer.domElement.addEventListener('pointerdown', onPointerDown);
+            renderer.domElement.addEventListener('pointermove', onPointerMove);
+            renderer.domElement.addEventListener('pointerup', onPointerUp);
         }
 
-        function createStreetLight() {
-            const group = new THREE.Group();
-            const postMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8, roughness: 0.4 });
-            
-            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 6, 12), postMaterial);
-            post.position.y = 3;
-            post.castShadow = true;
-
-            const arm = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.1), postMaterial);
-            arm.position.set(0.75, 5.8, 0);
-            arm.castShadow = true;
-            
-            const lightFixture = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.2, 0.4, 8), postMaterial);
-            lightFixture.position.set(1.4, 5.7, 0);
-            
-            const lightBulbMaterial = new THREE.MeshStandardMaterial({ color: 0xffffee, emissive: 0xffffee, emissiveIntensity: 0 });
-            const lightBulb = new THREE.Mesh(new THREE.SphereGeometry(0.15), lightBulbMaterial);
-            lightBulb.position.set(1.4, 5.5, 0);
-
-            const pointLight = new THREE.PointLight(0xffd8a1, 0, 15, 2);
-            pointLight.position.copy(lightBulb.position);
-            pointLight.castShadow = false;
-
-            group.add(post, arm, lightFixture, lightBulb, pointLight);
-            
-            return { group, light: pointLight, bulb: lightBulbMaterial };
-        }
-
+        // --- マップ生成 & インフラ ---
         function createCityMap() {
             initPathfindingGrid();
             buildings = [];
@@ -371,28 +344,16 @@
             const roadInterval = 40;
             
             for (let i = -1; i <= 1; i++) {
-                const roadXPos = i * roadInterval;
-                const roadZPos = i * roadInterval;
-
                 const roadX = new THREE.Mesh(new THREE.PlaneGeometry(roadW, MAP_WORLD_SIZE), roadMaterial);
-                roadX.rotation.x = -Math.PI / 2; roadX.position.set(roadXPos, 0.01, 0); roadX.receiveShadow = true; mapObjects.add(roadX);
+                roadX.rotation.x = -Math.PI / 2; roadX.position.set(i * roadInterval, 0.01, 0); roadX.receiveShadow = true; mapObjects.add(roadX);
                 markPathfindingGrid(roadX.position, roadW/2, MAP_WORLD_SIZE/2, 2);
-
-                const roadZ = new THREE.Mesh(new THREE.PlaneGeometry(MAP_WORLD_SIZE, roadW), roadMaterial);
-                roadZ.rotation.x = -Math.PI / 2; roadZ.position.set(0, 0.01, roadZPos); roadZ.receiveShadow = true; mapObjects.add(roadZ);
-                markPathfindingGrid(roadZ.position, MAP_WORLD_SIZE/2, roadW/2, 2);
-
-                for (let j = -MAP_WORLD_SIZE/2 + 10; j < MAP_WORLD_SIZE/2; j += 20) {
-                    const light1 = createStreetLight();
-                    light1.group.position.set(roadXPos + roadW/2 + 0.5, 0, j);
-                    mapObjects.add(light1.group);
-                    streetLights.push(light1);
-                    
-                    const light2 = createStreetLight();
-                    light2.group.position.set(j, 0, roadZPos - roadW/2 - 0.5);
-                    light2.group.rotation.y = -Math.PI/2;
-                    mapObjects.add(light2.group);
-                    streetLights.push(light2);
+                if (i !== 0) { // 中央の道以外に街灯を設置
+                    for (let z = -MAP_WORLD_SIZE/2; z < MAP_WORLD_SIZE/2; z += 20) {
+                        const light1 = createStreetLight();
+                        light1.position.set(i * roadInterval + roadW/2 + 1, 0, z);
+                        mapObjects.add(light1);
+                        streetLights.push(light1.children[2]);
+                    }
                 }
             }
 
@@ -407,21 +368,41 @@
                     new THREE.BoxGeometry(bSize, height, bSize),
                     new THREE.MeshStandardMaterial({ 
                         color: new THREE.Color(Math.random()*0.2+0.2,Math.random()*0.2+0.2,Math.random()*0.2+0.2),
-                        roughness: 0.7, metalness: 0.3, emissive: 0x000000
+                        roughness: 0.5 + Math.random() * 0.4, 
+                        metalness: Math.random() * 0.5
                     })
                 );
                 building.position.set(x, height/2, z);
                 building.castShadow = true;
+                building.receiveShadow = true;
                 mapObjects.add(building);
                 buildings.push(building);
                 markPathfindingGrid(building.position, bSize/2, bSize/2, 1);
             }
         }
+        
+        function createStreetLight() {
+            const group = new THREE.Group();
+            const postMat = new THREE.MeshStandardMaterial({color: 0x555555, roughness: 0.8, metalness: 0.2});
+            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 8), postMat);
+            post.position.y = 2;
+            post.castShadow = true;
+            const arm = new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 0.1), postMat);
+            arm.position.set(0.5, 4, 0);
+            arm.castShadow = true;
+            const light = new THREE.PointLight(0xffddaa, 0, 15, 2);
+            light.position.set(1, 3.8, 0);
+            light.castShadow = true;
+            group.add(post, arm, light);
+            return group;
+        }
 
         // --- 経路探索 (A*) ---
         function initPathfindingGrid() {
             pathfindingGrid = [];
-            for(let i=0; i<PATHFINDING_GRID_SIZE; i++) pathfindingGrid[i] = new Array(PATHFINDING_GRID_SIZE).fill(0);
+            for(let i=0; i<PATHFINDING_GRID_SIZE; i++) {
+                pathfindingGrid[i] = new Array(PATHFINDING_GRID_SIZE).fill(0);
+            }
         }
         function markPathfindingGrid(center, width, depth, type) {
             const scale = MAP_WORLD_SIZE / PATHFINDING_GRID_SIZE;
@@ -429,24 +410,31 @@
             const cZ = Math.floor((center.z / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
             const halfW = Math.ceil(width / scale);
             const halfD = Math.ceil(depth / scale);
-            for(let i=Math.max(0,cX-halfW); i<Math.min(PATHFINDING_GRID_SIZE,cX+halfW); i++) {
-                for(let j=Math.max(0,cZ-halfD); j<Math.min(PATHFINDING_GRID_SIZE,cZ+halfD); j++) {
+
+            for(let i = Math.max(0, cX - halfW); i < Math.min(PATHFINDING_GRID_SIZE, cX + halfW); i++) {
+                for(let j = Math.max(0, cZ - halfD); j < Math.min(PATHFINDING_GRID_SIZE, cZ + halfD); j++) {
                     if (pathfindingGrid[i][j] === 0) pathfindingGrid[i][j] = type;
                 }
             }
         }
+
         function findPath(startVec, endVec) {
             const startNode = worldToGrid(startVec);
             const endNode = worldToGrid(endVec);
+
             if (!isNodePassable(startNode) || !isNodePassable(endNode)) return [];
+
             let openSet = [startNode];
             let cameFrom = {};
             let gScore = { [`${startNode.x},${startNode.y}`]: 0 };
             let fScore = { [`${startNode.x},${startNode.y}`]: heuristic(startNode, endNode) };
+
             while (openSet.length > 0) {
                 openSet.sort((a,b) => fScore[`${a.x},${a.y}`] - fScore[`${b.x},${b.y}`]);
                 let current = openSet.shift();
+
                 if (current.x === endNode.x && current.y === endNode.y) return reconstructPath(cameFrom, current);
+
                 getNeighbors(current).forEach(neighbor => {
                     let tentativeGScore = gScore[`${current.x},${current.y}`] + 1;
                     let neighborKey = `${neighbor.x},${neighbor.y}`;
@@ -462,20 +450,29 @@
             }
             return [];
         }
+
         function isNodePassable(node) {
             if (node.x < 0 || node.x >= PATHFINDING_GRID_SIZE || node.y < 0 || node.y >= PATHFINDING_GRID_SIZE) return false;
             return pathfindingGrid[node.x][node.y] !== 1;
         }
+
         function heuristic(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
+
         function getNeighbors(node) {
             let neighbors = [];
-            for (let x = -1; x <= 1; x++) { for (let y = -1; y <= 1; y++) {
-                if (x === 0 && y === 0) continue;
-                const newX = node.x + x; const newY = node.y + y;
-                if (isNodePassable({x: newX, y: newY})) neighbors.push({x: newX, y: newY});
-            }}
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    if (x === 0 && y === 0) continue;
+                    const newX = node.x + x;
+                    const newY = node.y + y;
+                    if (isNodePassable({x: newX, y: newY})) {
+                        neighbors.push({x: newX, y: newY});
+                    }
+                }
+            }
             return neighbors;
         }
+
         function reconstructPath(cameFrom, current) {
             const totalPath = [gridToWorld(current)];
             let currentKey = `${current.x},${current.y}`;
@@ -486,6 +483,7 @@
             }
             return totalPath;
         }
+
         function worldToGrid(worldVec) {
             const x = Math.floor((worldVec.x / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
             const y = Math.floor((worldVec.z / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
@@ -498,16 +496,41 @@
             );
         }
 
-        // --- キャラクター & NPC ---
+        // --- キャラクター ---
         function createCharacter(type, isNpc = false) {
             const group = new THREE.Group();
-            const shadowCaster = (obj) => { if (!isNpc) obj.castShadow = true; obj.receiveShadow = true; };
-            let body, head; const colors = [0x3399ff, 0xcccccc, 0x966c4a, 0x4a86e8, 0x6aa84f, 0xe06666];
+            const shadowCaster = (obj) => { 
+                if (!isNpc) obj.castShadow = true;
+                obj.receiveShadow = true;
+            };
+            let body, head, arm1, arm2, leg1, leg2;
+            const colors = [0x3399ff, 0xcccccc, 0x966c4a, 0x4a86e8, 0x6aa84f, 0xe06666];
             switch(type) {
-                case 0: body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.7; shadowCaster(body); group.add(body); break;
-                case 1: body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.8; shadowCaster(body); head = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), new THREE.MeshStandardMaterial({ color: 0xaaaaaa })); head.position.y = 1.75; shadowCaster(head); group.add(body, head); break;
-                case 2: body = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.8; shadowCaster(body); group.add(body); break;
-                case 3: case 4: case 5: const skin = 0xffd3b4; body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.0, 8), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.8; shadowCaster(body); head = new THREE.Mesh(new THREE.SphereGeometry(0.35), new THREE.MeshStandardMaterial({ color: skin })); head.position.y = 1.6; shadowCaster(head); let arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), new THREE.MeshStandardMaterial({ color: skin })); arm1.position.set(-0.5, 1.0, 0); shadowCaster(arm1); let arm2 = arm1.clone(); arm2.position.x = 0.5; let leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), new THREE.MeshStandardMaterial({ color: 0x333333 })); leg1.position.set(-0.2, 0.4, 0); shadowCaster(leg1); let leg2 = leg1.clone(); leg2.position.x = 0.2; group.add(body, head, arm1, arm2, leg1, leg2); break;
+                case 0:
+                    body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7), new THREE.MeshStandardMaterial({ color: colors[type] }));
+                    body.position.y = 0.7; shadowCaster(body); group.add(body); break;
+                case 1:
+                    body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: colors[type] }));
+                    body.position.y = 0.8; shadowCaster(body);
+                    head = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), new THREE.MeshStandardMaterial({ color: 0xaaaaaa }));
+                    head.position.y = 1.75; shadowCaster(head); group.add(body, head); break;
+                case 2:
+                    body = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8), new THREE.MeshStandardMaterial({ color: colors[type] }));
+                    body.position.y = 0.8; shadowCaster(body); group.add(body); break;
+                case 3: case 4: case 5:
+                    const skin = 0xffd3b4;
+                    body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.0, 8), new THREE.MeshStandardMaterial({ color: colors[type] }));
+                    body.position.y = 0.8; shadowCaster(body);
+                    head = new THREE.Mesh(new THREE.SphereGeometry(0.35), new THREE.MeshStandardMaterial({ color: skin }));
+                    head.position.y = 1.6; shadowCaster(head);
+                    arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), new THREE.MeshStandardMaterial({ color: skin }));
+                    arm1.position.set(-0.5, 1.0, 0); shadowCaster(arm1);
+                    arm2 = arm1.clone(); arm2.position.x = 0.5;
+                    leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), new THREE.MeshStandardMaterial({ color: 0x333333 }));
+                    leg1.position.set(-0.2, 0.4, 0); shadowCaster(leg1);
+                    leg2 = leg1.clone(); leg2.position.x = 0.2;
+                    group.add(body, head, arm1, arm2, leg1, leg2);
+                    break;
             }
             return group;
         }
@@ -522,20 +545,40 @@
                 playerGroup.add(character);
                 playerGroup.position.copy(oldPosition);
                 playerGroup.quaternion.copy(oldRotation);
-            } else { return createCharacter(Math.floor(Math.random() * 6), true); }
+            } else {
+                 return createCharacter(Math.floor(Math.random() * 6), true);
+            }
         }
+
+        // --- NPC関連 ---
         function updateNpcCount() {
             const newCount = parseInt(document.getElementById('npc-slider').value);
-            while (npcs.length < newCount) { const npc = changeCharacter(false); resetNpcPosition(npc); npc.targetPosition = new THREE.Vector3(); resetNpcTarget(npc); npcs.push(npc); scene.add(npc); }
-            while (npcs.length > newCount) { const npcToRemove = npcs.pop(); scene.remove(npcToRemove); }
+            while (npcs.length < newCount) {
+                const npc = changeCharacter(false);
+                resetNpcPosition(npc);
+                npc.targetPosition = new THREE.Vector3();
+                resetNpcTarget(npc);
+                npcs.push(npc);
+                scene.add(npc);
+            }
+            while (npcs.length > newCount) {
+                const npcToRemove = npcs.pop();
+                scene.remove(npcToRemove);
+            }
         }
-        function resetNpcPosition(npc) { npc.position.set((Math.random()-0.5)*MAP_WORLD_SIZE*0.95, 0, (Math.random()-0.5)*MAP_WORLD_SIZE*0.95); }
-        function resetNpcTarget(npc) { npc.targetPosition.set((Math.random()-0.5)*MAP_WORLD_SIZE*0.95, 0, (Math.random()-0.5)*MAP_WORLD_SIZE*0.95); }
+        function resetNpcPosition(npc) {
+             npc.position.set((Math.random() - 0.5) * MAP_WORLD_SIZE * 0.95, 0, (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.95);
+        }
+        function resetNpcTarget(npc) {
+            npc.targetPosition.set((Math.random() - 0.5) * MAP_WORLD_SIZE * 0.95, 0, (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.95);
+        }
         function moveNpcs() {
-            const playerPos = playerGroup.position; const updateDistanceSq = 50 * 50;
+            const playerPos = playerGroup.position;
+            const updateDistanceSq = 50 * 50;
             npcs.forEach(npc => {
                 if (npc.position.distanceToSquared(playerPos) > updateDistanceSq) return;
-                if (npc.position.distanceTo(npc.targetPosition) < 2) resetNpcTarget(npc);
+                const distanceToTarget = npc.position.distanceTo(npc.targetPosition);
+                if (distanceToTarget < 2) resetNpcTarget(npc);
                 const direction = npc.targetPosition.clone().sub(npc.position).normalize();
                 npc.position.add(direction.multiplyScalar(0.02));
                 npc.rotation.y = Math.atan2(direction.x, direction.z);
@@ -548,16 +591,20 @@
             const cameraName = cameraTypes[currentCameraIndex];
             orbitControls.enabled = (cameraName === 'Free Look');
             currentCamera = (cameraName === 'Third Person') ? cameras.thirdPerson : (cameraName === 'First Person') ? cameras.firstPerson : cameras.freeLook;
-            composer.passes.forEach(pass => { if(pass.camera) pass.camera = currentCamera; });
+            composer.passes[0].camera = currentCamera;
             document.getElementById('change-camera-btn').textContent = `視点切り替え (現在: ${cameraName})`;
             onWindowResize();
         }
         function handleMapClick(event) {
             const rect = mapCanvas.getBoundingClientRect();
-            const x = (event.clientX - rect.left) / mapCanvas.clientWidth;
-            const y = (event.clientY - rect.top) / mapCanvas.clientHeight;
-            const worldX = (x - 0.5) * MAP_WORLD_SIZE;
-            const worldZ = (y - 0.5) * MAP_WORLD_SIZE;
+            // ★目的地がズレるバグを修正
+            const scaleX = mapCanvas.width / rect.width;
+            const scaleY = mapCanvas.height / rect.height;
+            const canvasX = (event.clientX - rect.left) * scaleX;
+            const canvasY = (event.clientY - rect.top) * scaleY;
+            
+            const worldX = (canvasX / mapCanvas.width - 0.5) * MAP_WORLD_SIZE;
+            const worldZ = (canvasY / mapCanvas.height - 0.5) * MAP_WORLD_SIZE;
             
             if (document.getElementById('teleport-mode').checked) {
                 playerGroup.position.set(worldX, 0, worldZ);
@@ -569,131 +616,237 @@
                 document.getElementById('auto-drive-btn').style.display = path.length > 0 ? 'block' : 'none';
             }
         }
-        function startAutoDrive() { if (path.length > 0) { isAutoDriving = true; autoDriveTargetIndex = 1; document.getElementById('auto-drive-btn').style.display = 'none'; }}
-        function stopAutoDrive() { isAutoDriving = false; if (destination && path.length > 0) document.getElementById('auto-drive-btn').style.display = 'block'; }
-        
+        function startAutoDrive() {
+            if (path.length > 0) {
+                isAutoDriving = true;
+                autoDriveTargetIndex = 1;
+                document.getElementById('auto-drive-btn').style.display = 'none';
+            }
+        }
+        function stopAutoDrive() {
+            isAutoDriving = false;
+            if (destination && path.length > 0) document.getElementById('auto-drive-btn').style.display = 'block';
+        }
         function updateTime(hour) {
             const timeLabel = document.getElementById('time-label');
-            const h = Math.floor(hour); const m = Math.floor((hour - h) * 60);
+            const h = Math.floor(hour);
+            const m = Math.floor((hour - h) * 60);
             timeLabel.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-            const uniforms = sky.material.uniforms; const isNight = hour >= 17 || hour < 6;
+            
+            const uniforms = sky.material.uniforms;
+            const isNight = hour >= 17 || hour < 6;
+            
             const phi = THREE.MathUtils.degToRad(90 - (hour - 6) * 15);
-            const theta = THREE.MathUtils.degToRad(180);
-            sun.setFromSphericalCoords(1, phi, theta);
+            sun.setFromSphericalCoords(1, phi, Math.PI);
             uniforms['sunPosition'].value.copy(sun);
-            directionalLight.position.copy(sun).multiplyScalar(50);
             
             if (isNight) {
-                uniforms['turbidity'].value = 1; uniforms['rayleigh'].value = 0.1;
-                directionalLight.intensity = 0; ambientLight.intensity = 0.05; hemisphereLight.intensity = 0.1;
+                uniforms['turbidity'].value = 1;
+                uniforms['rayleigh'].value = 0.1;
+                directionalLight.intensity = 0;
+                ambientLight.intensity = 0.05;
+                hemisphereLight.intensity = 0.1;
             } else {
-                const day_t = (hour - 6) / 11; const noon_factor = 1 - Math.abs(day_t - 0.5) * 2;
-                uniforms['turbidity'].value = 3 + noon_factor * 7;
-                uniforms['rayleigh'].value = 1 + noon_factor * 2;
-                directionalLight.intensity = 0.5 + noon_factor;
+                const day_t = (hour - 6) / 11;
+                const noon_factor = 1 - Math.abs(day_t - 0.5) * 2;
+                uniforms['turbidity'].value = 3 + (1 - noon_factor) * 7;
+                uniforms['rayleigh'].value = 0.5 + noon_factor * 2.5;
+                directionalLight.intensity = 0.8 + noon_factor * 0.7;
                 ambientLight.intensity = 0.2 + noon_factor * 0.4;
                 hemisphereLight.intensity = 0.2 + noon_factor * 0.3;
             }
-            buildings.forEach(b => b.material.emissive.setHex(isNight ? 0x996600 : 0x000000));
-            streetLights.forEach(sl => { sl.light.intensity = isNight ? 2 : 0; sl.bulb.emissiveIntensity = isNight ? 5 : 0; });
+            
+            directionalLight.position.copy(sun).multiplyScalar(50);
+            scene.environment = pmremGenerator.fromScene(sky).texture;
+            
+            streetLights.forEach(light => { light.intensity = isNight ? 2 : 0; });
+            buildings.forEach(building => {
+                building.material.emissive.setHex(isNight ? 0x996600 : 0x000000);
+            });
         }
-        
         function changeWeather(weather) {
-            if (weatherParticles) { scene.remove(weatherParticles); weatherParticles.geometry.dispose(); weatherParticles.material.dispose(); weatherParticles = null; }
-            const hour = parseFloat(document.getElementById('time-slider').value); updateTime(hour);
+            if (weatherParticles) {
+                scene.remove(weatherParticles);
+                weatherParticles.geometry.dispose();
+                weatherParticles.material.dispose();
+                weatherParticles = null;
+            }
+            updateTime(parseFloat(document.getElementById('time-slider').value));
+            
             const uniforms = sky.material.uniforms;
-            if (weather === 'cloudy') { uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 1.5; }
-            else if (weather === 'rainy' || weather === 'snowy') {
-                uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 0.5;
-                const count = weather === 'rainy' ? 2000 : 1000;
-                const positions = new Float32Array(count * 3); const velocities = new Float32Array(count * 3);
-                for(let i=0; i<count*3; i+=3) {
-                    positions[i] = (Math.random() - 0.5) * 100; positions[i+1] = Math.random() * 50; positions[i+2] = (Math.random() - 0.5) * 100;
-                    velocities[i] = (weather === 'snowy') ? (Math.random() - 0.5) * 0.05 : 0;
-                    velocities[i+1] = weather === 'rainy' ? -Math.random() * 0.5 - 0.3 : -Math.random() * 0.05 - 0.02;
-                }
+            if(weather === 'cloudy') {
+                uniforms['turbidity'].value = 20;
+                uniforms['rayleigh'].value = 1.5;
+            } else if (weather === 'rainy' || weather === 'snowy') {
+                uniforms['turbidity'].value = 20;
+                uniforms['rayleigh'].value = 0.5;
+                
+                const count = weather === 'rainy' ? 3000 : 1500;
+                const positions = new Float32Array(count * 3);
+                const velocities = new Float32Array(count * 3);
                 const geometry = new THREE.BufferGeometry();
+                
+                for(let i=0; i<count*3; i+=3) {
+                    velocities[i] = (weather === 'snowy') ? (Math.random() - 0.5) * 0.05 : 0;
+                    velocities[i+1] = weather === 'rainy' ? -Math.random() * 0.8 - 0.5 : -Math.random() * 0.05 - 0.02;
+                }
                 geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                 geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
-                const material = new THREE.PointsMaterial({ color: weather==='rainy'?0xaaaaee:0xffffff, size: weather==='rainy'?0.1:0.2, transparent: true, opacity: 0.7 });
+                
+                const material = new THREE.PointsMaterial({
+                    color: (weather === 'rainy') ? 0xaaaaee : 0xffffff,
+                    size: (weather === 'rainy') ? 0.05 : 0.15,
+                    transparent: true, opacity: 0.6, sizeAttenuation: true
+                });
                 weatherParticles = new THREE.Points(geometry, material);
                 scene.add(weatherParticles);
             }
         }
         
+        // --- 描画 & 更新 ---
         function drawMapBackground() {
             mapBackgroundCtx.clearRect(0, 0, mapBackgroundCanvas.width, mapBackgroundCanvas.height);
-            mapBackgroundCtx.fillStyle = 'rgba(0, 0, 0, 0.4)'; mapBackgroundCtx.fillRect(0, 0, mapBackgroundCanvas.width, mapBackgroundCanvas.height);
+            mapBackgroundCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            mapBackgroundCtx.fillRect(0, 0, mapBackgroundCanvas.width, mapBackgroundCanvas.height);
             const cellW = mapBackgroundCanvas.width / PATHFINDING_GRID_SIZE;
-            for(let i=0; i<PATHFINDING_GRID_SIZE; i++) for(let j=0; j<PATHFINDING_GRID_SIZE; j++) {
-                switch(pathfindingGrid[i][j]) {
-                    case 1: mapBackgroundCtx.fillStyle = 'rgba(100,0,0,0.5)'; break;
-                    case 2: mapBackgroundCtx.fillStyle = 'rgba(50,50,50,0.5)'; break;
-                    default: mapBackgroundCtx.fillStyle = 'transparent';
+            for(let i=0; i<PATHFINDING_GRID_SIZE; i++){
+                for(let j=0; j<PATHFINDING_GRID_SIZE; j++){
+                    switch(pathfindingGrid[i][j]){
+                        case 1: mapBackgroundCtx.fillStyle = 'rgba(100,0,0,0.5)'; break;
+                        case 2: mapBackgroundCtx.fillStyle = 'rgba(50,50,50,0.5)'; break;
+                        default: mapBackgroundCtx.fillStyle = 'transparent';
+                    }
+                    mapBackgroundCtx.fillRect(i*cellW, j*cellW, cellW, cellW);
                 }
-                mapBackgroundCtx.fillRect(i*cellW, j*cellW, cellW, cellW);
             }
         }
         function drawMap() {
             mapCtx.drawImage(mapBackgroundCanvas, 0, 0);
-            const toMapCoords = (pos) => ({ x: (pos.x/MAP_WORLD_SIZE+0.5)*mapCanvas.width, z: (pos.z/MAP_WORLD_SIZE+0.5)*mapCanvas.height });
+            const toMapCoords = (pos) => ({
+                x: (pos.x / MAP_WORLD_SIZE + 0.5) * mapCanvas.width,
+                z: (pos.z / MAP_WORLD_SIZE + 0.5) * mapCanvas.height
+            });
             if (path.length > 1) {
-                mapCtx.strokeStyle = isAutoDriving ? 'rgba(0,150,255,0.8)' : 'rgba(255,0,0,0.8)'; mapCtx.lineWidth = 3; mapCtx.beginPath();
+                mapCtx.strokeStyle = isAutoDriving ? 'rgba(0, 150, 255, 0.8)' : 'rgba(255, 0, 0, 0.8)';
+                mapCtx.lineWidth = 3; mapCtx.beginPath();
                 let p = toMapCoords(path[0]); mapCtx.moveTo(p.x, p.z);
-                for(let i=1; i<path.length; i++) { p = toMapCoords(path[i]); mapCtx.lineTo(p.x, p.z); }
+                for(let i=1; i<path.length; i++) {
+                    p = toMapCoords(path[i]); mapCtx.lineTo(p.x, p.z);
+                }
                 mapCtx.stroke();
             }
-            mapCtx.fillStyle = 'rgba(150,150,150,0.7)'; npcs.forEach(npc => { const p=toMapCoords(npc.position); mapCtx.fillRect(p.x-1, p.z-1, 2, 2); });
-            if (destination) { mapCtx.fillStyle='red'; const d=toMapCoords(destination); mapCtx.beginPath(); mapCtx.arc(d.x, d.z, 6, 0, Math.PI*2); mapCtx.fill(); }
-            mapCtx.fillStyle='white'; const p=toMapCoords(playerGroup.position); mapCtx.beginPath(); mapCtx.arc(p.x, p.z, 5, 0, Math.PI*2); mapCtx.fill();
+            mapCtx.fillStyle = 'rgba(150, 150, 150, 0.7)';
+            npcs.forEach(npc => {
+                const p = toMapCoords(npc.position);
+                mapCtx.fillRect(p.x - 1, p.z - 1, 2, 2);
+            });
+            if (destination) {
+                mapCtx.fillStyle = 'red';
+                const d = toMapCoords(destination);
+                mapCtx.beginPath(); mapCtx.arc(d.x, d.z, 6, 0, Math.PI * 2); mapCtx.fill();
+            }
+            mapCtx.fillStyle = 'white';
+            const p = toMapCoords(playerGroup.position);
+            mapCtx.beginPath(); mapCtx.arc(p.x, p.z, 5, 0, Math.PI * 2); mapCtx.fill();
         }
         function onWindowResize() {
-            const width = window.innerWidth; const height = window.innerHeight;
-            currentCamera.aspect = width / height; currentCamera.updateProjectionMatrix();
-            renderer.setSize(width, height); composer.setSize(width, height);
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            currentCamera.aspect = width / height;
+            currentCamera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            composer.setSize(width, height);
         }
         function setupMobileControls() {
-            const joystick=document.getElementById('joystick-handle'), base=document.getElementById('joystick-base'), runButton=document.getElementById('run-button');
+            const joystick = document.getElementById('joystick-handle');
+            const base = document.getElementById('joystick-base');
+            const runButton = document.getElementById('run-button');
             const radius = base.offsetWidth / 2;
+            let joyX = 0, joyY = 0;
+
             const moveJoystick = (touch) => {
-                const rect=base.getBoundingClientRect(), x=touch.clientX-rect.left-radius, y=touch.clientY-rect.top-radius;
-                const distance=Math.min(radius, Math.hypot(x, y)), angle=Math.atan2(y, x);
-                joystick.style.transform=`translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px)`;
-                keys.w=y/radius<-0.3; keys.s=y/radius>0.3; keys.a=x/radius<-0.3; keys.d=x/radius>0.3;
+                const rect = base.getBoundingClientRect();
+                const x = touch.clientX - rect.left - radius;
+                const y = touch.clientY - rect.top - radius;
+                const distance = Math.min(radius, Math.hypot(x, y));
+                const angle = Math.atan2(y, x);
+                joyX = Math.cos(angle) * distance;
+                joyY = Math.sin(angle) * distance;
+                joystick.style.transform = `translate(${joyX}px, ${joyY}px)`;
+                
+                const normalizedY = y / radius;
+                const normalizedX = x / radius;
+                keys.w = normalizedY < -0.3; keys.s = normalizedY > 0.3;
+                keys.a = normalizedX < -0.3; keys.d = normalizedX > 0.3;
             };
-            const endJoystick = () => { joystick.style.transform=`translate(0px, 0px)`; keys.w=keys.a=keys.s=keys.d=false; };
-            base.addEventListener('touchstart', (e)=>{e.preventDefault(); moveJoystick(e.touches[0]);}, {passive:false});
-            base.addEventListener('touchmove', (e)=>{e.preventDefault(); moveJoystick(e.touches[0]);}, {passive:false});
-            base.addEventListener('touchend', endJoystick); base.addEventListener('touchcancel', endJoystick);
-            runButton.addEventListener('touchstart', (e)=>{e.preventDefault(); isRunning=true;}, {passive:false});
-            runButton.addEventListener('touchend', (e)=>{e.preventDefault(); isRunning=false;}, {passive:false});
+            const touchEnd = () => {
+                joystick.style.transform = `translate(0px, 0px)`;
+                keys.w = keys.a = keys.s = keys.d = false;
+            };
+
+            base.addEventListener('touchstart', (e) => { e.preventDefault(); moveJoystick(e.touches[0]); }, { passive: false });
+            base.addEventListener('touchmove', (e) => { e.preventDefault(); moveJoystick(e.touches[0]); }, { passive: false });
+            base.addEventListener('touchend', touchEnd);
+            base.addEventListener('touchcancel', touchEnd);
+            runButton.addEventListener('touchstart', (e) => { e.preventDefault(); isRunning = true; }, { passive: false });
+            runButton.addEventListener('touchend', (e) => { e.preventDefault(); isRunning = false; }, { passive: false });
         }
+        
+        function onPointerDown(event) {
+            if (event.target.tagName === 'CANVAS') {
+                isPointerDown = true;
+                pointerPosition.x = event.clientX;
+                pointerPosition.y = event.clientY;
+            }
+        }
+        function onPointerMove(event) {
+            if (!isPointerDown) return;
+            const deltaX = event.clientX - pointerPosition.x;
+            const deltaY = event.clientY - pointerPosition.y;
+
+            if (currentCameraIndex !== 2) { // Not Free Look
+                cameraOffsetSpherical.theta -= deltaX * 0.005;
+                cameraOffsetSpherical.phi -= deltaY * 0.005;
+                cameraOffsetSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.5, cameraOffsetSpherical.phi));
+            }
+            pointerPosition.x = event.clientX;
+            pointerPosition.y = event.clientY;
+        }
+        function onPointerUp() { isPointerDown = false; }
         
         // --- メインループ ---
         function animate() {
             requestAnimationFrame(animate);
             stats.begin();
 
+            let targetSpeedKmh = 0;
+            isRunning = keys['Shift'] || isRunning;
             const isMoving = Object.values(keys).some(k => k) || isAutoDriving;
-            const targetSpeedKmh = isMoving ? ((keys['Shift'] || isRunning) ? RUN_SPEED_KMH : WALK_SPEED_KMH) : 0;
+            
+            if(isMoving) targetSpeedKmh = isRunning ? RUN_SPEED_KMH : WALK_SPEED_KMH;
             currentSpeedMs = (targetSpeedKmh * 1000) / 3600;
             const moveDistance = currentSpeedMs / FRAME_RATE;
             
             characterDirection.set(0,0,0);
             if (isAutoDriving) {
-                if (autoDriveTargetIndex >= path.length) { stopAutoDrive(); }
-                else {
-                    if(playerGroup.position.distanceTo(path[autoDriveTargetIndex]) < 1) autoDriveTargetIndex++;
+                if(autoDriveTargetIndex >= path.length) {
+                    stopAutoDrive();
+                } else {
+                    const targetPoint = path[autoDriveTargetIndex];
+                    if(playerGroup.position.distanceTo(targetPoint) < 1) autoDriveTargetIndex++;
                     if(autoDriveTargetIndex < path.length) characterDirection.subVectors(path[autoDriveTargetIndex], playerGroup.position).normalize();
                 }
             } else {
-                if(keys['w']||keys['ArrowUp']) characterDirection.z=-1; if(keys['s']||keys['ArrowDown']) characterDirection.z=1;
-                if(keys['a']||keys['ArrowLeft']) characterDirection.x=-1; if(keys['d']||keys['ArrowRight']) characterDirection.x=1;
+                if (keys.w || keys.ArrowUp) characterDirection.z = -1;
+                if (keys.s || keys.ArrowDown) characterDirection.z = 1;
+                if (keys.a || keys.ArrowLeft) characterDirection.x = -1;
+                if (keys.d || keys.ArrowRight) characterDirection.x = 1;
             }
             
             if(characterDirection.lengthSq() > 0) {
                 const moveVector = characterDirection.normalize();
                 const newPosition = playerGroup.position.clone().add(moveVector.multiplyScalar(moveDistance));
+                
                 const halfMap = MAP_WORLD_SIZE / 2 - 1;
                 newPosition.x = Math.max(-halfMap, Math.min(halfMap, newPosition.x));
                 newPosition.z = Math.max(-halfMap, Math.min(halfMap, newPosition.z));
@@ -705,31 +858,38 @@
             }
             
             if(currentCamera === cameras.thirdPerson) {
-                const offset = new THREE.Vector3(0, 5, 8).applyQuaternion(playerGroup.quaternion);
-                cameras.thirdPerson.position.copy(playerGroup.position).add(offset);
-                cameras.thirdPerson.lookAt(playerGroup.position);
+                const offset = new THREE.Vector3().setFromSpherical(cameraOffsetSpherical);
+                currentCamera.position.copy(playerGroup.position).add(offset);
+                currentCamera.lookAt(playerGroup.position);
             } else if (currentCamera === cameras.firstPerson) {
-                const offset = new THREE.Vector3(0, 1.5, 0);
-                cameras.firstPerson.position.copy(playerGroup.position).add(offset);
-                const lookAtTarget = new THREE.Vector3(); playerGroup.getWorldDirection(lookAtTarget);
-                cameras.firstPerson.lookAt(cameras.firstPerson.position.clone().add(lookAtTarget));
-            } else { orbitControls.update(); }
+                currentCamera.position.copy(playerGroup.position).add(new THREE.Vector3(0, 1.5, 0));
+                const lookAtTarget = new THREE.Vector3(0, 1.5, -1);
+                lookAtTarget.applyQuaternion(playerGroup.quaternion);
+                lookAtTarget.add(playerGroup.position);
+                currentCamera.lookAt(lookAtTarget);
+            } else {
+                 orbitControls.update();
+            }
 
             moveNpcs();
             if(weatherParticles) {
                 weatherParticles.position.copy(playerGroup.position);
-                const positions = weatherParticles.geometry.attributes.position.array; const velocities = weatherParticles.geometry.attributes.velocity.array;
+                const positions = weatherParticles.geometry.attributes.position.array;
+                const velocities = weatherParticles.geometry.attributes.velocity.array;
                 for(let i=0; i<positions.length; i+=3) {
-                    positions[i] += velocities[i]; positions[i+1] += velocities[i+1];
+                    positions[i] += velocities[i];
+                    positions[i+1] += velocities[i+1];
                     if(positions[i+1] < -25) {
-                        positions[i]=(Math.random()-0.5)*100; positions[i+1]=25; positions[i+2]=(Math.random()-0.5)*100;
+                        positions[i] = (Math.random() - 0.5) * 100;
+                        positions[i+1] = 25;
+                        positions[i+2] = (Math.random() - 0.5) * 100;
                     }
                 }
                 weatherParticles.geometry.attributes.position.needsUpdate = true;
             }
 
             const pos = playerGroup.position;
-            document.getElementById('coords').textContent = `X:${pos.x.toFixed(1)}, Y:${pos.y.toFixed(1)}, Z:${pos.z.toFixed(1)}`;
+            document.getElementById('coords').textContent = `X: ${pos.x.toFixed(2)}, Y: ${pos.y.toFixed(2)}, Z: ${pos.z.toFixed(2)}`;
             const speedKmh = currentSpeedMs * 3.6;
             document.getElementById('speed-display').textContent = `${speedKmh.toFixed(0)} km/h | ${currentSpeedMs.toFixed(1)} m/s`;
             drawMap();
@@ -742,7 +902,5 @@
     </script>
 </body>
 </html>
-
-    </script>
 </body>
 </html>
