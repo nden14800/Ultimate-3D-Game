@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Ultimate 3D Game (v10 Hyper-Realistic)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+        .ui-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0,0,0,0.6);
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 300px;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+        .ui-container button, .ui-container select {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px 12px;
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+        }
+        .ui-container label {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .ui-container input[type="range"] {
+            width: 100%;
+        }
+        #coords, #speed-display {
+            margin-bottom: 10px;
+            font-size: 1.0em;
+            background-color: rgba(0,0,0,0.3);
+            padding: 5px;
+            border-radius: 3px;
+            white-space: pre;
+        }
+        #auto-drive-btn { display: none; background-color: #2a75d1; }
+
+        #map-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 250px;
+            height: 250px;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        #map-canvas { width: 100%; height: 100%; }
+
+        .mobile-ui { display: none; }
+        @media (pointer: coarse) {
+            .mobile-ui { display: block; }
+            #map-container { width: 150px; height: 150px; }
+            .ui-container { max-width: 200px; }
+        }
+
+        #joystick-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 120px;
+            height: 120px;
+        }
+        #joystick-base {
+            position: absolute;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
+        #joystick-handle {
+            position: absolute;
+            top: 40px; left: 40px;
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+        }
+        #run-button {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.3);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            color: white;
+            user-select: none;
+        }
+        #help-modal {
+            display: none;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%;
+            text-align: left;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="ui-container">
+        <div id="coords">X: 0.00, Y: 0.00, Z: 0.00</div>
+        <div id="speed-display">0 km/h | 0.0 m/s</div>
+        <button id="change-camera-btn">視点切り替え (現在: 三人称)</button>
+        <button id="change-character-btn">キャラクター変更</button>
+        <button id="auto-drive-btn">自動運転開始</button>
+        <button id="help-button">操作方法</button>
+        <div><input type="checkbox" id="teleport-mode"><label for="teleport-mode">テレポートモード</label></div>
+
+        <label for="npc-slider">NPCの数: <span id="npc-count">10</span></label>
+        <input type="range" id="npc-slider" min="0" max="10000" value="10">
+        
+        <label for="weather-select">天気</label>
+        <select id="weather-select">
+            <option value="sunny">晴れ</option>
+            <option value="cloudy">くもり</option>
+            <option value="rainy">雨</option>
+            <option value="snowy">雪</option>
+        </select>
+
+        <label for="time-slider">時間: <span id="time-label">12:00</span></label>
+        <input type="range" id="time-slider" min="0" max="23.99" value="12" step="0.01">
+    </div>
+
+    <div id="map-container">
+        <canvas id="map-canvas" width="500" height="500"></canvas>
+    </div>
+
+    <div id="joystick-container" class="mobile-ui">
+        <div id="joystick-base"></div>
+        <div id="joystick-handle"></div>
+    </div>
+    <div id="run-button" class="mobile-ui">走る</div>
+    
+    <div id="help-modal">
+        <h3>操作方法</h3>
+        <p><b>移動:</b> W/A/S/D or 矢印キー or 左下ジョイスティック</p>
+        <p><b>走る:</b> Shiftキー長押し or 右下「走る」ボタン長押し</p>
+        <p><b>視点:</b></p>
+        <p>- 自由視点モード時: マウスドラッグ or 画面スワイプ</p>
+        <p><b>テレポート:</b></p>
+        <p>1. UIの「テレポートモード」にチェックを入れる</p>
+        <p>2. 右上のマップで行きたい場所をクリック</p>
+        <button id="close-help-button">閉じる</button>
+    </div>
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    { "imports": {
+            "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+    } }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import Stats from 'three/addons/libs/stats.module.js';
+        import { Sky } from 'three/addons/objects/Sky.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
+
+        let scene, renderer, character, orbitControls, playerGroup, stats, composer, sky, sun;
+        let cameras = {}, currentCamera, currentCameraIndex = 0;
+        const cameraTypes = ['Third Person', 'First Person', 'Free Look'];
+        let keys = { w:false, a:false, s:false, d:false, Shift:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
+        let characterDirection = new THREE.Vector3();
+        let currentCharacterType = 0;
+        
+        let mapCanvas, mapCtx, mapBackgroundCanvas, mapBackgroundCtx;
+        const MAP_WORLD_SIZE = 128;
+        const PATHFINDING_GRID_SIZE = 50;
+        let pathfindingGrid = [];
+        let npcs = [], mapObjects = new THREE.Group(), buildings = [], streetLights = [];
+
+        let weatherParticles, directionalLight, ambientLight, hemisphereLight;
+        let destination = null, path = [], isAutoDriving = false;
+        let autoDriveTargetIndex = 0;
+        let currentSpeedMs = 0;
+        const FRAME_RATE = 60;
+        const WALK_SPEED_KMH = 4;
+        const RUN_SPEED_KMH = 44.72;
+        let isRunning = false;
+        
+        let targetQuaternion = new THREE.Quaternion();
+
+        function init() {
+            scene = new THREE.Scene();
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            renderer.shadowMap.enabled = true;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            document.body.appendChild(renderer.domElement);
+            
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+            
+            const cameraFar = MAP_WORLD_SIZE * 4;
+            cameras.thirdPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
+            cameras.firstPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
+            cameras.freeLook = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
+            cameras.thirdPerson.position.set(0, 5, 8);
+            cameras.freeLook.position.set(10, 10, 15);
+            currentCamera = cameras.thirdPerson;
+
+            orbitControls = new OrbitControls(cameras.freeLook, renderer.domElement);
+            orbitControls.enabled = false;
+
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
+            hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.5);
+            scene.add(hemisphereLight);
+            directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(32, 64, 32);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.left = -MAP_WORLD_SIZE/2;
+            directionalLight.shadow.camera.right = MAP_WORLD_SIZE/2;
+            directionalLight.shadow.camera.top = MAP_WORLD_SIZE/2;
+            directionalLight.shadow.camera.bottom = -MAP_WORLD_SIZE/2;
+            directionalLight.shadow.bias = -0.001;
+            scene.add(directionalLight);
+            
+            initSky();
+            initPostProcessing();
+
+            scene.add(mapObjects);
+            
+            playerGroup = new THREE.Group();
+            character = createCharacter(currentCharacterType, false);
+            playerGroup.add(character);
+            scene.add(playerGroup);
+            
+            mapCanvas = document.getElementById('map-canvas');
+            mapCtx = mapCanvas.getContext('2d');
+            mapBackgroundCanvas = document.createElement('canvas');
+            mapBackgroundCanvas.width = mapCanvas.width;
+            mapBackgroundCanvas.height = mapCanvas.height;
+            mapBackgroundCtx = mapBackgroundCanvas.getContext('2d');
+
+            setupEventListeners();
+            
+            createCityMap();
+            drawMapBackground();
+            updateTime(parseFloat(document.getElementById('time-slider').value));
+
+            updateNpcCount();
+            
+            animate();
+        }
+
+        function initSky() {
+            sky = new Sky();
+            sky.scale.setScalar(MAP_WORLD_SIZE * 4);
+            scene.add(sky);
+            sun = new THREE.Vector3();
+        }
+
+        function initPostProcessing() {
+            composer = new EffectComposer(renderer);
+            const renderPass = new RenderPass(scene, currentCamera);
+            composer.addPass(renderPass);
+
+            const ssaoPass = new SSAOPass(scene, currentCamera, window.innerWidth, window.innerHeight);
+            ssaoPass.kernelRadius = 16;
+            ssaoPass.minDistance = 0.005;
+            ssaoPass.maxDistance = 0.1;
+            composer.addPass(ssaoPass);
+
+            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+            bloomPass.threshold = 0.6;
+            bloomPass.strength = 0.4;
+            bloomPass.radius = 0.2;
+            composer.addPass(bloomPass);
+        }
+
+        function setupEventListeners() {
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('keydown', (e) => { keys[e.key] = true; stopAutoDrive(); });
+            document.addEventListener('keyup', (e) => { keys[e.key] = false; });
+            document.getElementById('change-camera-btn').addEventListener('click', changeCamera);
+            document.getElementById('change-character-btn').addEventListener('click', () => changeCharacter(true));
+            document.getElementById('auto-drive-btn').addEventListener('click', startAutoDrive);
+            document.getElementById('help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
+            document.getElementById('close-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'none'; });
+            
+            const npcSlider = document.getElementById('npc-slider');
+            npcSlider.addEventListener('input', () => { document.getElementById('npc-count').textContent = npcSlider.value; });
+            npcSlider.addEventListener('change', updateNpcCount);
+
+            document.getElementById('weather-select').addEventListener('change', (e) => changeWeather(e.target.value));
+            document.getElementById('time-slider').addEventListener('input', (e) => updateTime(parseFloat(e.target.value)));
+
+            mapCanvas.addEventListener('click', handleMapClick);
+            setupMobileControls();
+        }
+
+        function createStreetLight() {
+            const group = new THREE.Group();
+            const postMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8, roughness: 0.4 });
+            
+            const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 6, 12), postMaterial);
+            post.position.y = 3;
+            post.castShadow = true;
+
+            const arm = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.1), postMaterial);
+            arm.position.set(0.75, 5.8, 0);
+            arm.castShadow = true;
+            
+            const lightFixture = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.2, 0.4, 8), postMaterial);
+            lightFixture.position.set(1.4, 5.7, 0);
+            
+            const lightBulbMaterial = new THREE.MeshStandardMaterial({ color: 0xffffee, emissive: 0xffffee, emissiveIntensity: 0 });
+            const lightBulb = new THREE.Mesh(new THREE.SphereGeometry(0.15), lightBulbMaterial);
+            lightBulb.position.set(1.4, 5.5, 0);
+
+            const pointLight = new THREE.PointLight(0xffd8a1, 0, 15, 2);
+            pointLight.position.copy(lightBulb.position);
+            pointLight.castShadow = false;
+
+            group.add(post, arm, lightFixture, lightBulb, pointLight);
+            
+            return { group, light: pointLight, bulb: lightBulbMaterial };
+        }
+
+        function createCityMap() {
+            initPathfindingGrid();
+            buildings = [];
+            streetLights = [];
+            
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(MAP_WORLD_SIZE, MAP_WORLD_SIZE), new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.8 }));
+            ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; mapObjects.add(ground);
+            
+            const roadW = 8; 
+            const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+            const roadInterval = 40;
+            
+            for (let i = -1; i <= 1; i++) {
+                const roadXPos = i * roadInterval;
+                const roadZPos = i * roadInterval;
+
+                const roadX = new THREE.Mesh(new THREE.PlaneGeometry(roadW, MAP_WORLD_SIZE), roadMaterial);
+                roadX.rotation.x = -Math.PI / 2; roadX.position.set(roadXPos, 0.01, 0); roadX.receiveShadow = true; mapObjects.add(roadX);
+                markPathfindingGrid(roadX.position, roadW/2, MAP_WORLD_SIZE/2, 2);
+
+                const roadZ = new THREE.Mesh(new THREE.PlaneGeometry(MAP_WORLD_SIZE, roadW), roadMaterial);
+                roadZ.rotation.x = -Math.PI / 2; roadZ.position.set(0, 0.01, roadZPos); roadZ.receiveShadow = true; mapObjects.add(roadZ);
+                markPathfindingGrid(roadZ.position, MAP_WORLD_SIZE/2, roadW/2, 2);
+
+                for (let j = -MAP_WORLD_SIZE/2 + 10; j < MAP_WORLD_SIZE/2; j += 20) {
+                    const light1 = createStreetLight();
+                    light1.group.position.set(roadXPos + roadW/2 + 0.5, 0, j);
+                    mapObjects.add(light1.group);
+                    streetLights.push(light1);
+                    
+                    const light2 = createStreetLight();
+                    light2.group.position.set(j, 0, roadZPos - roadW/2 - 0.5);
+                    light2.group.rotation.y = -Math.PI/2;
+                    mapObjects.add(light2.group);
+                    streetLights.push(light2);
+                }
+            }
+
+            for (let i = 0; i < 150; i++) {
+                const x = (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.98;
+                const z = (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.98;
+                if (Math.abs(x % roadInterval) < roadW/2+4 || Math.abs(z % roadInterval) < roadW/2+4) continue;
+
+                const height = Math.random() * 20 + 8;
+                const bSize = Math.random()*5+4;
+                const building = new THREE.Mesh(
+                    new THREE.BoxGeometry(bSize, height, bSize),
+                    new THREE.MeshStandardMaterial({ 
+                        color: new THREE.Color(Math.random()*0.2+0.2,Math.random()*0.2+0.2,Math.random()*0.2+0.2),
+                        roughness: 0.7, metalness: 0.3, emissive: 0x000000
+                    })
+                );
+                building.position.set(x, height/2, z);
+                building.castShadow = true;
+                mapObjects.add(building);
+                buildings.push(building);
+                markPathfindingGrid(building.position, bSize/2, bSize/2, 1);
+            }
+        }
+
+        // --- 経路探索 (A*) ---
+        function initPathfindingGrid() {
+            pathfindingGrid = [];
+            for(let i=0; i<PATHFINDING_GRID_SIZE; i++) pathfindingGrid[i] = new Array(PATHFINDING_GRID_SIZE).fill(0);
+        }
+        function markPathfindingGrid(center, width, depth, type) {
+            const scale = MAP_WORLD_SIZE / PATHFINDING_GRID_SIZE;
+            const cX = Math.floor((center.x / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
+            const cZ = Math.floor((center.z / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
+            const halfW = Math.ceil(width / scale);
+            const halfD = Math.ceil(depth / scale);
+            for(let i=Math.max(0,cX-halfW); i<Math.min(PATHFINDING_GRID_SIZE,cX+halfW); i++) {
+                for(let j=Math.max(0,cZ-halfD); j<Math.min(PATHFINDING_GRID_SIZE,cZ+halfD); j++) {
+                    if (pathfindingGrid[i][j] === 0) pathfindingGrid[i][j] = type;
+                }
+            }
+        }
+        function findPath(startVec, endVec) {
+            const startNode = worldToGrid(startVec);
+            const endNode = worldToGrid(endVec);
+            if (!isNodePassable(startNode) || !isNodePassable(endNode)) return [];
+            let openSet = [startNode];
+            let cameFrom = {};
+            let gScore = { [`${startNode.x},${startNode.y}`]: 0 };
+            let fScore = { [`${startNode.x},${startNode.y}`]: heuristic(startNode, endNode) };
+            while (openSet.length > 0) {
+                openSet.sort((a,b) => fScore[`${a.x},${a.y}`] - fScore[`${b.x},${b.y}`]);
+                let current = openSet.shift();
+                if (current.x === endNode.x && current.y === endNode.y) return reconstructPath(cameFrom, current);
+                getNeighbors(current).forEach(neighbor => {
+                    let tentativeGScore = gScore[`${current.x},${current.y}`] + 1;
+                    let neighborKey = `${neighbor.x},${neighbor.y}`;
+                    if (!gScore.hasOwnProperty(neighborKey) || tentativeGScore < gScore[neighborKey]) {
+                        cameFrom[neighborKey] = current;
+                        gScore[neighborKey] = tentativeGScore;
+                        fScore[neighborKey] = gScore[neighborKey] + heuristic(neighbor, endNode);
+                        if (!openSet.some(node => node.x === neighbor.x && node.y === neighbor.y)) {
+                            openSet.push(neighbor);
+                        }
+                    }
+                });
+            }
+            return [];
+        }
+        function isNodePassable(node) {
+            if (node.x < 0 || node.x >= PATHFINDING_GRID_SIZE || node.y < 0 || node.y >= PATHFINDING_GRID_SIZE) return false;
+            return pathfindingGrid[node.x][node.y] !== 1;
+        }
+        function heuristic(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
+        function getNeighbors(node) {
+            let neighbors = [];
+            for (let x = -1; x <= 1; x++) { for (let y = -1; y <= 1; y++) {
+                if (x === 0 && y === 0) continue;
+                const newX = node.x + x; const newY = node.y + y;
+                if (isNodePassable({x: newX, y: newY})) neighbors.push({x: newX, y: newY});
+            }}
+            return neighbors;
+        }
+        function reconstructPath(cameFrom, current) {
+            const totalPath = [gridToWorld(current)];
+            let currentKey = `${current.x},${current.y}`;
+            while (cameFrom[currentKey]) {
+                current = cameFrom[currentKey];
+                currentKey = `${current.x},${current.y}`;
+                totalPath.unshift(gridToWorld(current));
+            }
+            return totalPath;
+        }
+        function worldToGrid(worldVec) {
+            const x = Math.floor((worldVec.x / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
+            const y = Math.floor((worldVec.z / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
+            return {x, y};
+        }
+        function gridToWorld(gridNode) {
+            return new THREE.Vector3(
+                (gridNode.x / PATHFINDING_GRID_SIZE - 0.5) * MAP_WORLD_SIZE, 0,
+                (gridNode.y / PATHFINDING_GRID_SIZE - 0.5) * MAP_WORLD_SIZE
+            );
+        }
+
+        // --- キャラクター & NPC ---
+        function createCharacter(type, isNpc = false) {
+            const group = new THREE.Group();
+            const shadowCaster = (obj) => { if (!isNpc) obj.castShadow = true; obj.receiveShadow = true; };
+            let body, head; const colors = [0x3399ff, 0xcccccc, 0x966c4a, 0x4a86e8, 0x6aa84f, 0xe06666];
+            switch(type) {
+                case 0: body = new THREE.Mesh(new THREE.DodecahedronGeometry(0.7), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.7; shadowCaster(body); group.add(body); break;
+                case 1: body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.8; shadowCaster(body); head = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), new THREE.MeshStandardMaterial({ color: 0xaaaaaa })); head.position.y = 1.75; shadowCaster(head); group.add(body, head); break;
+                case 2: body = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.8; shadowCaster(body); group.add(body); break;
+                case 3: case 4: case 5: const skin = 0xffd3b4; body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 1.0, 8), new THREE.MeshStandardMaterial({ color: colors[type] })); body.position.y = 0.8; shadowCaster(body); head = new THREE.Mesh(new THREE.SphereGeometry(0.35), new THREE.MeshStandardMaterial({ color: skin })); head.position.y = 1.6; shadowCaster(head); let arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), new THREE.MeshStandardMaterial({ color: skin })); arm1.position.set(-0.5, 1.0, 0); shadowCaster(arm1); let arm2 = arm1.clone(); arm2.position.x = 0.5; let leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), new THREE.MeshStandardMaterial({ color: 0x333333 })); leg1.position.set(-0.2, 0.4, 0); shadowCaster(leg1); let leg2 = leg1.clone(); leg2.position.x = 0.2; group.add(body, head, arm1, arm2, leg1, leg2); break;
+            }
+            return group;
+        }
+        function changeCharacter(isPlayer) {
+            if (isPlayer) {
+                const oldPosition = playerGroup.position.clone();
+                const oldRotation = playerGroup.quaternion.clone();
+                playerGroup.remove(character);
+                currentCharacterType = (currentCharacterType + 1) % 6;
+                character = createCharacter(currentCharacterType, false);
+                character.position.set(0,0,0);
+                playerGroup.add(character);
+                playerGroup.position.copy(oldPosition);
+                playerGroup.quaternion.copy(oldRotation);
+            } else { return createCharacter(Math.floor(Math.random() * 6), true); }
+        }
+        function updateNpcCount() {
+            const newCount = parseInt(document.getElementById('npc-slider').value);
+            while (npcs.length < newCount) { const npc = changeCharacter(false); resetNpcPosition(npc); npc.targetPosition = new THREE.Vector3(); resetNpcTarget(npc); npcs.push(npc); scene.add(npc); }
+            while (npcs.length > newCount) { const npcToRemove = npcs.pop(); scene.remove(npcToRemove); }
+        }
+        function resetNpcPosition(npc) { npc.position.set((Math.random()-0.5)*MAP_WORLD_SIZE*0.95, 0, (Math.random()-0.5)*MAP_WORLD_SIZE*0.95); }
+        function resetNpcTarget(npc) { npc.targetPosition.set((Math.random()-0.5)*MAP_WORLD_SIZE*0.95, 0, (Math.random()-0.5)*MAP_WORLD_SIZE*0.95); }
+        function moveNpcs() {
+            const playerPos = playerGroup.position; const updateDistanceSq = 50 * 50;
+            npcs.forEach(npc => {
+                if (npc.position.distanceToSquared(playerPos) > updateDistanceSq) return;
+                if (npc.position.distanceTo(npc.targetPosition) < 2) resetNpcTarget(npc);
+                const direction = npc.targetPosition.clone().sub(npc.position).normalize();
+                npc.position.add(direction.multiplyScalar(0.02));
+                npc.rotation.y = Math.atan2(direction.x, direction.z);
+            });
+        }
+
+        // --- UI & 機能 ---
+        function changeCamera() {
+            currentCameraIndex = (currentCameraIndex + 1) % cameraTypes.length;
+            const cameraName = cameraTypes[currentCameraIndex];
+            orbitControls.enabled = (cameraName === 'Free Look');
+            currentCamera = (cameraName === 'Third Person') ? cameras.thirdPerson : (cameraName === 'First Person') ? cameras.firstPerson : cameras.freeLook;
+            composer.passes.forEach(pass => { if(pass.camera) pass.camera = currentCamera; });
+            document.getElementById('change-camera-btn').textContent = `視点切り替え (現在: ${cameraName})`;
+            onWindowResize();
+        }
+        function handleMapClick(event) {
+            const rect = mapCanvas.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / mapCanvas.clientWidth;
+            const y = (event.clientY - rect.top) / mapCanvas.clientHeight;
+            const worldX = (x - 0.5) * MAP_WORLD_SIZE;
+            const worldZ = (y - 0.5) * MAP_WORLD_SIZE;
+            
+            if (document.getElementById('teleport-mode').checked) {
+                playerGroup.position.set(worldX, 0, worldZ);
+                stopAutoDrive(); path = []; destination = null;
+            } else {
+                destination = new THREE.Vector3(worldX, 0, worldZ);
+                stopAutoDrive();
+                path = findPath(playerGroup.position, destination);
+                document.getElementById('auto-drive-btn').style.display = path.length > 0 ? 'block' : 'none';
+            }
+        }
+        function startAutoDrive() { if (path.length > 0) { isAutoDriving = true; autoDriveTargetIndex = 1; document.getElementById('auto-drive-btn').style.display = 'none'; }}
+        function stopAutoDrive() { isAutoDriving = false; if (destination && path.length > 0) document.getElementById('auto-drive-btn').style.display = 'block'; }
+        
+        function updateTime(hour) {
+            const timeLabel = document.getElementById('time-label');
+            const h = Math.floor(hour); const m = Math.floor((hour - h) * 60);
+            timeLabel.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            const uniforms = sky.material.uniforms; const isNight = hour >= 17 || hour < 6;
+            const phi = THREE.MathUtils.degToRad(90 - (hour - 6) * 15);
+            const theta = THREE.MathUtils.degToRad(180);
+            sun.setFromSphericalCoords(1, phi, theta);
+            uniforms['sunPosition'].value.copy(sun);
+            directionalLight.position.copy(sun).multiplyScalar(50);
+            
+            if (isNight) {
+                uniforms['turbidity'].value = 1; uniforms['rayleigh'].value = 0.1;
+                directionalLight.intensity = 0; ambientLight.intensity = 0.05; hemisphereLight.intensity = 0.1;
+            } else {
+                const day_t = (hour - 6) / 11; const noon_factor = 1 - Math.abs(day_t - 0.5) * 2;
+                uniforms['turbidity'].value = 3 + noon_factor * 7;
+                uniforms['rayleigh'].value = 1 + noon_factor * 2;
+                directionalLight.intensity = 0.5 + noon_factor;
+                ambientLight.intensity = 0.2 + noon_factor * 0.4;
+                hemisphereLight.intensity = 0.2 + noon_factor * 0.3;
+            }
+            buildings.forEach(b => b.material.emissive.setHex(isNight ? 0x996600 : 0x000000));
+            streetLights.forEach(sl => { sl.light.intensity = isNight ? 2 : 0; sl.bulb.emissiveIntensity = isNight ? 5 : 0; });
+        }
+        
+        function changeWeather(weather) {
+            if (weatherParticles) { scene.remove(weatherParticles); weatherParticles.geometry.dispose(); weatherParticles.material.dispose(); weatherParticles = null; }
+            const hour = parseFloat(document.getElementById('time-slider').value); updateTime(hour);
+            const uniforms = sky.material.uniforms;
+            if (weather === 'cloudy') { uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 1.5; }
+            else if (weather === 'rainy' || weather === 'snowy') {
+                uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 0.5;
+                const count = weather === 'rainy' ? 2000 : 1000;
+                const positions = new Float32Array(count * 3); const velocities = new Float32Array(count * 3);
+                for(let i=0; i<count*3; i+=3) {
+                    positions[i] = (Math.random() - 0.5) * 100; positions[i+1] = Math.random() * 50; positions[i+2] = (Math.random() - 0.5) * 100;
+                    velocities[i] = (weather === 'snowy') ? (Math.random() - 0.5) * 0.05 : 0;
+                    velocities[i+1] = weather === 'rainy' ? -Math.random() * 0.5 - 0.3 : -Math.random() * 0.05 - 0.02;
+                }
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+                const material = new THREE.PointsMaterial({ color: weather==='rainy'?0xaaaaee:0xffffff, size: weather==='rainy'?0.1:0.2, transparent: true, opacity: 0.7 });
+                weatherParticles = new THREE.Points(geometry, material);
+                scene.add(weatherParticles);
+            }
+        }
+        
+        function drawMapBackground() {
+            mapBackgroundCtx.clearRect(0, 0, mapBackgroundCanvas.width, mapBackgroundCanvas.height);
+            mapBackgroundCtx.fillStyle = 'rgba(0, 0, 0, 0.4)'; mapBackgroundCtx.fillRect(0, 0, mapBackgroundCanvas.width, mapBackgroundCanvas.height);
+            const cellW = mapBackgroundCanvas.width / PATHFINDING_GRID_SIZE;
+            for(let i=0; i<PATHFINDING_GRID_SIZE; i++) for(let j=0; j<PATHFINDING_GRID_SIZE; j++) {
+                switch(pathfindingGrid[i][j]) {
+                    case 1: mapBackgroundCtx.fillStyle = 'rgba(100,0,0,0.5)'; break;
+                    case 2: mapBackgroundCtx.fillStyle = 'rgba(50,50,50,0.5)'; break;
+                    default: mapBackgroundCtx.fillStyle = 'transparent';
+                }
+                mapBackgroundCtx.fillRect(i*cellW, j*cellW, cellW, cellW);
+            }
+        }
+        function drawMap() {
+            mapCtx.drawImage(mapBackgroundCanvas, 0, 0);
+            const toMapCoords = (pos) => ({ x: (pos.x/MAP_WORLD_SIZE+0.5)*mapCanvas.width, z: (pos.z/MAP_WORLD_SIZE+0.5)*mapCanvas.height });
+            if (path.length > 1) {
+                mapCtx.strokeStyle = isAutoDriving ? 'rgba(0,150,255,0.8)' : 'rgba(255,0,0,0.8)'; mapCtx.lineWidth = 3; mapCtx.beginPath();
+                let p = toMapCoords(path[0]); mapCtx.moveTo(p.x, p.z);
+                for(let i=1; i<path.length; i++) { p = toMapCoords(path[i]); mapCtx.lineTo(p.x, p.z); }
+                mapCtx.stroke();
+            }
+            mapCtx.fillStyle = 'rgba(150,150,150,0.7)'; npcs.forEach(npc => { const p=toMapCoords(npc.position); mapCtx.fillRect(p.x-1, p.z-1, 2, 2); });
+            if (destination) { mapCtx.fillStyle='red'; const d=toMapCoords(destination); mapCtx.beginPath(); mapCtx.arc(d.x, d.z, 6, 0, Math.PI*2); mapCtx.fill(); }
+            mapCtx.fillStyle='white'; const p=toMapCoords(playerGroup.position); mapCtx.beginPath(); mapCtx.arc(p.x, p.z, 5, 0, Math.PI*2); mapCtx.fill();
+        }
+        function onWindowResize() {
+            const width = window.innerWidth; const height = window.innerHeight;
+            currentCamera.aspect = width / height; currentCamera.updateProjectionMatrix();
+            renderer.setSize(width, height); composer.setSize(width, height);
+        }
+        function setupMobileControls() {
+            const joystick=document.getElementById('joystick-handle'), base=document.getElementById('joystick-base'), runButton=document.getElementById('run-button');
+            const radius = base.offsetWidth / 2;
+            const moveJoystick = (touch) => {
+                const rect=base.getBoundingClientRect(), x=touch.clientX-rect.left-radius, y=touch.clientY-rect.top-radius;
+                const distance=Math.min(radius, Math.hypot(x, y)), angle=Math.atan2(y, x);
+                joystick.style.transform=`translate(${Math.cos(angle)*distance}px, ${Math.sin(angle)*distance}px)`;
+                keys.w=y/radius<-0.3; keys.s=y/radius>0.3; keys.a=x/radius<-0.3; keys.d=x/radius>0.3;
+            };
+            const endJoystick = () => { joystick.style.transform=`translate(0px, 0px)`; keys.w=keys.a=keys.s=keys.d=false; };
+            base.addEventListener('touchstart', (e)=>{e.preventDefault(); moveJoystick(e.touches[0]);}, {passive:false});
+            base.addEventListener('touchmove', (e)=>{e.preventDefault(); moveJoystick(e.touches[0]);}, {passive:false});
+            base.addEventListener('touchend', endJoystick); base.addEventListener('touchcancel', endJoystick);
+            runButton.addEventListener('touchstart', (e)=>{e.preventDefault(); isRunning=true;}, {passive:false});
+            runButton.addEventListener('touchend', (e)=>{e.preventDefault(); isRunning=false;}, {passive:false});
+        }
+        
+        // --- メインループ ---
+        function animate() {
+            requestAnimationFrame(animate);
+            stats.begin();
+
+            const isMoving = Object.values(keys).some(k => k) || isAutoDriving;
+            const targetSpeedKmh = isMoving ? ((keys['Shift'] || isRunning) ? RUN_SPEED_KMH : WALK_SPEED_KMH) : 0;
+            currentSpeedMs = (targetSpeedKmh * 1000) / 3600;
+            const moveDistance = currentSpeedMs / FRAME_RATE;
+            
+            characterDirection.set(0,0,0);
+            if (isAutoDriving) {
+                if (autoDriveTargetIndex >= path.length) { stopAutoDrive(); }
+                else {
+                    if(playerGroup.position.distanceTo(path[autoDriveTargetIndex]) < 1) autoDriveTargetIndex++;
+                    if(autoDriveTargetIndex < path.length) characterDirection.subVectors(path[autoDriveTargetIndex], playerGroup.position).normalize();
+                }
+            } else {
+                if(keys['w']||keys['ArrowUp']) characterDirection.z=-1; if(keys['s']||keys['ArrowDown']) characterDirection.z=1;
+                if(keys['a']||keys['ArrowLeft']) characterDirection.x=-1; if(keys['d']||keys['ArrowRight']) characterDirection.x=1;
+            }
+            
+            if(characterDirection.lengthSq() > 0) {
+                const moveVector = characterDirection.normalize();
+                const newPosition = playerGroup.position.clone().add(moveVector.multiplyScalar(moveDistance));
+                const halfMap = MAP_WORLD_SIZE / 2 - 1;
+                newPosition.x = Math.max(-halfMap, Math.min(halfMap, newPosition.x));
+                newPosition.z = Math.max(-halfMap, Math.min(halfMap, newPosition.z));
+                playerGroup.position.copy(newPosition);
+                
+                const targetAngle = Math.atan2(characterDirection.x, characterDirection.z);
+                targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetAngle);
+                playerGroup.quaternion.slerp(targetQuaternion, 0.1);
+            }
+            
+            if(currentCamera === cameras.thirdPerson) {
+                const offset = new THREE.Vector3(0, 5, 8).applyQuaternion(playerGroup.quaternion);
+                cameras.thirdPerson.position.copy(playerGroup.position).add(offset);
+                cameras.thirdPerson.lookAt(playerGroup.position);
+            } else if (currentCamera === cameras.firstPerson) {
+                const offset = new THREE.Vector3(0, 1.5, 0);
+                cameras.firstPerson.position.copy(playerGroup.position).add(offset);
+                const lookAtTarget = new THREE.Vector3(); playerGroup.getWorldDirection(lookAtTarget);
+                cameras.firstPerson.lookAt(cameras.firstPerson.position.clone().add(lookAtTarget));
+            } else { orbitControls.update(); }
+
+            moveNpcs();
+            if(weatherParticles) {
+                weatherParticles.position.copy(playerGroup.position);
+                const positions = weatherParticles.geometry.attributes.position.array; const velocities = weatherParticles.geometry.attributes.velocity.array;
+                for(let i=0; i<positions.length; i+=3) {
+                    positions[i] += velocities[i]; positions[i+1] += velocities[i+1];
+                    if(positions[i+1] < -25) {
+                        positions[i]=(Math.random()-0.5)*100; positions[i+1]=25; positions[i+2]=(Math.random()-0.5)*100;
+                    }
+                }
+                weatherParticles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            const pos = playerGroup.position;
+            document.getElementById('coords').textContent = `X:${pos.x.toFixed(1)}, Y:${pos.y.toFixed(1)}, Z:${pos.z.toFixed(1)}`;
+            const speedKmh = currentSpeedMs * 3.6;
+            document.getElementById('speed-display').textContent = `${speedKmh.toFixed(0)} km/h | ${currentSpeedMs.toFixed(1)} m/s`;
+            drawMap();
+
+            composer.render();
+            stats.end();
+        }
+
+        init();
+    </script>
+</body>
+</html>
+
+    </script>
+</body>
+</html>
