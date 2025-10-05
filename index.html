@@ -137,6 +137,9 @@
 
         <label for="npc-slider">NPCの数: <span id="npc-count">10</span></label>
         <input type="range" id="npc-slider" min="0" max="10000" value="10">
+
+        <label for="draw-distance-slider">描画距離: <span id="draw-distance-label">512</span></label>
+        <input type="range" id="draw-distance-slider" min="100" max="1000" value="512">
         
         <label for="weather-select">天気</label>
         <select id="weather-select">
@@ -210,12 +213,9 @@
         const RUN_SPEED_KMH = 44.72;
         let isRunning = false;
         
-        let targetQuaternion = new THREE.Quaternion();
-        
-        // ★視点操作用変数
         let isPointerDown = false;
         let pointerPosition = new THREE.Vector2();
-        const cameraOffsetSpherical = new THREE.Spherical(8, Math.PI / 2.5, 0); // radius, phi, theta
+        const cameraOffsetSpherical = new THREE.Spherical(8, Math.PI / 2.5, 0);
         const firstPersonEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
         function init() {
@@ -225,21 +225,22 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
             renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // ★リアルな影
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             document.body.appendChild(renderer.domElement);
             
-            pmremGenerator = new THREE.PMREMGenerator(renderer); // ★環境マップ用
+            pmremGenerator = new THREE.PMREMGenerator(renderer);
 
             stats = new Stats();
             document.body.appendChild(stats.dom);
             
-            const cameraFar = MAP_WORLD_SIZE * 4;
-            cameras.thirdPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
-            cameras.firstPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
-            cameras.freeLook = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, cameraFar);
+            const initialFar = parseFloat(document.getElementById('draw-distance-slider').value);
+            cameras.thirdPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, initialFar);
+            cameras.firstPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, initialFar);
+            cameras.freeLook = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, initialFar);
             cameras.freeLook.position.set(10, 10, 15);
             currentCamera = cameras.thirdPerson;
+            scene.fog = new THREE.Fog(0x87ceeb, 20, initialFar * 0.9);
 
             orbitControls = new OrbitControls(cameras.freeLook, renderer.domElement);
             orbitControls.enabled = false;
@@ -251,7 +252,7 @@
             directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
             directionalLight.position.set(32, 64, 32);
             directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048; // ★影の解像度向上
+            directionalLight.shadow.mapSize.width = 2048;
             directionalLight.shadow.mapSize.height = 2048;
             directionalLight.shadow.camera.left = -MAP_WORLD_SIZE/2;
             directionalLight.shadow.camera.right = MAP_WORLD_SIZE/2;
@@ -318,19 +319,30 @@
             npcSlider.addEventListener('input', () => { document.getElementById('npc-count').textContent = npcSlider.value; });
             npcSlider.addEventListener('change', updateNpcCount);
 
+            const drawDistanceSlider = document.getElementById('draw-distance-slider');
+            drawDistanceSlider.addEventListener('input', (e) => {
+                const distance = parseFloat(e.target.value);
+                document.getElementById('draw-distance-label').textContent = distance.toFixed(0);
+                cameras.thirdPerson.far = distance;
+                cameras.firstPerson.far = distance;
+                cameras.freeLook.far = distance;
+                cameras.thirdPerson.updateProjectionMatrix();
+                cameras.firstPerson.updateProjectionMatrix();
+                cameras.freeLook.updateProjectionMatrix();
+                scene.fog.far = distance * 0.9;
+            });
+
             document.getElementById('weather-select').addEventListener('change', (e) => changeWeather(e.target.value));
             document.getElementById('time-slider').addEventListener('input', (e) => updateTime(parseFloat(e.target.value)));
 
             mapCanvas.addEventListener('click', handleMapClick);
             setupMobileControls();
             
-            // ★視点操作用イベントリスナー
             renderer.domElement.addEventListener('pointerdown', onPointerDown);
             renderer.domElement.addEventListener('pointermove', onPointerMove);
             renderer.domElement.addEventListener('pointerup', onPointerUp);
         }
 
-        // --- マップ生成 & インフラ ---
         function createCityMap() {
             initPathfindingGrid();
             buildings = [];
@@ -347,8 +359,8 @@
                 const roadX = new THREE.Mesh(new THREE.PlaneGeometry(roadW, MAP_WORLD_SIZE), roadMaterial);
                 roadX.rotation.x = -Math.PI / 2; roadX.position.set(i * roadInterval, 0.01, 0); roadX.receiveShadow = true; mapObjects.add(roadX);
                 markPathfindingGrid(roadX.position, roadW/2, MAP_WORLD_SIZE/2, 2);
-                if (i !== 0) { // 中央の道以外に街灯を設置
-                    for (let z = -MAP_WORLD_SIZE/2; z < MAP_WORLD_SIZE/2; z += 20) {
+                if (i !== 0) {
+                    for (let z = -MAP_WORLD_SIZE/2 + 10; z < MAP_WORLD_SIZE/2; z += 20) {
                         const light1 = createStreetLight();
                         light1.position.set(i * roadInterval + roadW/2 + 1, 0, z);
                         mapObjects.add(light1);
@@ -397,7 +409,6 @@
             return group;
         }
 
-        // --- 経路探索 (A*) ---
         function initPathfindingGrid() {
             pathfindingGrid = [];
             for(let i=0; i<PATHFINDING_GRID_SIZE; i++) {
@@ -410,7 +421,6 @@
             const cZ = Math.floor((center.z / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
             const halfW = Math.ceil(width / scale);
             const halfD = Math.ceil(depth / scale);
-
             for(let i = Math.max(0, cX - halfW); i < Math.min(PATHFINDING_GRID_SIZE, cX + halfW); i++) {
                 for(let j = Math.max(0, cZ - halfD); j < Math.min(PATHFINDING_GRID_SIZE, cZ + halfD); j++) {
                     if (pathfindingGrid[i][j] === 0) pathfindingGrid[i][j] = type;
@@ -421,20 +431,15 @@
         function findPath(startVec, endVec) {
             const startNode = worldToGrid(startVec);
             const endNode = worldToGrid(endVec);
-
             if (!isNodePassable(startNode) || !isNodePassable(endNode)) return [];
-
             let openSet = [startNode];
             let cameFrom = {};
             let gScore = { [`${startNode.x},${startNode.y}`]: 0 };
             let fScore = { [`${startNode.x},${startNode.y}`]: heuristic(startNode, endNode) };
-
             while (openSet.length > 0) {
                 openSet.sort((a,b) => fScore[`${a.x},${a.y}`] - fScore[`${b.x},${b.y}`]);
                 let current = openSet.shift();
-
                 if (current.x === endNode.x && current.y === endNode.y) return reconstructPath(cameFrom, current);
-
                 getNeighbors(current).forEach(neighbor => {
                     let tentativeGScore = gScore[`${current.x},${current.y}`] + 1;
                     let neighborKey = `${neighbor.x},${neighbor.y}`;
@@ -455,9 +460,7 @@
             if (node.x < 0 || node.x >= PATHFINDING_GRID_SIZE || node.y < 0 || node.y >= PATHFINDING_GRID_SIZE) return false;
             return pathfindingGrid[node.x][node.y] !== 1;
         }
-
         function heuristic(a, b) { return Math.abs(a.x - b.x) + Math.abs(a.y - b.y); }
-
         function getNeighbors(node) {
             let neighbors = [];
             for (let x = -1; x <= 1; x++) {
@@ -472,7 +475,6 @@
             }
             return neighbors;
         }
-
         function reconstructPath(cameFrom, current) {
             const totalPath = [gridToWorld(current)];
             let currentKey = `${current.x},${current.y}`;
@@ -483,7 +485,6 @@
             }
             return totalPath;
         }
-
         function worldToGrid(worldVec) {
             const x = Math.floor((worldVec.x / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
             const y = Math.floor((worldVec.z / MAP_WORLD_SIZE + 0.5) * PATHFINDING_GRID_SIZE);
@@ -496,7 +497,6 @@
             );
         }
 
-        // --- キャラクター ---
         function createCharacter(type, isNpc = false) {
             const group = new THREE.Group();
             const shadowCaster = (obj) => { 
@@ -550,7 +550,6 @@
             }
         }
 
-        // --- NPC関連 ---
         function updateNpcCount() {
             const newCount = parseInt(document.getElementById('npc-slider').value);
             while (npcs.length < newCount) {
@@ -585,7 +584,6 @@
             });
         }
 
-        // --- UI & 機能 ---
         function changeCamera() {
             currentCameraIndex = (currentCameraIndex + 1) % cameraTypes.length;
             const cameraName = cameraTypes[currentCameraIndex];
@@ -597,7 +595,6 @@
         }
         function handleMapClick(event) {
             const rect = mapCanvas.getBoundingClientRect();
-            // ★目的地がズレるバグを修正
             const scaleX = mapCanvas.width / rect.width;
             const scaleY = mapCanvas.height / rect.height;
             const canvasX = (event.clientX - rect.left) * scaleX;
@@ -685,7 +682,6 @@
                 const positions = new Float32Array(count * 3);
                 const velocities = new Float32Array(count * 3);
                 const geometry = new THREE.BufferGeometry();
-                
                 for(let i=0; i<count*3; i+=3) {
                     velocities[i] = (weather === 'snowy') ? (Math.random() - 0.5) * 0.05 : 0;
                     velocities[i+1] = weather === 'rainy' ? -Math.random() * 0.8 - 0.5 : -Math.random() * 0.05 - 0.02;
@@ -703,7 +699,6 @@
             }
         }
         
-        // --- 描画 & 更新 ---
         function drawMapBackground() {
             mapBackgroundCtx.clearRect(0, 0, mapBackgroundCanvas.width, mapBackgroundCanvas.height);
             mapBackgroundCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
@@ -800,11 +795,15 @@
             }
         }
         function onPointerMove(event) {
-            if (!isPointerDown) return;
+            if (!isPointerDown || currentCameraIndex === 2) return;
             const deltaX = event.clientX - pointerPosition.x;
             const deltaY = event.clientY - pointerPosition.y;
 
-            if (currentCameraIndex !== 2) { // Not Free Look
+            if (currentCameraIndex === 1) { // First Person
+                playerGroup.rotation.y -= deltaX * 0.002;
+                firstPersonEuler.x -= deltaY * 0.002;
+                firstPersonEuler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, firstPersonEuler.x));
+            } else { // Third Person
                 cameraOffsetSpherical.theta -= deltaX * 0.005;
                 cameraOffsetSpherical.phi -= deltaY * 0.005;
                 cameraOffsetSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.5, cameraOffsetSpherical.phi));
@@ -821,7 +820,7 @@
 
             let targetSpeedKmh = 0;
             isRunning = keys['Shift'] || isRunning;
-            const isMoving = Object.values(keys).some(k => k) || isAutoDriving;
+            const isMoving = (keys.w||keys.s||keys.a||keys.d||keys.ArrowUp||keys.ArrowDown||keys.ArrowLeft||keys.ArrowRight) || isAutoDriving;
             
             if(isMoving) targetSpeedKmh = isRunning ? RUN_SPEED_KMH : WALK_SPEED_KMH;
             currentSpeedMs = (targetSpeedKmh * 1000) / 3600;
@@ -845,16 +844,14 @@
             
             if(characterDirection.lengthSq() > 0) {
                 const moveVector = characterDirection.normalize();
+                moveVector.applyQuaternion(playerGroup.quaternion); // 向きに合わせて移動
+                
                 const newPosition = playerGroup.position.clone().add(moveVector.multiplyScalar(moveDistance));
                 
                 const halfMap = MAP_WORLD_SIZE / 2 - 1;
                 newPosition.x = Math.max(-halfMap, Math.min(halfMap, newPosition.x));
                 newPosition.z = Math.max(-halfMap, Math.min(halfMap, newPosition.z));
                 playerGroup.position.copy(newPosition);
-                
-                const targetAngle = Math.atan2(characterDirection.x, characterDirection.z);
-                targetQuaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetAngle);
-                playerGroup.quaternion.slerp(targetQuaternion, 0.1);
             }
             
             if(currentCamera === cameras.thirdPerson) {
@@ -863,10 +860,9 @@
                 currentCamera.lookAt(playerGroup.position);
             } else if (currentCamera === cameras.firstPerson) {
                 currentCamera.position.copy(playerGroup.position).add(new THREE.Vector3(0, 1.5, 0));
-                const lookAtTarget = new THREE.Vector3(0, 1.5, -1);
-                lookAtTarget.applyQuaternion(playerGroup.quaternion);
-                lookAtTarget.add(playerGroup.position);
-                currentCamera.lookAt(lookAtTarget);
+                currentCamera.rotation.x = 0; currentCamera.rotation.y = 0; currentCamera.rotation.z = 0;
+                currentCamera.quaternion.copy(playerGroup.quaternion);
+                currentCamera.rotation.x = firstPersonEuler.x;
             } else {
                  orbitControls.update();
             }
@@ -903,4 +899,6 @@
 </body>
 </html>
 </body>
+</html>
+
 </html>
