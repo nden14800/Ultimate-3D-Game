@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Ultimate 3D Game (v10 Hyper-Realistic)</title>
+    <title>Ultimate 3D Game (v11 Centered Chat)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
@@ -28,7 +28,7 @@
             max-height: 95vh;
             overflow-y: auto;
         }
-        .ui-container button, .ui-container select {
+        .ui-container button, .ui-container select, .ui-container input[type="text"] {
             display: block;
             width: 100%;
             margin-top: 8px;
@@ -39,6 +39,7 @@
             background-color: #333;
             color: white;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         .ui-container label {
             display: inline-block;
@@ -48,13 +49,14 @@
         .ui-container input[type="range"] {
             width: 100%;
         }
-        #coords, #speed-display {
+        #coords, #speed-display, #destination-info {
             margin-bottom: 10px;
             font-size: 1.0em;
             background-color: rgba(0,0,0,0.3);
             padding: 5px;
             border-radius: 3px;
             white-space: pre;
+            min-height: 1.2em;
         }
         #auto-drive-btn { display: none; background-color: #2a75d1; }
 
@@ -78,10 +80,8 @@
 
         #joystick-container {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 120px;
-            height: 120px;
+            bottom: 80px; left: 20px;
+            width: 120px; height: 120px;
         }
         #joystick-base {
             position: absolute;
@@ -98,8 +98,7 @@
         }
         #run-button {
             position: absolute;
-            bottom: 30px;
-            right: 30px;
+            bottom: 90px; right: 30px;
             width: 80px; height: 80px;
             background: rgba(255,255,255,0.3);
             border: 2px solid rgba(255,255,255,0.5);
@@ -122,6 +121,57 @@
             border-radius: 10px;
             max-width: 80%;
             text-align: left;
+            z-index: 100;
+        }
+        
+        #chat-ui {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            max-width: 800px;
+            box-sizing: border-box;
+            background: rgba(0,0,0,0.5);
+            border-radius: 5px;
+            z-index: 10;
+        }
+        #chat-log {
+            height: 6em;
+            padding: 5px;
+            overflow-y: scroll;
+            color: white;
+            font-size: 0.9em;
+        }
+        #chat-log p { margin: 0 0 2px 0; }
+        #chat-form {
+            display: flex;
+            padding: 5px;
+        }
+        #chat-input {
+            flex-grow: 1;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid #555;
+            border-radius: 3px;
+            padding: 5px;
+        }
+        #chat-send {
+            margin-left: 5px;
+            background: #2a75d1;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+        .chat-bubble {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -129,17 +179,27 @@
     <div class="ui-container">
         <div id="coords">X: 0.00, Y: 0.00, Z: 0.00</div>
         <div id="speed-display">0 km/h | 0.0 m/s</div>
+        <div id="destination-info"></div>
         <button id="change-camera-btn">視点切り替え (現在: 三人称)</button>
         <button id="change-character-btn">キャラクター変更</button>
         <button id="auto-drive-btn">自動運転開始</button>
         <button id="help-button">操作方法</button>
         <div><input type="checkbox" id="teleport-mode"><label for="teleport-mode">テレポートモード</label></div>
+        <div><input type="checkbox" id="auto-drive-run"><label for="auto-drive-run">自動運転で走る</label></div>
+
+        <label for="username-input">ユーザー名</label>
+        <input type="text" id="username-input" value="Player">
+        <label for="userid-input">ユーザーID</label>
+        <input type="text" id="userid-input" value="001">
 
         <label for="npc-slider">NPCの数: <span id="npc-count">10</span></label>
         <input type="range" id="npc-slider" min="0" max="10000" value="10">
 
-        <label for="draw-distance-slider">描画距離: <span id="draw-distance-label">512</span></label>
-        <input type="range" id="draw-distance-slider" min="100" max="1000" value="512">
+        <label for="chat-speed-slider">NPCチャット頻度: <span id="chat-speed-label">1</span> msg/s</label>
+        <input type="range" id="chat-speed-slider" min="0" max="200" value="1">
+
+        <label for="draw-distance-slider">描画距離(m): <span id="draw-distance-label">512</span></label>
+        <input type="range" id="draw-distance-slider" min="1" max="1000" value="512">
         
         <label for="weather-select">天気</label>
         <select id="weather-select">
@@ -174,6 +234,14 @@
         <button id="close-help-button">閉じる</button>
     </div>
 
+    <div id="chat-ui">
+        <div id="chat-log"></div>
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="メッセージを入力...">
+            <button id="chat-send" type="submit">送信</button>
+        </form>
+    </div>
+
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
     <script type="importmap">
     { "imports": {
@@ -190,8 +258,9 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-        let scene, renderer, character, orbitControls, playerGroup, stats, composer, sky, sun, pmremGenerator;
+        let scene, renderer, character, orbitControls, playerGroup, stats, composer, sky, sun, pmremGenerator, labelRenderer;
         let cameras = {}, currentCamera, currentCameraIndex = 0;
         const cameraTypes = ['Third Person', 'First Person', 'Free Look'];
         let keys = { w:false, a:false, s:false, d:false, Shift:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
@@ -217,6 +286,13 @@
         let pointerPosition = new THREE.Vector2();
         const cameraOffsetSpherical = new THREE.Spherical(8, Math.PI / 2.5, 0);
         const firstPersonEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+        let nextNpcChatTime = 0;
+
+        const NPC_MESSAGES = [
+            "こんにちは！", "やあ！", "いい天気だね。", "元気？", "調子はどう？", "また会ったね！", "今日は何を？", "どこへ行くの？", "良い一日を！", "こんばんは。",
+            "この街は広いよね。", "空が綺麗だ。", "夜景もいいものだよ。", "たまに走ると気持ちいいよ。", "テレポートは便利だね。", "NPCの数は変えられるらしいよ。", "天気を変えてみるのも面白いかも。", "時間の流れって不思議だね。", "君のIDはなんだい？", "僕の名前はランダムだよ。", "高いところからの眺めは最高さ。", "操作にはもう慣れた？",
+            "なんだか眠いな…", "今日は何をしようかな。", "考え事をしてたんだ。", "散歩はいい気分転換になる。", "あのビル、何階建てだろう？", "雲の形が面白い。", "風が気持ちいいね。", "少し休憩しようかな。", "時間はあっという間に過ぎるね。", "遠くを眺めるのが好きだ。", "静かな場所は落ち着くな。", "みんな忙しそうだ。", "何か面白いことないかな？", "明日は晴れるといいな。", "星が見えるかな。", "雨の音も悪くない。", "雪が降ると静かになるよね。", "影が伸びてきた。", "太陽が眩しい。", "ふと、空を見上げてしまう。", "ただ歩いているだけだよ。", "特に目的はないんだ。", "人生とはなんだろうね。", "君はどこから来たんだい？", "この街の歴史を知ってる？", "昔はここも違った景色だったのかな。", "未来はどうなるんだろう。", "テクノロジーの進歩はすごいね。", "たまには立ち止まるのも大事さ。", "自分のペースでいこう。", "急ぐことはないよ。", "道の先には何があるんだろう。", "交差点では注意しないとね。", "建物が綺麗に並んでいる。", "デザインが洗練されているな。", "シンプルなのも良いものだ。", "物思いにふけっていたよ。", "自分の影を追いかけてたんだ。", "なんだか懐かしい気分だ。", "一期一会だね。", "またどこかで会えるかな。", "じゃあ、またね。", "気をつけて！", "楽しんで！", "幸運を祈るよ。", "そろそろ行かないと。", "時間は有限だからね。", "一歩一歩、進んでいこう。", "上を向いて歩こう。", "下を向いていたら何も見えないよ。", "景色を楽しんでるかい？", "新しい発見があるかもしれない。", "角を曲がれば違う景色が。", "世界の広さを感じるよ。", "ここはどこで、私は誰だろう…", "哲学的な気分さ。", "なんてね、冗談だよ！", "人に話しかけるのは勇気がいるね。", "でも、話せてよかったよ。", "君のキャラクター、個性的だね。", "色々な人がいるから面白い。", "多様性は大事だ。", "みんな違って、みんないい。", "空の色が変わってきた。", "夕焼けは綺麗だね。", "夜の帳が下りてくる。", "一日の終わりだ。", "今日も一日お疲れ様。", "また明日も頑張ろう。", "夢の中で会えるかな。", "おやすみ。", "良い夢を。"
+        ];
 
         function init() {
             scene = new THREE.Scene();
@@ -229,6 +305,13 @@
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             document.body.appendChild(renderer.domElement);
             
+            labelRenderer = new CSS2DRenderer();
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none';
+            document.body.appendChild(labelRenderer.domElement);
+
             pmremGenerator = new THREE.PMREMGenerator(renderer);
 
             stats = new Stats();
@@ -267,6 +350,7 @@
             
             playerGroup = new THREE.Group();
             character = createCharacter(currentCharacterType, false);
+            playerGroup.userData = { name: "Player", id: "001" };
             playerGroup.add(character);
             scene.add(playerGroup);
             
@@ -315,9 +399,26 @@
             document.getElementById('help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
             document.getElementById('close-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'none'; });
             
+            document.getElementById('username-input').addEventListener('input', (e) => { playerGroup.userData.name = e.target.value; });
+            document.getElementById('userid-input').addEventListener('input', (e) => { playerGroup.userData.id = e.target.value; });
+
+            document.getElementById('chat-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const input = document.getElementById('chat-input');
+                if (input.value.trim() !== '') {
+                    addChatMessage(playerGroup, input.value);
+                    input.value = '';
+                }
+            });
+
             const npcSlider = document.getElementById('npc-slider');
             npcSlider.addEventListener('input', () => { document.getElementById('npc-count').textContent = npcSlider.value; });
             npcSlider.addEventListener('change', updateNpcCount);
+
+            const chatSpeedSlider = document.getElementById('chat-speed-slider');
+            chatSpeedSlider.addEventListener('input', (e) => {
+                document.getElementById('chat-speed-label').textContent = `${e.target.value} msg/s`;
+            });
 
             const drawDistanceSlider = document.getElementById('draw-distance-slider');
             drawDistanceSlider.addEventListener('input', (e) => {
@@ -503,7 +604,7 @@
                 if (!isNpc) obj.castShadow = true;
                 obj.receiveShadow = true;
             };
-            let body, head, arm1, arm2, leg1, leg2;
+            let body, head;
             const colors = [0x3399ff, 0xcccccc, 0x966c4a, 0x4a86e8, 0x6aa84f, 0xe06666];
             switch(type) {
                 case 0:
@@ -523,28 +624,36 @@
                     body.position.y = 0.8; shadowCaster(body);
                     head = new THREE.Mesh(new THREE.SphereGeometry(0.35), new THREE.MeshStandardMaterial({ color: skin }));
                     head.position.y = 1.6; shadowCaster(head);
-                    arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), new THREE.MeshStandardMaterial({ color: skin }));
+                    const arm1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.8, 0.2), new THREE.MeshStandardMaterial({ color: skin }));
                     arm1.position.set(-0.5, 1.0, 0); shadowCaster(arm1);
-                    arm2 = arm1.clone(); arm2.position.x = 0.5;
-                    leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), new THREE.MeshStandardMaterial({ color: 0x333333 }));
+                    const arm2 = arm1.clone(); arm2.position.x = 0.5;
+                    const leg1 = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.8, 0.25), new THREE.MeshStandardMaterial({ color: 0x333333 }));
                     leg1.position.set(-0.2, 0.4, 0); shadowCaster(leg1);
-                    leg2 = leg1.clone(); leg2.position.x = 0.2;
+                    const leg2 = leg1.clone(); leg2.position.x = 0.2;
                     group.add(body, head, arm1, arm2, leg1, leg2);
                     break;
             }
+            const chatDiv = document.createElement('div');
+            chatDiv.className = 'chat-bubble';
+            const chatLabel = new CSS2DObject(chatDiv);
+            chatLabel.position.set(0, 2.2, 0);
+            chatLabel.visible = false;
+            group.add(chatLabel);
             return group;
         }
         function changeCharacter(isPlayer) {
             if (isPlayer) {
                 const oldPosition = playerGroup.position.clone();
                 const oldRotation = playerGroup.quaternion.clone();
-                playerGroup.remove(character);
+                scene.remove(playerGroup);
+                playerGroup = new THREE.Group();
                 currentCharacterType = (currentCharacterType + 1) % 6;
                 character = createCharacter(currentCharacterType, false);
-                character.position.set(0,0,0);
                 playerGroup.add(character);
+                playerGroup.userData = { name: document.getElementById('username-input').value, id: document.getElementById('userid-input').value };
                 playerGroup.position.copy(oldPosition);
                 playerGroup.quaternion.copy(oldRotation);
+                scene.add(playerGroup);
             } else {
                  return createCharacter(Math.floor(Math.random() * 6), true);
             }
@@ -554,6 +663,7 @@
             const newCount = parseInt(document.getElementById('npc-slider').value);
             while (npcs.length < newCount) {
                 const npc = changeCharacter(false);
+                npc.userData = { name: "NPC " + (npcs.length + 1), id: 1000 + npcs.length + 1 };
                 resetNpcPosition(npc);
                 npc.targetPosition = new THREE.Vector3();
                 resetNpcTarget(npc);
@@ -584,6 +694,34 @@
             });
         }
 
+        function addChatMessage(characterObject, message) {
+            const log = document.getElementById('chat-log');
+            const p = document.createElement('p');
+            p.textContent = `[${characterObject.userData.name}]: ${message}`;
+            log.appendChild(p);
+            log.scrollTop = log.scrollHeight;
+
+            const label = characterObject.children.find(c => c.isCSS2DObject);
+            if (label) {
+                label.element.textContent = message;
+                label.visible = true;
+                if (label.timeout) clearTimeout(label.timeout);
+                label.timeout = setTimeout(() => { label.visible = false; }, 5000);
+            }
+        }
+
+        function handleNpcChat(time) {
+            const chatSpeed = parseFloat(document.getElementById('chat-speed-slider').value);
+            if (chatSpeed === 0 || npcs.length === 0 || time < nextNpcChatTime) return;
+
+            const interval = 1000 / chatSpeed;
+            nextNpcChatTime = time + Math.random() * interval * 2;
+
+            const randomNpc = npcs[Math.floor(Math.random() * npcs.length)];
+            const randomMessage = NPC_MESSAGES[Math.floor(Math.random() * NPC_MESSAGES.length)];
+            addChatMessage(randomNpc, randomMessage);
+        }
+
         function changeCamera() {
             currentCameraIndex = (currentCameraIndex + 1) % cameraTypes.length;
             const cameraName = cameraTypes[currentCameraIndex];
@@ -599,18 +737,19 @@
             const scaleY = mapCanvas.height / rect.height;
             const canvasX = (event.clientX - rect.left) * scaleX;
             const canvasY = (event.clientY - rect.top) * scaleY;
-            
             const worldX = (canvasX / mapCanvas.width - 0.5) * MAP_WORLD_SIZE;
             const worldZ = (canvasY / mapCanvas.height - 0.5) * MAP_WORLD_SIZE;
             
             if (document.getElementById('teleport-mode').checked) {
                 playerGroup.position.set(worldX, 0, worldZ);
                 stopAutoDrive(); path = []; destination = null;
+                document.getElementById('destination-info').textContent = '';
             } else {
                 destination = new THREE.Vector3(worldX, 0, worldZ);
                 stopAutoDrive();
                 path = findPath(playerGroup.position, destination);
                 document.getElementById('auto-drive-btn').style.display = path.length > 0 ? 'block' : 'none';
+                updateDestinationInfo();
             }
         }
         function startAutoDrive() {
@@ -624,25 +763,46 @@
             isAutoDriving = false;
             if (destination && path.length > 0) document.getElementById('auto-drive-btn').style.display = 'block';
         }
+        
+        function updateDestinationInfo() {
+            if (!path || path.length === 0) {
+                document.getElementById('destination-info').textContent = '';
+                return;
+            }
+            let distance = 0;
+            for (let i = 0; i < path.length - 1; i++) {
+                distance += path[i].distanceTo(path[i+1]);
+            }
+            const isAutoRun = document.getElementById('auto-drive-run').checked;
+            const speedKmh = isAutoRun ? RUN_SPEED_KMH : WALK_SPEED_KMH;
+            const speedMs = (speedKmh * 1000) / 3600;
+            const timeSec = distance / speedMs;
+
+            let timeString;
+            if (timeSec < 60) {
+                timeString = `${Math.round(timeSec)}秒`;
+            } else if (timeSec < 3600) {
+                timeString = `${Math.floor(timeSec / 60)}分 ${Math.round(timeSec % 60)}秒`;
+            } else {
+                timeString = `${Math.floor(timeSec / 3600)}時間 ${Math.floor((timeSec % 3600) / 60)}分`;
+            }
+
+            document.getElementById('destination-info').textContent = `距離: ${distance.toFixed(0)}m, 到着予測: ${timeString}`;
+        }
+
         function updateTime(hour) {
             const timeLabel = document.getElementById('time-label');
             const h = Math.floor(hour);
             const m = Math.floor((hour - h) * 60);
             timeLabel.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-            
             const uniforms = sky.material.uniforms;
             const isNight = hour >= 17 || hour < 6;
-            
             const phi = THREE.MathUtils.degToRad(90 - (hour - 6) * 15);
             sun.setFromSphericalCoords(1, phi, Math.PI);
             uniforms['sunPosition'].value.copy(sun);
-            
             if (isNight) {
-                uniforms['turbidity'].value = 1;
-                uniforms['rayleigh'].value = 0.1;
-                directionalLight.intensity = 0;
-                ambientLight.intensity = 0.05;
-                hemisphereLight.intensity = 0.1;
+                uniforms['turbidity'].value = 1; uniforms['rayleigh'].value = 0.1;
+                directionalLight.intensity = 0; ambientLight.intensity = 0.05; hemisphereLight.intensity = 0.1;
             } else {
                 const day_t = (hour - 6) / 11;
                 const noon_factor = 1 - Math.abs(day_t - 0.5) * 2;
@@ -652,10 +812,8 @@
                 ambientLight.intensity = 0.2 + noon_factor * 0.4;
                 hemisphereLight.intensity = 0.2 + noon_factor * 0.3;
             }
-            
             directionalLight.position.copy(sun).multiplyScalar(50);
             scene.environment = pmremGenerator.fromScene(sky).texture;
-            
             streetLights.forEach(light => { light.intensity = isNight ? 2 : 0; });
             buildings.forEach(building => {
                 building.material.emissive.setHex(isNight ? 0x996600 : 0x000000);
@@ -669,15 +827,11 @@
                 weatherParticles = null;
             }
             updateTime(parseFloat(document.getElementById('time-slider').value));
-            
             const uniforms = sky.material.uniforms;
             if(weather === 'cloudy') {
-                uniforms['turbidity'].value = 20;
-                uniforms['rayleigh'].value = 1.5;
+                uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 1.5;
             } else if (weather === 'rainy' || weather === 'snowy') {
-                uniforms['turbidity'].value = 20;
-                uniforms['rayleigh'].value = 0.5;
-                
+                uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 0.5;
                 const count = weather === 'rainy' ? 3000 : 1500;
                 const positions = new Float32Array(count * 3);
                 const velocities = new Float32Array(count * 3);
@@ -688,7 +842,6 @@
                 }
                 geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
                 geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
-                
                 const material = new THREE.PointsMaterial({
                     color: (weather === 'rainy') ? 0xaaaaee : 0xffffff,
                     size: (weather === 'rainy') ? 0.05 : 0.15,
@@ -751,6 +904,7 @@
             currentCamera.updateProjectionMatrix();
             renderer.setSize(width, height);
             composer.setSize(width, height);
+            labelRenderer.setSize(width, height);
         }
         function setupMobileControls() {
             const joystick = document.getElementById('joystick-handle');
@@ -758,7 +912,6 @@
             const runButton = document.getElementById('run-button');
             const radius = base.offsetWidth / 2;
             let joyX = 0, joyY = 0;
-
             const moveJoystick = (touch) => {
                 const rect = base.getBoundingClientRect();
                 const x = touch.clientX - rect.left - radius;
@@ -768,9 +921,7 @@
                 joyX = Math.cos(angle) * distance;
                 joyY = Math.sin(angle) * distance;
                 joystick.style.transform = `translate(${joyX}px, ${joyY}px)`;
-                
-                const normalizedY = y / radius;
-                const normalizedX = x / radius;
+                const normalizedY = y / radius; const normalizedX = x / radius;
                 keys.w = normalizedY < -0.3; keys.s = normalizedY > 0.3;
                 keys.a = normalizedX < -0.3; keys.d = normalizedX > 0.3;
             };
@@ -778,7 +929,6 @@
                 joystick.style.transform = `translate(0px, 0px)`;
                 keys.w = keys.a = keys.s = keys.d = false;
             };
-
             base.addEventListener('touchstart', (e) => { e.preventDefault(); moveJoystick(e.touches[0]); }, { passive: false });
             base.addEventListener('touchmove', (e) => { e.preventDefault(); moveJoystick(e.touches[0]); }, { passive: false });
             base.addEventListener('touchend', touchEnd);
@@ -788,6 +938,7 @@
         }
         
         function onPointerDown(event) {
+            if (document.activeElement.tagName === 'INPUT') return;
             if (event.target.tagName === 'CANVAS') {
                 isPointerDown = true;
                 pointerPosition.x = event.clientX;
@@ -799,13 +950,12 @@
             const deltaX = event.clientX - pointerPosition.x;
             const deltaY = event.clientY - pointerPosition.y;
 
+            playerGroup.rotation.y -= deltaX * 0.002;
             if (currentCameraIndex === 1) { // First Person
-                playerGroup.rotation.y -= deltaX * 0.002;
                 firstPersonEuler.x -= deltaY * 0.002;
                 firstPersonEuler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, firstPersonEuler.x));
             } else { // Third Person
-                cameraOffsetSpherical.theta -= deltaX * 0.005;
-                cameraOffsetSpherical.phi -= deltaY * 0.005;
+                cameraOffsetSpherical.phi -= deltaY * 0.002;
                 cameraOffsetSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.5, cameraOffsetSpherical.phi));
             }
             pointerPosition.x = event.clientX;
@@ -813,16 +963,18 @@
         }
         function onPointerUp() { isPointerDown = false; }
         
-        // --- メインループ ---
-        function animate() {
+        function animate(time) {
             requestAnimationFrame(animate);
             stats.begin();
 
-            let targetSpeedKmh = 0;
             isRunning = keys['Shift'] || isRunning;
             const isMoving = (keys.w||keys.s||keys.a||keys.d||keys.ArrowUp||keys.ArrowDown||keys.ArrowLeft||keys.ArrowRight) || isAutoDriving;
             
-            if(isMoving) targetSpeedKmh = isRunning ? RUN_SPEED_KMH : WALK_SPEED_KMH;
+            const autoRun = document.getElementById('auto-drive-run').checked;
+            let targetSpeedKmh = 0;
+            if(isAutoDriving) targetSpeedKmh = autoRun ? RUN_SPEED_KMH : WALK_SPEED_KMH;
+            else if(isMoving) targetSpeedKmh = isRunning ? RUN_SPEED_KMH : WALK_SPEED_KMH;
+
             currentSpeedMs = (targetSpeedKmh * 1000) / 3600;
             const moveDistance = currentSpeedMs / FRAME_RATE;
             
@@ -844,10 +996,17 @@
             
             if(characterDirection.lengthSq() > 0) {
                 const moveVector = characterDirection.normalize();
-                moveVector.applyQuaternion(playerGroup.quaternion); // 向きに合わせて移動
+                
+                if(!isAutoDriving) {
+                    const targetAngle = playerGroup.rotation.y + Math.atan2(characterDirection.x, characterDirection.z);
+                    moveVector.set(Math.sin(targetAngle), 0, Math.cos(targetAngle));
+                } else {
+                    const targetAngle = Math.atan2(characterDirection.x, characterDirection.z);
+                    const targetQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetAngle);
+                    playerGroup.quaternion.slerp(targetQuat, 0.1);
+                }
                 
                 const newPosition = playerGroup.position.clone().add(moveVector.multiplyScalar(moveDistance));
-                
                 const halfMap = MAP_WORLD_SIZE / 2 - 1;
                 newPosition.x = Math.max(-halfMap, Math.min(halfMap, newPosition.x));
                 newPosition.z = Math.max(-halfMap, Math.min(halfMap, newPosition.z));
@@ -860,14 +1019,14 @@
                 currentCamera.lookAt(playerGroup.position);
             } else if (currentCamera === cameras.firstPerson) {
                 currentCamera.position.copy(playerGroup.position).add(new THREE.Vector3(0, 1.5, 0));
-                currentCamera.rotation.x = 0; currentCamera.rotation.y = 0; currentCamera.rotation.z = 0;
                 currentCamera.quaternion.copy(playerGroup.quaternion);
-                currentCamera.rotation.x = firstPersonEuler.x;
+                currentCamera.rotation.x += firstPersonEuler.x;
             } else {
                  orbitControls.update();
             }
 
             moveNpcs();
+            handleNpcChat(time);
             if(weatherParticles) {
                 weatherParticles.position.copy(playerGroup.position);
                 const positions = weatherParticles.geometry.attributes.position.array;
@@ -888,9 +1047,11 @@
             document.getElementById('coords').textContent = `X: ${pos.x.toFixed(2)}, Y: ${pos.y.toFixed(2)}, Z: ${pos.z.toFixed(2)}`;
             const speedKmh = currentSpeedMs * 3.6;
             document.getElementById('speed-display').textContent = `${speedKmh.toFixed(0)} km/h | ${currentSpeedMs.toFixed(1)} m/s`;
+            if (isAutoDriving) updateDestinationInfo();
             drawMap();
 
             composer.render();
+            labelRenderer.render(scene, currentCamera);
             stats.end();
         }
 
@@ -898,7 +1059,6 @@
     </script>
 </body>
 </html>
+</script>
 </body>
-</html>
-
 </html>
