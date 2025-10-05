@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Ultimate 3D Game (v11 Centered Chat)</title>
+    <title>Ultimate 3D Game (v12 Camera Fix)</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
@@ -700,7 +700,6 @@
             p.textContent = `[${characterObject.userData.name}]: ${message}`;
             log.appendChild(p);
             log.scrollTop = log.scrollHeight;
-
             const label = characterObject.children.find(c => c.isCSS2DObject);
             if (label) {
                 label.element.textContent = message;
@@ -713,10 +712,8 @@
         function handleNpcChat(time) {
             const chatSpeed = parseFloat(document.getElementById('chat-speed-slider').value);
             if (chatSpeed === 0 || npcs.length === 0 || time < nextNpcChatTime) return;
-
             const interval = 1000 / chatSpeed;
             nextNpcChatTime = time + Math.random() * interval * 2;
-
             const randomNpc = npcs[Math.floor(Math.random() * npcs.length)];
             const randomMessage = NPC_MESSAGES[Math.floor(Math.random() * NPC_MESSAGES.length)];
             addChatMessage(randomNpc, randomMessage);
@@ -777,7 +774,6 @@
             const speedKmh = isAutoRun ? RUN_SPEED_KMH : WALK_SPEED_KMH;
             const speedMs = (speedKmh * 1000) / 3600;
             const timeSec = distance / speedMs;
-
             let timeString;
             if (timeSec < 60) {
                 timeString = `${Math.round(timeSec)}秒`;
@@ -786,7 +782,6 @@
             } else {
                 timeString = `${Math.floor(timeSec / 3600)}時間 ${Math.floor((timeSec % 3600) / 60)}分`;
             }
-
             document.getElementById('destination-info').textContent = `距離: ${distance.toFixed(0)}m, 到着予測: ${timeString}`;
         }
 
@@ -950,12 +945,12 @@
             const deltaX = event.clientX - pointerPosition.x;
             const deltaY = event.clientY - pointerPosition.y;
 
-            playerGroup.rotation.y -= deltaX * 0.002;
-            if (currentCameraIndex === 1) { // First Person
-                firstPersonEuler.x -= deltaY * 0.002;
-                firstPersonEuler.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, firstPersonEuler.x));
-            } else { // Third Person
-                cameraOffsetSpherical.phi -= deltaY * 0.002;
+            if (currentCameraIndex === 1) { // ★一人称視点
+                playerGroup.rotation.y -= deltaX * 0.002;
+                // 上下スクロールは無効化
+            } else { // ★三人称視点
+                cameraOffsetSpherical.theta -= deltaX * 0.005;
+                cameraOffsetSpherical.phi -= deltaY * 0.005;
                 cameraOffsetSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.5, cameraOffsetSpherical.phi));
             }
             pointerPosition.x = event.clientX;
@@ -1020,7 +1015,6 @@
             } else if (currentCamera === cameras.firstPerson) {
                 currentCamera.position.copy(playerGroup.position).add(new THREE.Vector3(0, 1.5, 0));
                 currentCamera.quaternion.copy(playerGroup.quaternion);
-                currentCamera.rotation.x += firstPersonEuler.x;
             } else {
                  orbitControls.update();
             }
@@ -1059,6 +1053,10 @@
     </script>
 </body>
 </html>
-</script>
+.end();
+        }
+
+        init();
+    </script>
 </body>
 </html>
