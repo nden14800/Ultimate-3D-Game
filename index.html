@@ -172,20 +172,15 @@
             font-size: 14px;
             text-align: center;
             pointer-events: none;
-            /* 修正: 複数行表示とアニメーションのためのスタイル追加 */
-            line-height: 1.4;
-            max-width: 200px;
-            word-break: break-all;
-            transform-origin: 50% 100%;
+            /* --- ▼ 修正点: ポップアップアニメーションのためのスタイルを追加 ▼ --- */
+            transform: scale(0);
+            opacity: 0;
+            transform-origin: 50% 100%; /* 下中央を基点にアニメーション */
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
         }
-        /* 追加: ポップアップアニメーションの定義 */
-        @keyframes popup-bubble {
-            0% { transform: scale(0.5) translateY(10px); opacity: 0; }
-            70% { transform: scale(1.1) translateY(0); opacity: 1; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
-        }
-        .chat-bubble-animation {
-            animation: popup-bubble 0.3s ease-out forwards;
+        .chat-bubble.visible { /* 表示状態を制御するクラス */
+            transform: scale(1);
+            opacity: 1;
         }
     </style>
 </head>
@@ -708,52 +703,31 @@
             });
         }
 
-        /**
-         * 修正: この関数は全体的に修正されました。
-         * 1. プレイヤーのチャットが頭上に表示されるように検索方法を変更しました。
-         * 2. 連続したチャットが複数行で表示されるようにしました。
-         * 3. 表示時にポップアップアニメーションが再生されるようにしました。
-         */
         function addChatMessage(characterObject, message) {
             const log = document.getElementById('chat-log');
             const p = document.createElement('p');
             p.textContent = `[${characterObject.userData.name}]: ${message}`;
             log.appendChild(p);
             log.scrollTop = log.scrollHeight;
-
-            // 修正点1: getObjectByPropertyを使い、ネストされたオブジェクト内のラベルも検索できるようにする
-            const label = characterObject.getObjectByProperty('isCSS2DObject', true);
-
+            
+            // --- ▼ 修正点: traverseを使い、子孫要素からチャットラベルを正しく検索する ▼ ---
+            let label = null;
+            characterObject.traverse(function(child) {
+                if (child.isCSS2DObject) {
+                    label = child;
+                }
+            });
+            
             if (label) {
-                // 修正点2: 複数行チャットを管理
-                if (!label.messages) {
-                    label.messages = [];
-                }
-                label.messages.push(message);
-                // 表示するメッセージの最大数を3に制限
-                if (label.messages.length > 3) {
-                    label.messages.shift();
-                }
-                label.element.innerHTML = label.messages.join('<br>');
-
-                label.visible = true;
-
-                // 修正点3: ポップアップアニメーションをトリガー
-                // 一度クラスを削除し、requestAnimationFrameを使って次の描画サイクルでクラスを追加することで、
-                // 毎回アニメーションが再生されるようにする
-                label.element.classList.remove('chat-bubble-animation');
-                requestAnimationFrame(() => {
-                    label.element.classList.add('chat-bubble-animation');
-                });
-
-
+                label.element.textContent = message;
+                // --- ▼ 修正点: CSSクラスの付け外しで表示とアニメーションを制御する ▼ ---
+                label.visible = true; //念のため表示状態に
+                label.element.classList.add('visible');
                 if (label.timeout) clearTimeout(label.timeout);
-                // タイムアウトで非表示にし、メッセージ配列と表示内容、アニメーションクラスをクリアする
-                label.timeout = setTimeout(() => {
-                    label.visible = false;
-                    label.messages = [];
-                    label.element.innerHTML = '';
-                    label.element.classList.remove('chat-bubble-animation');
+                label.timeout = setTimeout(() => { 
+                    label.element.classList.remove('visible');
+                    // アニメーション終了後に非表示にする
+                    setTimeout(() => { if (!label.element.classList.contains('visible')) label.visible = false; }, 300);
                 }, 5000);
             }
         }
