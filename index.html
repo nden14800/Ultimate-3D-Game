@@ -263,6 +263,147 @@
         @media (max-width: 760px) { #game-topbar { inset: 10px 10px auto; } .brand-lockup h1 { font-size: 13px; } .brand-lockup span { font-size: 7px; } .brand-mark { width: 36px; height: 36px; border-radius: 12px; } .round-button { height: 36px; padding: 0 9px; font-size: 9px; } .round-button .button-label { display: none; } .ui-container { top: 58px; right: 10px; width: min(320px, calc(100vw - 20px)); max-height: calc(100vh - 76px); } #map-container { right: 10px; bottom: 109px; width: 120px; height: 120px; } #chat-ui { bottom: 84px; width: calc(100vw - 150px); min-width: 170px; } #quickbar { bottom: 9px; gap: 4px; padding: 5px; border-radius: 15px; } .quick-action { min-width: 54px; min-height: 52px; padding: 5px; font-size: 8px; } .quick-action .bi-icon { width: 18px; height: 18px; } .title-card { padding: 25px; } .title-card h2 { font-size: clamp(39px, 13vw, 58px); } }
         @media (max-width: 430px) { #chat-ui { display: none; } #map-container { bottom: 104px; } .quick-action { min-width: 49px; } }
 
+
+        /* Creative Sandbox Refresh — Build Belt, Field Pack, and conversation dock. */
+        :root {
+            --city-ink: #11345f;
+            --city-blue: #2b87f7;
+            --city-cyan: #61d7ff;
+            --city-sand: #ffd36c;
+            --city-green: #54c98b;
+            --city-coral: #f58873;
+            --city-panel: rgba(250, 254, 255, .91);
+        }
+        #world-readout {
+            position: absolute; z-index: 25; top: 74px; left: 18px; display: grid; gap: 7px;
+            width: min(258px, calc(100vw - 36px)); padding: 11px; border: 2px solid rgba(255,255,255,.8);
+            border-radius: 18px; color: var(--city-ink); background: var(--city-panel);
+            box-shadow: 0 7px 0 rgba(7,54,116,.13), 0 17px 34px rgba(7,35,70,.18); backdrop-filter: blur(14px);
+            pointer-events: none;
+        }
+        .readout-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #3979bd; font-size: 9px; font-weight: 900; letter-spacing: .14em; }
+        .readout-title span:last-child { color: #27a96d; }
+        .readout-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+        .readout-chip { min-width: 0; padding: 8px; border: 1px solid rgba(33,108,183,.13); border-radius: 11px; background: rgba(230,244,255,.78); }
+        .readout-chip small { display: block; color: #6181a4; font-size: 8px; font-weight: 900; letter-spacing: .11em; }
+        .readout-chip strong { display: block; overflow: hidden; margin-top: 3px; color: #204d83; font-size: 10px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+        #build-status {
+            position: absolute; z-index: 25; top: 80px; left: 50%; display: flex; align-items: center; gap: 9px;
+            transform: translateX(-50%); padding: 8px 12px; border: 2px solid rgba(255,255,255,.78); border-radius: 999px;
+            color: #174679; background: rgba(251,254,255,.92); box-shadow: 0 5px 0 rgba(7,54,116,.12), 0 12px 28px rgba(7,35,70,.15); backdrop-filter: blur(12px);
+        }
+        #build-status .bi-icon { color: #2a83ef; }
+        #build-status strong { font-size: 11px; white-space: nowrap; }
+        #build-status span { color: #6482a6; font-size: 9px; font-weight: 800; white-space: nowrap; }
+        #build-belt {
+            position: absolute; z-index: 31; bottom: 17px; left: 50%; display: flex; align-items: stretch; gap: 5px;
+            max-width: calc(100vw - 30px); padding: 7px; overflow-x: auto; transform: translateX(-50%);
+            border: 3px solid rgba(255,255,255,.84); border-radius: 22px; background: rgba(248,253,255,.94);
+            box-shadow: 0 8px 0 rgba(7,54,116,.16), 0 18px 38px rgba(7,35,70,.2); scrollbar-width: none; backdrop-filter: blur(16px);
+        }
+        #build-belt::-webkit-scrollbar { display: none; }
+        .belt-slot {
+            position: relative; display: grid; min-width: 64px; min-height: 62px; place-items: center; gap: 2px; padding: 7px 7px 6px;
+            border: 1px solid #c9def3; border-radius: 14px; color: #315f91; background: linear-gradient(180deg, #ffffff, #f0f8ff);
+            box-shadow: 0 3px 0 rgba(29,101,182,.13); font-size: 9px; font-weight: 900; line-height: 1.1; transition: transform .15s ease, border-color .15s ease, background .15s ease, color .15s ease;
+        }
+        .belt-slot:hover { transform: translateY(-2px); border-color: #78b5fb; }
+        .belt-slot .bi-icon { width: 20px; height: 20px; color: #2f87f6; }
+        .belt-slot .slot-key { position: absolute; top: 5px; right: 6px; color: #82a0c0; font-size: 8px; line-height: 1; }
+        .belt-slot.selected, .belt-slot.active { border-color: #216fd8; color: white; background: linear-gradient(180deg, #58adff, #2475e9); box-shadow: 0 4px 0 #165dc7; }
+        .belt-slot.selected .bi-icon, .belt-slot.active .bi-icon, .belt-slot.selected .slot-key, .belt-slot.active .slot-key { color: white; }
+        .belt-slot.utility { min-width: 58px; color: #4e6280; background: #fffdf6; }
+        .belt-slot.utility .bi-icon { color: #ee933e; }
+        .belt-slot.utility.active { color: white; border-color: #e76868; background: linear-gradient(180deg, #ff8e88, #eb5e68); box-shadow: 0 4px 0 #c94554; }
+        #context-actions { position: absolute; z-index: 27; right: 18px; bottom: 286px; display: grid; gap: 7px; }
+        .context-action { display: inline-flex; min-height: 38px; align-items: center; justify-content: center; gap: 6px; padding: 7px 10px; border: 2px solid rgba(255,255,255,.8); border-radius: 13px; color: #1f578f; background: rgba(250,253,255,.94); box-shadow: 0 4px 0 rgba(7,54,116,.14), 0 10px 20px rgba(7,35,70,.15); font-size: 10px; font-weight: 900; }
+        .context-action .bi-icon { color: #2d85f4; }
+        #chat-ui.conversation-dock {
+            z-index: 30; bottom: 102px; left: 18px; width: min(580px, calc(100vw - 244px)); min-width: 310px;
+            border: 2px solid rgba(255,255,255,.82); border-radius: 19px; background: rgba(249,253,255,.93);
+            box-shadow: 0 7px 0 rgba(7,54,116,.13), 0 16px 34px rgba(7,35,70,.17); transition: transform .22s ease, opacity .22s ease; backdrop-filter: blur(16px);
+        }
+        #chat-ui.conversation-dock.collapsed { transform: translateY(calc(100% - 44px)); }
+        .conversation-head { display: flex; align-items: center; justify-content: space-between; gap: 9px; min-height: 43px; padding: 8px 9px 7px 12px; border-bottom: 1px solid #d7e8fa; }
+        .conversation-title { display: flex; align-items: center; gap: 7px; color: #23558a; font-size: 10px; font-weight: 900; letter-spacing: .10em; }
+        .conversation-title .bi-icon { color: #2c87f8; }
+        #chat-mode-status { color: #4a7caa; font-size: 9px; font-weight: 800; }
+        .conversation-toggle { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid #d2e2f4; border-radius: 9px; color: #3b76b0; background: #f4f9ff; }
+        #chat-log { height: 142px; padding: 10px 13px; color: #31597f; font-size: 11px; line-height: 1.55; }
+        #chat-log p { margin: 0 0 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(80,135,190,.08); }
+        #chat-form { padding: 9px; gap: 8px; border-top-color: #d7e7f8; }
+        #chat-input { min-height: 35px; padding: 8px 10px; border-radius: 10px; font-size: 11px; }
+        #chat-send { min-width: 72px; border-radius: 10px; font-weight: 900; }
+        #field-pack {
+            position: absolute; z-index: 90; top: 50%; left: 50%; width: min(756px, calc(100vw - 32px)); max-height: min(610px, calc(100vh - 32px));
+            overflow: auto; transform: translate(-50%, -50%); padding: 18px; border: 3px solid rgba(255,255,255,.88); border-radius: 25px;
+            color: #143e71; background: rgba(247,253,255,.96); box-shadow: 0 28px 85px rgba(4,30,66,.32); backdrop-filter: blur(20px);
+        }
+        #field-pack[hidden] { display: none; }
+        .pack-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid #d9e9fa; }
+        .pack-head h2 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 20px; letter-spacing: -.035em; }
+        .pack-head h2 .bi-icon { color: #2d87f5; }
+        .pack-head p { margin: 4px 0 0; color: #6885a6; font-size: 11px; font-weight: 700; }
+        .pack-close { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid #cfe1f3; border-radius: 11px; color: #3d6f9f; background: white; }
+        .pack-grid { display: grid; grid-template-columns: 1.18fr .82fr; gap: 14px; margin-top: 14px; }
+        .pack-section { padding: 13px; border: 1px solid #d7e7f7; border-radius: 17px; background: linear-gradient(145deg, #ffffff, #f1f8ff); }
+        .pack-section h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 4px; color: #316499; font-size: 10px; letter-spacing: .12em; }
+        .pack-section > p { margin: 0 0 11px; color: #6d8aa9; font-size: 10px; line-height: 1.45; }
+        .material-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .material-card { display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 8px; padding: 9px; border: 1px solid #cfe1f3; border-radius: 13px; color: #315c8c; background: rgba(255,255,255,.9); text-align: left; }
+        .material-card:hover, .material-card.selected { border-color: #2e80e8; background: #eaf5ff; }
+        .material-card .bi-icon { width: 23px; height: 23px; color: #2f86f5; }
+        .material-card strong { display: block; font-size: 11px; }
+        .material-card span { display: block; margin-top: 2px; color: #718eac; font-size: 9px; font-weight: 700; }
+        .pack-notes { display: grid; gap: 8px; }
+        .pack-note { padding: 10px; border-radius: 12px; color: #456b94; background: #edf7ff; font-size: 10px; font-weight: 700; line-height: 1.5; }
+        .pack-note b { color: #2168bc; }
+        #build-count { color: #2f86f5; font-variant-numeric: tabular-nums; }
+        .ui-container { max-height: calc(100vh - 146px); }
+        #quickbar { display: none; }
+        @media (max-width: 760px) {
+            #world-readout { top: 57px; left: 10px; width: 178px; padding: 8px; border-radius: 14px; }
+            .readout-title { font-size: 7px; } .readout-chip { padding: 6px; } .readout-chip strong { font-size: 8px; }
+            #build-status { top: 60px; max-width: calc(100vw - 208px); padding: 7px 9px; } #build-status span { display: none; }
+            #build-belt { bottom: 8px; width: calc(100vw - 12px); justify-content: flex-start; padding: 5px; border-radius: 17px; }
+            .belt-slot { min-width: 54px; min-height: 53px; padding: 5px; font-size: 8px; } .belt-slot .bi-icon { width: 17px; height: 17px; }
+            #context-actions { right: 10px; bottom: 255px; } .context-action { min-height: 32px; padding: 5px 7px; font-size: 8px; }
+            #chat-ui.conversation-dock { bottom: 79px; left: 10px; width: min(480px, calc(100vw - 138px)); min-width: 0; } #chat-log { height: 114px; }
+            #field-pack { width: calc(100vw - 20px); max-height: calc(100vh - 20px); padding: 14px; border-radius: 20px; } .pack-grid { grid-template-columns: 1fr; } .pack-head h2 { font-size: 17px; }
+        }
+        @media (max-width: 430px) {
+            #world-readout { width: 148px; } .readout-row { gap: 4px; } .readout-chip:nth-child(2) { display: none; }
+            #build-status { left: auto; right: 10px; transform: none; max-width: 130px; } #build-status strong { overflow: hidden; text-overflow: ellipsis; }
+            #chat-ui.conversation-dock { display: block; width: calc(100vw - 20px); } #chat-ui.conversation-dock.collapsed { transform: translateY(calc(100% - 42px)); }
+            #context-actions { bottom: 214px; } .context-action .context-label { display: none; }
+            .material-grid { grid-template-columns: 1fr; }
+        }
+
+
+        /* NPC behavior and opt-in local AI conversation controls. */
+        .conversation-head { flex-wrap: wrap; }
+        .conversation-controls { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+        .conversation-ai {
+            display: inline-flex; min-height: 28px; align-items: center; justify-content: center; gap: 5px; padding: 5px 8px;
+            border: 1px solid #77b5f6; border-radius: 9px; color: #1559a9; background: #eaf5ff; font-size: 9px; font-weight: 900;
+            transition: transform .15s ease, background .15s ease, color .15s ease;
+        }
+        .conversation-ai:hover:not(:disabled) { transform: translateY(-1px); background: #d9efff; }
+        .conversation-ai.ready { border-color: #3ab782; color: white; background: linear-gradient(180deg, #55d497, #28af70); }
+        .conversation-ai.loading { border-color: #f3b85a; color: #82530a; background: #fff4dc; }
+        .conversation-ai .bi-icon { width: 13px; height: 13px; }
+        .conversation-status-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 12px 8px; color: #718eac; font-size: 9px; font-weight: 800; }
+        .conversation-status-row b { color: #2d78c6; }
+        .npc-behavior-tag { display: inline-flex; align-items: center; gap: 4px; margin-left: 5px; color: #5c88b5; font-size: 8px; font-weight: 800; }
+        #chat-log p.ai-stream { border-left: 3px solid #4ccf91; padding-left: 7px; color: #245e49; }
+        #chat-log p.system-note { color: #6b839d; font-size: 10px; font-style: italic; }
+        @media (max-width: 760px) {
+            .conversation-ai { padding: 5px 6px; font-size: 8px; }
+            .conversation-ai .ai-button-label { display: none; }
+            .conversation-controls { gap: 4px; }
+            #chat-mode-status { max-width: 108px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        }
+
         </style>
 </head>
 <body>
@@ -283,7 +424,23 @@
         <div class="brand-lockup"><div class="brand-mark"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-fill"></use></svg></div><div><span>CREATIVE CITY</span><h1>ULTIMATE 3D</h1></div></div>
         <div class="top-actions"><button id="drawer-toggle" class="round-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#list"></use></svg><span class="button-label">メニュー</span></button><button id="pause-button" class="round-button primary"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#pause-fill"></use></svg><span class="button-label">ポーズ</span></button></div>
     </header>
-    <nav id="quickbar" aria-label="クイック操作"><button id="quick-camera" class="quick-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点</button><button id="quick-car" class="quick-action highlight"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg>乗り物</button><button id="quick-place" class="quick-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>配置</button><button id="quick-map" class="quick-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg>マップ</button></nav>
+    <section id="world-readout" aria-label="ワールド状況">
+        <div class="readout-title"><span>WORLD READOUT</span><span>LIVE</span></div>
+        <div class="readout-row"><div class="readout-chip"><small>POSITION</small><strong id="coords">X: 0.0, Y: 0.0, Z: 0.0</strong></div><div class="readout-chip"><small>VELOCITY</small><strong id="speed-display">0 km/h</strong></div></div>
+        <div class="readout-row"><div class="readout-chip"><small>STREAM</small><strong id="chunk-readout">読み込み中</strong></div><div class="readout-chip"><small>DAYTIME</small><strong id="world-time-readout">12:00</strong></div></div>
+    </section>
+    <section id="build-status" aria-live="polite"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg><strong id="build-material-label">Turf Deck</strong><span id="build-mode-label">Bで建築モード</span><span id="build-rotation-label">0°</span></section>
+    <nav id="build-belt" aria-label="Build Belt">
+        <button class="belt-slot selected" type="button" data-build-material="turf" aria-label="Turf Deckを選択"><span class="slot-key">1</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#flower1"></use></svg>Turf</button>
+        <button class="belt-slot" type="button" data-build-material="stone" aria-label="Stone Coreを選択"><span class="slot-key">2</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#bricks"></use></svg>Stone</button>
+        <button class="belt-slot" type="button" data-build-material="timber" aria-label="Timber Stackを選択"><span class="slot-key">3</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#tree-fill"></use></svg>Timber</button>
+        <button class="belt-slot" type="button" data-build-material="glass" aria-label="Clear Prismを選択"><span class="slot-key">4</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#window-stack"></use></svg>Prism</button>
+        <button class="belt-slot" type="button" data-build-material="alloy" aria-label="Alloy Moduleを選択"><span class="slot-key">5</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cpu-fill"></use></svg>Alloy</button>
+        <button id="belt-rotate" class="belt-slot utility" type="button" aria-label="建築物を回転"><span class="slot-key">R</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#arrow-clockwise"></use></svg>Rotate</button>
+        <button id="belt-remove" class="belt-slot utility" type="button" aria-label="削除モード"><span class="slot-key">7</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#eraser-fill"></use></svg>Remove</button>
+        <button id="field-pack-button" class="belt-slot utility" type="button" aria-label="Field Packを開く"><span class="slot-key">Tab</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg>Pack</button>
+    </nav>
+    <aside id="context-actions" aria-label="すばやいアクション"><button id="quick-camera" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg><span class="context-label">視点</span></button><button id="quick-car" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg><span class="context-label">乗り物</span></button><button id="quick-map" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg><span class="context-label">マップ</span></button></aside>
 
     <div class="ui-container" aria-label="ゲームコントロール">
         <header class="console-header">
@@ -364,6 +521,18 @@
         </section>
     </div>
 
+    <section id="field-pack" hidden aria-label="Field Pack" role="dialog" aria-modal="true">
+        <header class="pack-head"><div><h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg>Field Pack</h2><p>都市を作る素材と、自由な探索のためのツール。</p></div><button id="field-pack-close" class="pack-close" type="button" aria-label="Field Packを閉じる"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#x-lg"></use></svg></button></header>
+        <div class="pack-grid"><section class="pack-section"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>BUILD MODULES</h3><p>選択すると建築モードになります。<b>R</b>で向き、右クリックで除去します。</p><div class="material-grid">
+            <button class="material-card selected" type="button" data-build-material="turf"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#flower1"></use></svg><span><strong>Turf Deck</strong><span>緑化された基礎</span></span></button>
+            <button class="material-card" type="button" data-build-material="stone"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#bricks"></use></svg><span><strong>Stone Core</strong><span>石の構造体</span></span></button>
+            <button class="material-card" type="button" data-build-material="timber"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#tree-fill"></use></svg><span><strong>Timber Stack</strong><span>暖色の木材</span></span></button>
+            <button class="material-card" type="button" data-build-material="glass"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#window-stack"></use></svg><span><strong>Clear Prism</strong><span>透明な展望素材</span></span></button>
+            <button class="material-card" type="button" data-build-material="alloy"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cpu-fill"></use></svg><span><strong>Alloy Module</strong><span>都市用合金</span></span></button>
+        </div></section>
+        <aside class="pack-section"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#compass-fill"></use></svg>FIELD NOTES</h3><p>現在の創作状況とショートカット。</p><div class="pack-notes"><div class="pack-note"><b id="build-count">0</b> 個のモジュールを配置中。配置物はこのセッションの間、街に残ります。</div><div class="pack-note"><b>B</b> 建築モードの切替、<b>R</b> 90度回転、<b>1–5</b> 素材選択、<b>Tab</b> このパックを表示。</div><div class="pack-note">車両・NPC・他のブロックに近すぎる位置は、赤いゴーストで配置不可として表示されます。</div></div></aside></div>
+    </section>
+
     <div id="map-container">
         <canvas id="map-canvas" width="500" height="500"></canvas>
     </div>
@@ -387,13 +556,12 @@
         <button id="close-help-button">閉じる</button>
     </div>
 
-    <div id="chat-ui">
-        <div id="chat-log"></div>
-        <form id="chat-form">
-            <input type="text" id="chat-input" placeholder="メッセージを入力...">
-            <button id="chat-send" type="submit">送信</button>
-        </form>
-    </div>
+    <section id="chat-ui" class="conversation-dock" aria-label="NPC会話">
+        <header class="conversation-head"><div class="conversation-title"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg>CONVERSATION DOCK</div><div class="conversation-controls"><span id="chat-mode-status">ローカルAI: 未起動</span><button id="local-ai-button" class="conversation-ai" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cpu-fill"></use></svg><span class="ai-button-label">LOCAL AIを開始</span></button><button id="chat-drawer-toggle" class="conversation-toggle" type="button" aria-label="会話欄を折り畳む"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chevron-down"></use></svg></button></div></header>
+        <div class="conversation-status-row"><span>近くのNPCへ話しかけます</span><b id="npc-activity-readout">12人が街を移動中</b></div>
+        <div id="chat-log" role="log" aria-live="polite"><p class="system-note">街の居住者と話せます。LOCAL AIはWebGPU対応端末でのみ、ここから任意で起動します。</p></div>
+        <form id="chat-form"><input type="text" id="chat-input" placeholder="街の誰かに話しかける…" autocomplete="off"><button id="chat-send" type="submit">送信</button></form>
+    </section>
 
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -437,6 +605,12 @@
         let frameCounter = 0, lastHudUpdate = 0, lastMapDraw = 0, lastFpsSample = 0, sampledFrames = 0, currentFps = 0, labelRenderUntil = 0, npcUpdateCursor = 0, lastShadowUpdateTime = 0, lastShadowChunkSignature = '';
         let qualityMode = 'balanced';
         let gameStarted = false, gamePaused = false;
+        let selectedBuildMaterial = 'turf', buildRotationQuarter = 0, buildGhost = null, buildGhostValid = false, removeMode = false;
+        const MAX_PLACED_PROPS = 240;
+        let localAiEngine = null, localAiStatus = 'idle', localAiSending = false, localAiHistory = [];
+        let lastNpcActivityUi = 0;
+        const LOCAL_AI_MODEL = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
+        const LOCAL_AI_MODULE_URL = 'https://esm.run/@mlc-ai/web-llm@0.2.84';
         const mobileInput = { x: 0, z: 0 };
         const WORLD_UP = new THREE.Vector3(0, 1, 0);
         const cameraForward = new THREE.Vector3();
@@ -469,6 +643,16 @@
             "なんだか眠いな…", "今日は何をしようかな。", "考え事をしてたんだ。", "散歩はいい気分転換になる。", "あのビル、何階建てだろう？", "雲の形が面白い。", "風が気持ちいいね。", "少し休憩しようかな。", "時間はあっという間に過ぎるね。", "遠くを眺めるのが好きだ。", "静かな場所は落ち着くな。", "みんな忙しそうだ。", "何か面白いことないかな？", "明日は晴れるといいな。", "星が見えるかな。", "雨の音も悪くない。", "雪が降ると静かになるよね。", "影が伸びてきた。", "太陽が眩しい。", "ふと、空を見上げてしまう。", "ただ歩いているだけだよ。", "特に目的はないんだ。", "人生とはなんだろうね。", "君はどこから来たんだい？", "この街の歴史を知ってる？", "昔はここも違った景色だったのかな。", "未来はどうなるんだろう。", "テクノロジーの進歩はすごいね。", "たまには立ち止まるのも大事さ。", "自分のペースでいこう。", "急ぐことはないよ。", "道の先には何があるんだろう。", "交差点では注意しないとね。", "建物が綺麗に並んでいる。", "デザインが洗練されているな。", "シンプルなのも良いものだ。", "物思いにふけっていたよ。", "自分の影を追いかけてたんだ。", "なんだか懐かしい気分だ。", "一期一会だね。", "またどこかで会えるかな。", "じゃあ、またね。", "気をつけて！", "楽しんで！", "幸運を祈るよ。", "そろそろ行かないと。", "時間は有限だからね。", "一歩一歩、進んでいこう。", "上を向いて歩こう。", "下を向いていたら何も見えないよ。", "景色を楽しんでるかい？", "新しい発見があるかもしれない。", "角を曲がれば違う景色が。", "世界の広さを感じるよ。", "ここはどこで、私は誰だろう…", "哲学的な気分さ。", "なんてね、冗談だよ！", "人に話しかけるのは勇気がいるね。", "でも、話せてよかったよ。", "君のキャラクター、個性的だね。", "色々な人がいるから面白い。", "多様性は大事だ。", "みんな違って、みんないい。", "空の色が変わってきた。", "夕焼けは綺麗だね。", "夜の帳が下りてくる。", "一日の終わりだ。", "今日も一日お疲れ様。", "また明日も頑張ろう。", "夢の中で会えるかな。", "おやすみ。", "良い夢を。"
         ];
 
+
+        const BUILD_MATERIALS = {
+            turf: { label: 'Turf Deck', shortLabel: 'Turf', color: 0x65bb78, accent: 0xcef2a0, baseHeight: 0.7, icon: 'flower1' },
+            stone: { label: 'Stone Core', shortLabel: 'Stone', color: 0x687789, accent: 0xb7c2cc, baseHeight: 2, icon: 'bricks' },
+            timber: { label: 'Timber Stack', shortLabel: 'Timber', color: 0xc98552, accent: 0xf2c883, baseHeight: 2, icon: 'tree-fill' },
+            glass: { label: 'Clear Prism', shortLabel: 'Prism', color: 0x63d4e9, accent: 0xc9fbff, baseHeight: 2, icon: 'window-stack' },
+            alloy: { label: 'Alloy Module', shortLabel: 'Alloy', color: 0x557ca5, accent: 0x79e4ff, baseHeight: 2, icon: 'cpu-fill' }
+        };
+        const NPC_BEHAVIOR_LABELS = { patrol: '巡回', wander: '散策', wait: '休憩', yield: '回避', talk: '会話中' };
+
         function init() {
             scene = new THREE.Scene();
 
@@ -479,7 +663,7 @@
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.shadowMap.autoUpdate = false;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 1.18;
+            renderer.toneMappingExposure = 1.36;
             renderer.outputColorSpace = THREE.SRGBColorSpace;
             renderer.debug.checkShaderErrors = false;
             document.body.appendChild(renderer.domElement);
@@ -499,7 +683,7 @@
             cameras.freeLook = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, initialFar);
             cameras.freeLook.position.set(10, 10, 15);
             currentCamera = cameras.thirdPerson;
-            scene.fog = new THREE.Fog(0x9ed9ff, 34, initialFar * 0.95);
+            scene.fog = new THREE.Fog(0xbde9ff, 58, initialFar * 0.99);
 
             orbitControls = new OrbitControls(cameras.freeLook, renderer.domElement);
             orbitControls.enabled = false;
@@ -547,6 +731,7 @@
             updateTime(parseFloat(document.getElementById('time-slider').value));
 
             updateNpcCount();
+            updateBuildUi();
             setQuality(document.getElementById('quality-select').value, true);
             renderer.compile(scene, currentCamera);
 
@@ -560,7 +745,7 @@
             sky.material.uniforms['rayleigh'].value = 1.85;
             sky.material.uniforms['mieCoefficient'].value = 0.005;
             sky.material.uniforms['mieDirectionalG'].value = 0.78;
-            scene.background = new THREE.Color(0x9ed9ff);
+            scene.background = new THREE.Color(0xa8ddff);
             scene.add(sky);
             sun = new THREE.Vector3();
         }
@@ -576,8 +761,13 @@
             };
             document.addEventListener('keydown', (e) => {
                 const key = normalizedKey(e.key);
-                if (!e.repeat && (key === 'Escape' || key === 'p') && gameStarted) { e.preventDefault(); togglePause(); return; }
-                if (!gameStarted || gamePaused) return;
+                const editable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+                if (!e.repeat && (key === 'Escape' || key === 'p') && gameStarted && !editable) { e.preventDefault(); togglePause(); return; }
+                if (!gameStarted || gamePaused || editable) return;
+                if (!e.repeat && key === 'Tab') { e.preventDefault(); toggleFieldPack(); return; }
+                if (!e.repeat && ['1', '2', '3', '4', '5'].includes(key)) { e.preventDefault(); selectBuildMaterial(['turf', 'stone', 'timber', 'glass', 'alloy'][Number(key) - 1]); return; }
+                if (!e.repeat && key === '7') { e.preventDefault(); toggleRemoveMode(); return; }
+                if (!e.repeat && key === 'r') { e.preventDefault(); rotateBuildModule(); return; }
                 keys[key] = true;
                 if (!controlledVehicle) stopAutoDrive();
                 if (!e.repeat && key === 'e') toggleVehicleControl();
@@ -603,8 +793,14 @@
             document.getElementById('drawer-toggle').addEventListener('click', () => toggleDrawer());
             document.getElementById('quick-camera').addEventListener('click', changeCamera);
             document.getElementById('quick-car').addEventListener('click', () => { spawnVehicle(); setSandboxMessage('乗り物を近くに出しました。Eキーで乗車できます。'); });
-            document.getElementById('quick-place').addEventListener('click', togglePlaceMode);
             document.getElementById('quick-map').addEventListener('click', () => { document.getElementById('map-container').classList.toggle('map-emphasis'); setSandboxMessage('ミニマップをクリックして目的地を決められます。'); });
+            document.querySelectorAll('[data-build-material]').forEach(button => button.addEventListener('click', () => selectBuildMaterial(button.dataset.buildMaterial)));
+            document.getElementById('belt-rotate').addEventListener('click', rotateBuildModule);
+            document.getElementById('belt-remove').addEventListener('click', toggleRemoveMode);
+            document.getElementById('field-pack-button').addEventListener('click', () => toggleFieldPack(true));
+            document.getElementById('field-pack-close').addEventListener('click', () => toggleFieldPack(false));
+            document.getElementById('chat-drawer-toggle').addEventListener('click', toggleChatDock);
+            document.getElementById('local-ai-button').addEventListener('click', startLocalAi);
             document.getElementById('title-help-button').addEventListener('click', () => { document.getElementById('title-screen').classList.add('hidden'); document.getElementById('help-modal').style.display = 'block'; });
             setupPanelTabs();
             document.getElementById('help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
@@ -613,13 +809,16 @@
             document.getElementById('username-input').addEventListener('input', (e) => { playerGroup.userData.name = e.target.value; });
             document.getElementById('userid-input').addEventListener('input', (e) => { playerGroup.userData.id = e.target.value; });
 
-            document.getElementById('chat-form').addEventListener('submit', (e) => {
+            document.getElementById('chat-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const input = document.getElementById('chat-input');
-                if (input.value.trim() !== '') {
-                    addChatMessage(playerGroup, input.value);
-                    input.value = '';
-                }
+                const message = input.value.trim();
+                if (!message || localAiSending) return;
+                addChatMessage(playerGroup, message);
+                input.value = '';
+                const npc = getConversationNpc();
+                if (localAiStatus === 'ready' && localAiEngine) await requestLocalAiResponse(npc, message);
+                else respondWithFallback(npc, message);
             });
 
             const npcSlider = document.getElementById('npc-slider');
@@ -647,6 +846,7 @@
             renderer.domElement.addEventListener('pointerdown', onPointerDown);
             renderer.domElement.addEventListener('pointermove', onPointerMove);
             renderer.domElement.addEventListener('pointerup', onPointerUp);
+            renderer.domElement.addEventListener('contextmenu', (e) => { if (placeMode || removeMode) e.preventDefault(); });
         }
 
         function createCityMap() {
@@ -659,16 +859,17 @@
         }
 
         function createChunkAssets() {
-            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x5d7580, roughness: 0.9, metalness: 0.02 });
-            const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x263849, roughness: 0.72, metalness: 0.13 });
-            buildingMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.43, metalness: 0.22, emissive: 0x1f5a85, emissiveIntensity: 0.56 });
-            const windowMaterial = new THREE.MeshBasicMaterial({ color: 0x79d3ff });
-            const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x3f956a, roughness: 0.86, metalness: 0.02 });
+            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x9dcf8b, roughness: 0.88, metalness: 0.01 });
+            const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x4a6071, roughness: 0.72, metalness: 0.1 });
+            buildingMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, vertexColors: true });
+            const windowMaterial = new THREE.MeshBasicMaterial({ color: 0x9eefff });
+            const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x48b87c, roughness: 0.76, metalness: 0.01 });
             return {
                 groundGeometry: new THREE.PlaneGeometry(CHUNK_SIZE, CHUNK_SIZE),
                 unitPlane: new THREE.PlaneGeometry(1, 1),
                 buildingGeometry: new THREE.BoxGeometry(1, 1, 1),
                 facadeGeometry: new THREE.BoxGeometry(1, 1, 0.05),
+                roofGeometry: new THREE.BoxGeometry(1, 1, 1),
                 treeGeometry: new THREE.ConeGeometry(1, 3.2, 6),
                 groundMaterial, roadMaterial, buildingMaterial, windowMaterial, treeMaterial
             };
@@ -752,7 +953,7 @@
             group.add(roadMesh);
 
             const specs = [];
-            const palette = [0x5088bd, 0x627ca9, 0x536d83, 0x6d87a7, 0x5d93a0, 0x7488ad];
+            const palette = [0xafd7fb, 0xa6d7ad, 0xffbd8c, 0xf9dc88, 0xc7b2ef, 0x91dde0, 0xffb5c0];
             const attempts = qualityConfig().chunkBuildings * 3;
             for (let index = 0; index < attempts && specs.length < qualityConfig().chunkBuildings; index++) {
                 const seed = hash2D(cx * 101 + index, cz * 67 - index, 11);
@@ -764,22 +965,38 @@
                 const size = 4 + hash2D(cx - index, cz + index, 71) * 4;
                 specs.push({ x, z, height, size, color: new THREE.Color(palette[Math.floor(hash2D(cx + index, cz + index, 101) * palette.length)]) });
             }
-            const buildingMesh = new THREE.InstancedMesh(chunkAssets.buildingGeometry, chunkAssets.buildingMaterial, Math.max(specs.length, 1));
+            const chunkTone = new THREE.Color(palette[Math.floor(hash2D(cx, cz, 257) * palette.length)]).lerp(new THREE.Color(0xffffff), 0.22);
+            const buildingSurfaceMaterial = new THREE.MeshStandardMaterial({ color: chunkTone, roughness: 0.42, metalness: 0.12, emissive: chunkTone.clone().multiplyScalar(0.07), emissiveIntensity: 0.28 });
+            const buildingMesh = new THREE.InstancedMesh(chunkAssets.buildingGeometry, buildingSurfaceMaterial, Math.max(specs.length, 1));
             specs.forEach((spec, index) => {
                 helper.rotation.set(0, 0, 0);
                 helper.position.set(spec.x, spec.height / 2, spec.z);
                 helper.scale.set(spec.size, spec.height, spec.size);
                 helper.updateMatrix();
                 buildingMesh.setMatrixAt(index, helper.matrix);
-                buildingMesh.setColorAt(index, spec.color);
             });
             buildingMesh.count = specs.length;
             buildingMesh.instanceMatrix.needsUpdate = true;
-            if (buildingMesh.instanceColor) buildingMesh.instanceColor.needsUpdate = true;
             buildingMesh.castShadow = false;
             buildingMesh.receiveShadow = true;
             buildingMesh.userData.dynamicShadowCaster = true;
             group.add(buildingMesh);
+
+            const roofMaterial = new THREE.MeshStandardMaterial({ color: chunkTone.clone().lerp(new THREE.Color(0xffffff), 0.48), roughness: 0.31, metalness: 0.18, emissive: 0x355e76, emissiveIntensity: 0.16 });
+            const roofMesh = new THREE.InstancedMesh(chunkAssets.roofGeometry, roofMaterial, Math.max(specs.length, 1));
+            specs.forEach((spec, index) => {
+                helper.rotation.set(0, 0, 0);
+                helper.position.set(spec.x, spec.height + 0.13, spec.z);
+                helper.scale.set(spec.size * 1.08, 0.26, spec.size * 1.08);
+                helper.updateMatrix();
+                roofMesh.setMatrixAt(index, helper.matrix);
+            });
+            roofMesh.count = specs.length;
+            roofMesh.instanceMatrix.needsUpdate = true;
+            roofMesh.castShadow = false;
+            roofMesh.receiveShadow = true;
+            roofMesh.userData.dynamicShadowCaster = true;
+            group.add(roofMesh);
 
             const facadeMesh = new THREE.InstancedMesh(chunkAssets.facadeGeometry, chunkAssets.windowMaterial, Math.max(specs.length * 12, 1));
             let facadeIndex = 0;
@@ -1055,50 +1272,222 @@
             });
         }
 
-        function togglePlaceMode() {
-            placeMode = !placeMode;
-            const button = document.getElementById('place-prop-btn');
-            button.innerHTML = placeMode
-                ? '<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cursor-fill"></use></svg>地面をクリック'
-                : '<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>ブロック配置';
-            button.style.background = placeMode ? 'rgba(136, 93, 10, 0.88)' : '';
-            setSandboxMessage(placeMode ? '配置モードを有効化しました。ゲーム画面の地面をクリックしてブロックを置けます。' : '配置モードを終了しました。');
+        function createBuildModule(materialId, ghost = false) {
+            const spec = BUILD_MATERIALS[materialId] || BUILD_MATERIALS.turf;
+            const group = new THREE.Group();
+            const solid = (color, options = {}) => new THREE.MeshStandardMaterial({ color, roughness: options.roughness ?? 0.55, metalness: options.metalness ?? 0.08, transparent: !!options.transparent, opacity: options.opacity ?? 1, emissive: options.emissive ?? 0x000000, emissiveIntensity: options.emissiveIntensity ?? 0 });
+            const addBox = (size, position, material) => {
+                const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+                mesh.position.set(...position);
+                mesh.castShadow = !ghost;
+                mesh.receiveShadow = true;
+                mesh.userData.buildPiece = true;
+                group.add(mesh);
+                return mesh;
+            };
+            if (materialId === 'turf') {
+                addBox([2, 0.64, 2], [0, 0.32, 0], solid(spec.color, { roughness: 0.88 }));
+                addBox([2.04, 0.10, 2.04], [0, 0.69, 0], solid(spec.accent, { roughness: 0.95 }));
+            } else if (materialId === 'stone') {
+                addBox([2, 2, 2], [0, 1, 0], solid(spec.color, { roughness: 0.82 }));
+                addBox([2.04, 0.10, 2.04], [0, 0.70, 0], solid(spec.accent, { roughness: 0.75 }));
+                addBox([2.04, 0.10, 2.04], [0, 1.33, 0], solid(spec.accent, { roughness: 0.75 }));
+            } else if (materialId === 'timber') {
+                addBox([2, 2, 2], [0, 1, 0], solid(spec.color, { roughness: 0.72 }));
+                [-0.68, 0, 0.68].forEach(y => addBox([2.07, 0.12, 2.07], [0, 1 + y, 0], solid(spec.accent, { roughness: 0.62 })));
+            } else if (materialId === 'glass') {
+                addBox([2, 2, 2], [0, 1, 0], solid(spec.color, { roughness: 0.08, metalness: 0.3, transparent: true, opacity: 0.42, emissive: 0x1d7d91, emissiveIntensity: 0.26 }));
+                const edgeMat = solid(spec.accent, { roughness: 0.26, metalness: 0.46, emissive: 0x1c88a8, emissiveIntensity: 0.35 });
+                [-0.93, 0.93].forEach(x => [-0.93, 0.93].forEach(z => addBox([0.12, 2.08, 0.12], [x, 1, z], edgeMat)));
+            } else {
+                addBox([2, 2, 2], [0, 1, 0], solid(spec.color, { roughness: 0.34, metalness: 0.58, emissive: 0x173b62, emissiveIntensity: 0.25 }));
+                const lightMat = solid(spec.accent, { roughness: 0.2, metalness: 0.3, emissive: spec.accent, emissiveIntensity: 0.65 });
+                addBox([1.35, 0.11, 0.12], [0, 1.03, 1.03], lightMat);
+                addBox([1.35, 0.11, 0.12], [0, 1.03, -1.03], lightMat);
+            }
+            group.userData = { isBuildModule: true, materialId, cellSize: 2, baseHeight: spec.baseHeight };
+            if (ghost) {
+                group.traverse(child => {
+                    if (!child.isMesh) return;
+                    child.material = child.material.clone();
+                    child.material.transparent = true;
+                    child.material.opacity = 0.32;
+                    child.material.depthWrite = false;
+                    child.material.emissive = new THREE.Color(0x39cfff);
+                    child.material.emissiveIntensity = 0.55;
+                    child.renderOrder = 3;
+                });
+            }
+            return group;
         }
 
-        function placePropAtPointer(event) {
+        function getBuildIntersection(event, includeProps = true) {
             const rect = renderer.domElement.getBoundingClientRect();
             vehiclePointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             vehiclePointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
             vehicleRaycaster.setFromCamera(vehiclePointer, currentCamera);
             const grounds = Array.from(loadedChunks.values()).map(chunk => chunk.ground);
-            const hit = vehicleRaycaster.intersectObjects(grounds, false)[0];
+            const targets = includeProps ? grounds.concat(placedProps) : grounds;
+            return vehicleRaycaster.intersectObjects(targets, true)[0] || null;
+        }
+
+        function getBuildRoot(object) {
+            let current = object;
+            while (current?.parent && !current.userData?.isBuildModule) current = current.parent;
+            return current?.userData?.isBuildModule ? current : null;
+        }
+
+        function getSnappedBuildPosition(hit) {
+            const spec = BUILD_MATERIALS[selectedBuildMaterial];
+            const root = getBuildRoot(hit.object);
+            const snap = (value) => Math.round(value / 2) * 2;
+            if (root) {
+                const normal = hit.face?.normal?.clone() || new THREE.Vector3(0, 1, 0);
+                normal.transformDirection(hit.object.matrixWorld);
+                if (Math.abs(normal.y) > 0.6) return new THREE.Vector3(snap(hit.point.x), Math.max(spec.baseHeight / 2, Math.round((hit.point.y + spec.baseHeight / 2) / 2) * 2 + spec.baseHeight / 2), snap(hit.point.z));
+                const direction = Math.abs(normal.x) > Math.abs(normal.z) ? new THREE.Vector3(Math.sign(normal.x), 0, 0) : new THREE.Vector3(0, 0, Math.sign(normal.z));
+                return root.position.clone().addScaledVector(direction, 2).set(snap(root.position.x + direction.x * 2), spec.baseHeight / 2, snap(root.position.z + direction.z * 2));
+            }
+            return new THREE.Vector3(snap(hit.point.x), spec.baseHeight / 2, snap(hit.point.z));
+        }
+
+        function canPlaceBuildAt(position) {
+            const occupied = placedProps.some(prop => prop.position.distanceToSquared(position) < 1.2);
+            const nearCharacter = [playerGroup, ...npcs, ...vehicles, ...trafficVehicles].some(object => object && object.position.distanceToSquared(position) < 3.2);
+            return !occupied && !nearCharacter && placedProps.length < MAX_PLACED_PROPS;
+        }
+
+        function ensureBuildGhost() {
+            if (buildGhost?.userData.materialId === selectedBuildMaterial) return;
+            if (buildGhost) scene.remove(buildGhost);
+            buildGhost = createBuildModule(selectedBuildMaterial, true);
+            buildGhost.visible = false;
+            scene.add(buildGhost);
+        }
+
+        function updateBuildGhost(event) {
+            if (!placeMode || removeMode || !gameStarted) { if (buildGhost) buildGhost.visible = false; return; }
+            ensureBuildGhost();
+            const hit = getBuildIntersection(event, true);
+            if (!hit) { buildGhost.visible = false; return; }
+            const position = getSnappedBuildPosition(hit);
+            buildGhost.position.copy(position);
+            buildGhost.rotation.y = buildRotationQuarter * Math.PI / 2;
+            buildGhostValid = canPlaceBuildAt(position);
+            buildGhost.visible = true;
+            buildGhost.traverse(child => {
+                if (!child.isMesh) return;
+                child.material.emissive.setHex(buildGhostValid ? 0x39cfff : 0xff4e61);
+            });
+        }
+
+        function updateBuildUi() {
+            const spec = BUILD_MATERIALS[selectedBuildMaterial];
+            document.querySelectorAll('[data-build-material]').forEach(button => button.classList.toggle('selected', button.dataset.buildMaterial === selectedBuildMaterial));
+            document.getElementById('build-material-label').textContent = spec.label;
+            document.getElementById('build-rotation-label').textContent = `${buildRotationQuarter * 90}°`;
+            document.getElementById('build-mode-label').textContent = removeMode ? '右クリックまたは左クリックで除去' : placeMode ? 'クリックで配置・右クリックで除去' : 'Bで建築モード';
+            document.getElementById('belt-remove').classList.toggle('active', removeMode);
+            const button = document.getElementById('place-prop-btn');
+            if (button) {
+                button.innerHTML = placeMode && !removeMode
+                    ? '<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cursor-fill"></use></svg>建築中（Bで終了）'
+                    : '<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>建築モード';
+            }
+            const buildCount = document.getElementById('build-count');
+            if (buildCount) buildCount.textContent = placedProps.length;
+        }
+
+        function selectBuildMaterial(materialId) {
+            if (!BUILD_MATERIALS[materialId]) return;
+            selectedBuildMaterial = materialId;
+            removeMode = false;
+            placeMode = true;
+            if (buildGhost) { scene.remove(buildGhost); buildGhost = null; }
+            updateBuildUi();
+            setSandboxMessage(`${BUILD_MATERIALS[materialId].label}を選択しました。地面または既存モジュールをクリックして配置できます。`);
+        }
+
+        function rotateBuildModule() {
+            buildRotationQuarter = (buildRotationQuarter + 1) % 4;
+            if (buildGhost) buildGhost.rotation.y = buildRotationQuarter * Math.PI / 2;
+            updateBuildUi();
+            setSandboxMessage(`配置の向きを${buildRotationQuarter * 90}°に変更しました。`);
+        }
+
+        function toggleRemoveMode() {
+            removeMode = !removeMode;
+            placeMode = removeMode || placeMode;
+            if (buildGhost) buildGhost.visible = false;
+            updateBuildUi();
+            setSandboxMessage(removeMode ? '削除モードです。配置済みモジュールをクリックして取り除けます。' : '削除モードを終了しました。');
+        }
+
+        function togglePlaceMode() {
+            placeMode = !placeMode;
+            removeMode = false;
+            if (buildGhost) buildGhost.visible = false;
+            updateBuildUi();
+            setSandboxMessage(placeMode ? `${BUILD_MATERIALS[selectedBuildMaterial].label}の建築モードです。クリックで配置、右クリックで除去します。` : '建築モードを終了しました。');
+        }
+
+        function placePropAtPointer(event) {
+            if (placedProps.length >= MAX_PLACED_PROPS) { setSandboxMessage(`配置上限の${MAX_PLACED_PROPS}個に達しました。不要なモジュールを削除してください。`); return; }
+            const hit = getBuildIntersection(event, true);
             if (!hit) return;
-            const colors = [0x57c7ef, 0xff7b9a, 0xffcf72, 0x7ee0ac, 0xa98cff];
-            const size = 1 + Math.random() * 2.2;
-            const height = 1.5 + Math.random() * 6;
-            const prop = new THREE.Group();
-            const base = new THREE.Mesh(new THREE.BoxGeometry(size, height, size), new THREE.MeshStandardMaterial({ color: colors[Math.floor(Math.random() * colors.length)], roughness: 0.45, metalness: 0.32, emissive: 0x071018 }));
-            base.position.y = height / 2;
-            const cap = new THREE.Mesh(new THREE.BoxGeometry(size * 1.08, 0.18, size * 1.08), new THREE.MeshBasicMaterial({ color: 0x9eeeff }));
-            cap.position.y = height + 0.1;
-            prop.add(base, cap);
-            prop.position.copy(hit.point);
-            prop.position.y = 0;
+            const position = getSnappedBuildPosition(hit);
+            if (!canPlaceBuildAt(position)) { setSandboxMessage('ここには置けません。赤いゴーストが表示されない位置を選んでください。'); return; }
+            const prop = createBuildModule(selectedBuildMaterial, false);
+            prop.position.copy(position);
+            prop.rotation.y = buildRotationQuarter * Math.PI / 2;
             scene.add(prop);
             placedProps.push(prop);
-            setSandboxMessage(`ブロックを配置しました。現在 ${placedProps.length} 個です。`);
+            updateBuildUi();
+            setSandboxMessage(`${BUILD_MATERIALS[selectedBuildMaterial].label}を配置しました。現在 ${placedProps.length} 個です。`);
+        }
+
+        function removePropAtPointer(event) {
+            if (!placedProps.length) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            vehiclePointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            vehiclePointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            scene.updateMatrixWorld(true);
+            const buildPieces = [];
+            placedProps.forEach(prop => {
+                prop.updateMatrixWorld(true);
+                prop.traverse(child => { if (child.isMesh && child.userData.buildPiece) buildPieces.push(child); });
+            });
+            vehicleRaycaster.setFromCamera(vehiclePointer, currentCamera);
+            const hit = vehicleRaycaster.intersectObjects(buildPieces, false)[0];
+            let prop = hit ? getBuildRoot(hit.object) : null;
+            if (!prop) {
+                currentCamera.updateMatrixWorld(true);
+                const pointerX = event.clientX;
+                const pointerY = event.clientY;
+                let nearest = null;
+                placedProps.forEach(candidate => {
+                    const screen = candidate.position.clone().project(currentCamera);
+                    if (screen.z < -1 || screen.z > 1) return;
+                    const screenX = rect.left + (screen.x * 0.5 + 0.5) * rect.width;
+                    const screenY = rect.top + (-screen.y * 0.5 + 0.5) * rect.height;
+                    const distanceSq = (pointerX - screenX) ** 2 + (pointerY - screenY) ** 2;
+                    if (!nearest || distanceSq < nearest.distanceSq) nearest = { candidate, distanceSq };
+                });
+                if (nearest) prop = nearest.candidate;
+            }
+            if (!prop) { setSandboxMessage('配置済みモジュールを狙ってクリックまたは右クリックしてください。'); return; }
+            scene.remove(prop);
+            placedProps = placedProps.filter(item => item !== prop);
+            updateBuildUi();
+            setSandboxMessage(`モジュールを取り除きました。現在 ${placedProps.length} 個です。`);
         }
 
         function clearPlacedProps() {
-            placedProps.forEach(prop => {
-                prop.traverse(child => {
-                    if (child.geometry) child.geometry.dispose();
-                    if (child.material) child.material.dispose();
-                });
-                scene.remove(prop);
-            });
+            placedProps.forEach(prop => scene.remove(prop));
             placedProps = [];
-            setSandboxMessage('配置したブロックをすべて削除しました。');
+            if (buildGhost) buildGhost.visible = false;
+            updateBuildUi();
+            setSandboxMessage('配置したモジュールをすべて削除しました。');
         }
 
         function setSandboxMessage(message) {
@@ -1199,14 +1588,28 @@
             }
         }
 
+        function createNpcBrain(npc) {
+            npc.targetPosition = new THREE.Vector3();
+            npc.userData.brain = {
+                state: 'wander',
+                stateUntil: 0,
+                speed: 1.15 + Math.random() * 0.7,
+                destinationIndex: 0,
+                patrolAxis: Math.random() > 0.5 ? 'x' : 'z',
+                patrolDirection: Math.random() > 0.5 ? 1 : -1,
+                home: npc.position.clone(),
+                lastStateChange: 0
+            };
+            chooseNpcDestination(npc, performance.now(), true);
+        }
+
         function updateNpcCount() {
             const newCount = Math.min(parseInt(document.getElementById('npc-slider').value), qualityConfig().npcCap);
             while (npcs.length < newCount) {
                 const npc = changeCharacter(false);
                 npc.userData = { name: "NPC " + (npcs.length + 1), id: 1000 + npcs.length + 1 };
                 resetNpcPosition(npc);
-                npc.targetPosition = new THREE.Vector3();
-                resetNpcTarget(npc);
+                createNpcBrain(npc);
                 npcs.push(npc);
                 scene.add(npc);
             }
@@ -1214,61 +1617,286 @@
                 const npcToRemove = npcs.pop();
                 scene.remove(npcToRemove);
             }
+            updateNpcActivityReadout();
         }
+
         function resetNpcPosition(npc) {
             const center = getControlledObject ? getControlledObject().position : new THREE.Vector3();
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 10 + Math.random() * CHUNK_SIZE * 0.8;
-            npc.position.set(center.x + Math.cos(angle) * radius, 0, center.z + Math.sin(angle) * radius);
+            const corridor = Math.random() > 0.5 ? 'x' : 'z';
+            const lane = (Math.random() > 0.5 ? 1 : -1) * (ROAD_WIDTH * 0.5 + 1.45);
+            const distance = 12 + Math.random() * CHUNK_SIZE * 0.64;
+            if (corridor === 'x') npc.position.set(center.x + (Math.random() > 0.5 ? distance : -distance), 0, nearestRoad(center.z) + lane);
+            else npc.position.set(nearestRoad(center.x) + lane, 0, center.z + (Math.random() > 0.5 ? distance : -distance));
         }
-        function resetNpcTarget(npc) {
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 6 + Math.random() * 24;
-            npc.targetPosition.set(npc.position.x + Math.cos(angle) * radius, 0, npc.position.z + Math.sin(angle) * radius);
+
+        function chooseNpcDestination(npc, time = performance.now(), force = false) {
+            const brain = npc.userData.brain;
+            if (!brain) return;
+            const patrol = force || Math.random() < 0.64;
+            brain.state = patrol ? 'patrol' : 'wander';
+            brain.lastStateChange = time;
+            const travel = 12 + Math.random() * 28;
+            if (patrol) {
+                const lane = (Math.random() > 0.5 ? 1 : -1) * (ROAD_WIDTH * 0.5 + 1.45);
+                if (brain.patrolAxis === 'x') {
+                    npc.targetPosition.set(npc.position.x + travel * brain.patrolDirection, 0, nearestRoad(npc.position.z) + lane);
+                } else {
+                    npc.targetPosition.set(nearestRoad(npc.position.x) + lane, 0, npc.position.z + travel * brain.patrolDirection);
+                }
+                if (Math.random() < 0.33) brain.patrolAxis = brain.patrolAxis === 'x' ? 'z' : 'x';
+                if (Math.random() < 0.22) brain.patrolDirection *= -1;
+            } else {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 7 + Math.random() * 18;
+                const rawX = npc.position.x + Math.cos(angle) * radius;
+                const rawZ = npc.position.z + Math.sin(angle) * radius;
+                const nearRoadX = nearestRoad(rawX);
+                const nearRoadZ = nearestRoad(rawZ);
+                const sidewalkOffset = ROAD_WIDTH * 0.5 + 1.8;
+                npc.targetPosition.set(
+                    Math.abs(rawX - nearRoadX) < Math.abs(rawZ - nearRoadZ) ? nearRoadX + (Math.random() > 0.5 ? sidewalkOffset : -sidewalkOffset) : rawX,
+                    0,
+                    Math.abs(rawZ - nearRoadZ) <= Math.abs(rawX - nearRoadX) ? nearRoadZ + (Math.random() > 0.5 ? sidewalkOffset : -sidewalkOffset) : rawZ
+                );
+            }
         }
-        function moveNpcs(delta) {
+
+        function enterNpcWait(npc, time) {
+            const brain = npc.userData.brain;
+            if (!brain) return;
+            brain.state = 'wait';
+            brain.stateUntil = time + 850 + Math.random() * 2300;
+            brain.lastStateChange = time;
+        }
+
+        function markNpcTalking(npc, duration = 4600) {
+            const brain = npc?.userData?.brain;
+            if (!brain) return;
+            brain.state = 'talk';
+            brain.stateUntil = performance.now() + duration;
+            brain.lastStateChange = performance.now();
+        }
+
+        function getNpcAvoidance(npc, index, playerPos) {
+            const avoidance = new THREE.Vector3();
+            const pushAway = (other, radius, strength) => {
+                if (!other || other === npc) return;
+                const delta = npc.position.clone().sub(other.position);
+                delta.y = 0;
+                const distance = delta.length();
+                if (distance > 0.001 && distance < radius) avoidance.addScaledVector(delta.normalize(), (1 - distance / radius) * strength);
+            };
+            pushAway(getControlledObject(), 3.6, 1.35);
+            trafficVehicles.forEach(vehicle => pushAway(vehicle, 3.2, 1.5));
+            vehicles.forEach(vehicle => pushAway(vehicle, 2.8, 1.15));
+            placedProps.forEach(prop => pushAway(prop, 2.25, 1.2));
+            const sampleCount = Math.min(npcs.length - 1, 14);
+            for (let offset = 1; offset <= sampleCount; offset++) pushAway(npcs[(index + offset * 7) % npcs.length], 1.35, 0.76);
+            return avoidance;
+        }
+
+        function moveNpcs(delta, time) {
             const playerPos = getControlledObject().position;
             const stride = qualityConfig().npcStride;
             const updateDistanceSq = Math.pow((getActiveChunkRadius() + 0.8) * CHUNK_SIZE, 2);
             for (let index = npcUpdateCursor; index < npcs.length; index += stride) {
                 const npc = npcs[index];
-                if (npc.position.distanceToSquared(playerPos) > updateDistanceSq) { resetNpcPosition(npc); resetNpcTarget(npc); continue; }
-                const distanceToTarget = npc.position.distanceTo(npc.targetPosition);
-                if (distanceToTarget < 2) resetNpcTarget(npc);
-                const direction = npc.targetPosition.clone().sub(npc.position).normalize();
-                npc.position.addScaledVector(direction, 1.2 * delta * stride);
-                npc.rotation.y = Math.atan2(direction.x, direction.z);
+                const brain = npc.userData.brain;
+                if (!brain) { createNpcBrain(npc); continue; }
+                if (npc.position.distanceToSquared(playerPos) > updateDistanceSq) {
+                    resetNpcPosition(npc);
+                    brain.home.copy(npc.position);
+                    chooseNpcDestination(npc, time, true);
+                    continue;
+                }
+                if ((brain.state === 'wait' || brain.state === 'talk') && time < brain.stateUntil) continue;
+                if (brain.state === 'wait' || brain.state === 'talk') chooseNpcDestination(npc, time);
+                const toTarget = npc.targetPosition.clone().sub(npc.position);
+                toTarget.y = 0;
+                if (toTarget.lengthSq() < 2.25) { enterNpcWait(npc, time); continue; }
+                const desired = toTarget.normalize();
+                const avoidance = getNpcAvoidance(npc, index, playerPos);
+                if (avoidance.lengthSq() > 0.005) {
+                    desired.addScaledVector(avoidance.normalize(), 0.82).normalize();
+                    if (brain.state !== 'yield') { brain.state = 'yield'; brain.stateUntil = time + 500; }
+                } else if (brain.state === 'yield' && time > brain.stateUntil) {
+                    brain.state = Math.random() < 0.65 ? 'patrol' : 'wander';
+                }
+                npc.position.addScaledVector(desired, brain.speed * delta * stride);
+                const targetAngle = Math.atan2(desired.x, desired.z);
+                npc.rotation.y += THREE.MathUtils.euclideanModulo(targetAngle - npc.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
             }
             npcUpdateCursor = (npcUpdateCursor + 1) % Math.max(stride, 1);
+            if (time - lastNpcActivityUi > 700) { updateNpcActivityReadout(); lastNpcActivityUi = time; }
         }
-        function addChatMessage(characterObject, message) {
+
+        function updateNpcActivityReadout() {
+            const readout = document.getElementById('npc-activity-readout');
+            if (!readout) return;
+            const walking = npcs.filter(npc => ['patrol', 'wander', 'yield'].includes(npc.userData.brain?.state)).length;
+            const talking = npcs.filter(npc => npc.userData.brain?.state === 'talk').length;
+            readout.textContent = talking ? `${walking}人が移動・${talking}人が会話中` : `${walking}人が街を移動中`;
+        }
+
+        function showNpcBubble(characterObject, message) {
+            if (!characterObject) return;
+            labelRenderUntil = Math.max(labelRenderUntil, performance.now() + 5300);
+            let label = null;
+            characterObject.traverse(child => { if (child.isCSS2DObject) label = child; });
+            if (!label) return;
+            label.element.textContent = message;
+            label.visible = true;
+            label.element.classList.add('visible');
+            if (label.timeout) clearTimeout(label.timeout);
+            label.timeout = setTimeout(() => {
+                label.element.classList.remove('visible');
+                setTimeout(() => { if (!label.element.classList.contains('visible')) label.visible = false; }, 300);
+            }, 5000);
+        }
+
+        function addChatMessage(characterObject, message, options = {}) {
             const log = document.getElementById('chat-log');
             const p = document.createElement('p');
-            p.textContent = `[${characterObject.userData.name}]: ${message}`;
+            if (options.className) p.className = options.className;
+            const role = characterObject?.userData?.name || 'CITY';
+            p.textContent = `[${role}]: ${message}`;
             log.appendChild(p);
-            while (log.children.length > 24) log.removeChild(log.firstChild);
+            while (log.children.length > 32) log.removeChild(log.firstChild);
             log.scrollTop = log.scrollHeight;
-            labelRenderUntil = Math.max(labelRenderUntil, performance.now() + 5300);
+            showNpcBubble(characterObject, message);
+            return p;
+        }
 
-            // --- ▼ 修正点: traverseを使い、子孫要素からチャットラベルを正しく検索する ▼ ---
-            let label = null;
-            characterObject.traverse(function(child) {
-                if (child.isCSS2DObject) {
-                    label = child;
+        function addChatSystemNote(message) {
+            const log = document.getElementById('chat-log');
+            const p = document.createElement('p');
+            p.className = 'system-note';
+            p.textContent = message;
+            log.appendChild(p);
+            while (log.children.length > 32) log.removeChild(log.firstChild);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function getConversationNpc() {
+            const origin = getControlledObject().position;
+            const nearest = npcs.reduce((best, npc) => {
+                const distanceSq = npc.position.distanceToSquared(origin);
+                return !best || distanceSq < best.distanceSq ? { npc, distanceSq } : best;
+            }, null);
+            return nearest?.npc || npcs[0] || playerGroup;
+        }
+
+        function getFallbackReply(message) {
+            const text = message.toLowerCase();
+            if (/建築|ブロック|素材|作/.test(text)) return '素材を組み合わせると、街の表情が変わるよ。高く積むなら土台から整えるのがおすすめ。';
+            if (/車|乗り物|運転/.test(text)) return '道路沿いなら乗り物が走りやすいよ。近くの車にはEキーで乗れるんだ。';
+            if (/天気|雨|雪|晴/.test(text)) return '天気が変わると、同じ通りでも印象が変わるね。空を見上げてみて。';
+            if (/どこ|場所|道|行/.test(text)) return '交差点を曲がるたびに新しい景色があるよ。ミニマップで目的地を決めるのもいいね。';
+            return NPC_MESSAGES[Math.floor(Math.random() * NPC_MESSAGES.length)];
+        }
+
+        function respondWithFallback(npc, message) {
+            const speaker = npc || getConversationNpc();
+            const reply = getFallbackReply(message);
+            markNpcTalking(speaker);
+            setTimeout(() => addChatMessage(speaker, reply), 280);
+        }
+
+        function setChatModeStatus(text) {
+            const status = document.getElementById('chat-mode-status');
+            if (status) status.textContent = text;
+        }
+
+        function updateLocalAiButton() {
+            const button = document.getElementById('local-ai-button');
+            if (!button) return;
+            button.disabled = localAiStatus === 'loading' || localAiStatus === 'ready';
+            button.classList.toggle('loading', localAiStatus === 'loading');
+            button.classList.toggle('ready', localAiStatus === 'ready');
+            const label = button.querySelector('.ai-button-label');
+            if (label) label.textContent = localAiStatus === 'ready' ? 'LOCAL AI稼働中' : localAiStatus === 'loading' ? '読込中…' : 'LOCAL AIを開始';
+        }
+
+        async function startLocalAi() {
+            if (localAiStatus === 'loading' || localAiStatus === 'ready') return;
+            if (!navigator.gpu) {
+                localAiStatus = 'fallback';
+                setChatModeStatus('WebGPU非対応・テンプレート会話');
+                updateLocalAiButton();
+                addChatSystemNote('このブラウザはWebGPUを利用できないため、軽量なテンプレート会話を使用します。');
+                return;
+            }
+            localAiStatus = 'loading';
+            setChatModeStatus('LOCAL AIを準備中…');
+            updateLocalAiButton();
+            addChatSystemNote('LOCAL AIを準備しています。初回のみモデルの取得に時間がかかることがあります。');
+            try {
+                const webllm = await import(LOCAL_AI_MODULE_URL);
+                localAiEngine = await webllm.CreateMLCEngine(LOCAL_AI_MODEL, {
+                    initProgressCallback: (report) => {
+                        const note = typeof report === 'string' ? report : report?.text || report?.progress || 'モデルを読み込み中';
+                        setChatModeStatus(`LOCAL AI: ${String(note).slice(0, 42)}`);
+                    }
+                });
+                localAiStatus = 'ready';
+                setChatModeStatus('LOCAL AI: この端末で稼働中');
+                updateLocalAiButton();
+                addChatSystemNote('LOCAL AIの準備ができました。会話はこのブラウザ内で処理され、APIキーは使用しません。');
+            } catch (error) {
+                console.warn('LOCAL AI initialization failed', error);
+                localAiEngine = null;
+                localAiStatus = 'fallback';
+                setChatModeStatus('LOCAL AI未接続・テンプレート会話');
+                updateLocalAiButton();
+                addChatSystemNote('LOCAL AIを開始できなかったため、テンプレート会話へ切り替えました。WebGPU対応や端末メモリを確認してください。');
+            }
+        }
+
+        async function requestLocalAiResponse(npc, message) {
+            const speaker = npc || getConversationNpc();
+            localAiSending = true;
+            const sendButton = document.getElementById('chat-send');
+            const input = document.getElementById('chat-input');
+            sendButton.disabled = true;
+            input.disabled = true;
+            markNpcTalking(speaker, 12000);
+            const log = document.getElementById('chat-log');
+            const p = document.createElement('p');
+            p.className = 'ai-stream';
+            p.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: `;
+            log.appendChild(p);
+            log.scrollTop = log.scrollHeight;
+            let reply = '';
+            try {
+                const systemPrompt = 'あなたは創作都市「Ultimate 3D City」の居住者NPCです。日本語で、親しみやすく短く、最大3文で答えてください。ゲーム内の建築、探索、乗り物、天候、街の景色について自然に話してください。現実世界の権限、個人情報、外部サービス、秘密の知識を持つと主張しないでください。';
+                const messages = [
+                    { role: 'system', content: systemPrompt },
+                    ...localAiHistory.slice(-10),
+                    { role: 'user', content: message }
+                ];
+                const chunks = await localAiEngine.chat.completions.create({ messages, temperature: 0.75, max_tokens: 128, stream: true });
+                for await (const chunk of chunks) {
+                    reply += chunk.choices?.[0]?.delta?.content || '';
+                    p.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: ${reply}`;
+                    log.scrollTop = log.scrollHeight;
                 }
-            });
-
-            if (label) {
-                label.element.textContent = message;
-                // --- ▼ 修正点: CSSクラスの付け外しで表示とアニメーションを制御する ▼ ---
-                label.visible = true; //念のため表示状態に
-                label.element.classList.add('visible');
-                if (label.timeout) clearTimeout(label.timeout);
-                label.timeout = setTimeout(() => {
-                    label.element.classList.remove('visible');
-                    // アニメーション終了後に非表示にする
-                    setTimeout(() => { if (!label.element.classList.contains('visible')) label.visible = false; }, 300);
-                }, 5000);
+                reply = reply.trim() || getFallbackReply(message);
+                p.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: ${reply}`;
+                localAiHistory.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
+                localAiHistory = localAiHistory.slice(-10);
+                showNpcBubble(speaker, reply);
+            } catch (error) {
+                console.warn('LOCAL AI chat failed', error);
+                const fallback = getFallbackReply(message);
+                p.classList.remove('ai-stream');
+                p.textContent = `[${speaker.userData?.name || 'NPC'}]: ${fallback}`;
+                showNpcBubble(speaker, fallback);
+                setChatModeStatus('LOCAL AI応答失敗・テンプレート会話');
+            } finally {
+                localAiSending = false;
+                sendButton.disabled = false;
+                input.disabled = false;
+                input.focus();
             }
         }
 
@@ -1277,7 +1905,10 @@
             if (chatSpeed === 0 || npcs.length === 0 || time < nextNpcChatTime) return;
             const interval = 1000 / chatSpeed;
             nextNpcChatTime = time + Math.random() * interval * 2;
-            const randomNpc = npcs[Math.floor(Math.random() * npcs.length)];
+            const candidates = npcs.filter(npc => npc.userData.brain?.state !== 'talk');
+            const randomNpc = candidates[Math.floor(Math.random() * candidates.length)] || npcs[0];
+            if (!randomNpc) return;
+            markNpcTalking(randomNpc, 2200);
             const randomMessage = NPC_MESSAGES[Math.floor(Math.random() * NPC_MESSAGES.length)];
             addChatMessage(randomNpc, randomMessage);
         }
@@ -1354,7 +1985,10 @@
             const timeLabel = document.getElementById('time-label');
             const h = Math.floor(hour);
             const m = Math.floor((hour - h) * 60);
-            timeLabel.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            const formattedTime = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            timeLabel.textContent = formattedTime;
+            const worldTimeReadout = document.getElementById('world-time-readout');
+            if (worldTimeReadout) worldTimeReadout.textContent = formattedTime;
             const uniforms = sky.material.uniforms;
             const isNight = hour >= 17 || hour < 6;
             const phi = THREE.MathUtils.degToRad(90 - (hour - 6) * 15);
@@ -1368,9 +2002,9 @@
                 const noon_factor = 1 - Math.abs(day_t - 0.5) * 2;
                 uniforms['turbidity'].value = 3 + (1 - noon_factor) * 7;
                 uniforms['rayleigh'].value = 0.5 + noon_factor * 2.5;
-                directionalLight.intensity = 1.5 + noon_factor * 1.15;
-                ambientLight.intensity = 0.42 + noon_factor * 0.34;
-                hemisphereLight.intensity = 0.46 + noon_factor * 0.34;
+                directionalLight.intensity = 2.35 + noon_factor * 1.35;
+                ambientLight.intensity = 0.58 + noon_factor * 0.42;
+                hemisphereLight.intensity = 0.72 + noon_factor * 0.42;
             }
             const shadowFocus = getControlledObject ? getControlledObject().position : new THREE.Vector3();
             directionalLight.position.copy(shadowFocus).addScaledVector(sun, 90);
@@ -1378,8 +2012,7 @@
             directionalLight.target.updateMatrixWorld();
             streetLights.forEach(light => { light.intensity = isNight ? 0.75 : 0; });
             if (buildingMaterial) {
-                buildingMaterial.emissive.setHex(isNight ? 0x3e82a9 : 0x2a75a3);
-                buildingMaterial.emissiveIntensity = isNight ? 0.9 : 0.64;
+                buildingMaterial.needsUpdate = true;
             }
         }
         function changeWeather(weather) {
@@ -1504,26 +2137,25 @@
         }
 
         function onPointerDown(event) {
-            if (document.activeElement.tagName === 'INPUT') return;
-            if (event.target.tagName === 'CANVAS') {
-                if (placeMode) {
-                    placePropAtPointer(event);
-                    return;
-                }
-                isPointerDown = true;
-                pointerPosition.x = event.clientX;
-                pointerPosition.y = event.clientY;
-            }
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+            if (event.target.tagName !== 'CANVAS') return;
+            if (event.button === 2) { if (placeMode || removeMode) removePropAtPointer(event); return; }
+            if (event.button !== 0) return;
+            if (removeMode) { removePropAtPointer(event); return; }
+            if (placeMode) { placePropAtPointer(event); return; }
+            isPointerDown = true;
+            pointerPosition.x = event.clientX;
+            pointerPosition.y = event.clientY;
         }
         function onPointerMove(event) {
+            if (placeMode || removeMode) updateBuildGhost(event);
             if (!isPointerDown || currentCameraIndex === 2) return;
             const deltaX = event.clientX - pointerPosition.x;
             const deltaY = event.clientY - pointerPosition.y;
 
-            if (currentCameraIndex === 1) { // ★一人称視点
+            if (currentCameraIndex === 1) {
                 playerGroup.rotation.y -= deltaX * 0.002;
-                // 上下スクロールは無効化
-            } else { // ★三人称視点
+            } else {
                 cameraOffsetSpherical.theta -= deltaX * 0.005;
                 cameraOffsetSpherical.phi -= deltaY * 0.005;
                 cameraOffsetSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.5, cameraOffsetSpherical.phi));
@@ -1536,6 +2168,20 @@
         function toggleDrawer(force) {
             const open = typeof force === 'boolean' ? force : !document.body.classList.contains('drawer-open');
             document.body.classList.toggle('drawer-open', open);
+        }
+
+        function toggleFieldPack(force) {
+            const pack = document.getElementById('field-pack');
+            const open = typeof force === 'boolean' ? force : pack.hidden;
+            pack.hidden = !open;
+            if (open) { toggleDrawer(false); setPaused(false); }
+        }
+
+        function toggleChatDock() {
+            const dock = document.getElementById('chat-ui');
+            dock.classList.toggle('collapsed');
+            const collapsed = dock.classList.contains('collapsed');
+            document.getElementById('chat-drawer-toggle').setAttribute('aria-label', collapsed ? '会話欄を開く' : '会話欄を折り畳む');
         }
 
         function startGame() {
@@ -1603,7 +2249,7 @@
             lastShadowUpdateTime = 0;
             lastShadowChunkSignature = '';
             shadowFocusPosition.set(Infinity, Infinity, Infinity);
-            renderer.toneMappingExposure = qualityMode === 'visual' ? 1.34 : qualityMode === 'balanced' ? 1.24 : 1.12;
+            renderer.toneMappingExposure = qualityMode === 'visual' ? 1.58 : qualityMode === 'balanced' ? 1.46 : 1.30;
             const npcSlider = document.getElementById('npc-slider');
             npcSlider.max = config.npcCap;
             if (parseInt(npcSlider.value) > config.npcCap) npcSlider.value = config.npcCap;
@@ -1752,7 +2398,7 @@
             updateDynamicShadow(controlledObject.position, time);
 
             updateChunkStreaming(controlledObject.position);
-            moveNpcs(delta);
+            moveNpcs(delta, time);
             updateTraffic(delta);
             updateVehicleUi();
             handleNpcChat(time);
