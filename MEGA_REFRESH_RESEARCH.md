@@ -75,3 +75,13 @@ Chromeの公式資料は、端末内AIモデルの再起動を速くするため
 [15] [Chrome for Developers — Cache models in the browser](https://developer.chrome.com/docs/ai/cache-models)
 
 [16] [MDN — Cache](https://developer.mozilla.org/en-US/docs/Web/API/Cache)
+
+## 操作不能・モバイル視点修正の実装根拠
+
+Three.js公式のOrbitControls資料は、左ボタンまたは1本指の移動を回転に割り当て、ズームとパンを入力種別に応じて扱えること、減衰を有効にした場合は描画ループで`update()`を呼ぶ必要があることを示している。[17] 本作ではゲームキャンバスに独立したPointer Eventsベースの視点処理を持たせ、UI要素上の操作は誤ってカメラへ渡さず、キャンバス上のドラッグはPCとモバイルの両方で確実に視点へ渡す。
+
+W3C Pointer Events仕様は、`pointerdown`、`pointermove`、`pointerup`をマウス、タッチ、ペンに共通の入力モデルとして定義し、同じ処理で複数の入力装置へ対応できると説明している。[18] 乗降などの近接操作はキーボードの`E`に限定せず、モバイルの常設「使う」操作と3D近接ボタンの両方から同一処理を呼び出す。
+
+[17] [Three.js — OrbitControls](https://threejs.org/docs/pages/OrbitControls.html)
+
+[18] [W3C — Pointer Events](https://www.w3.org/TR/pointerevents/)

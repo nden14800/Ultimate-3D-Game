@@ -592,17 +592,47 @@
         /* Phase 7: focused NPC dialogue and local model control. */
         #npc-dialog-modal { position:fixed; z-index:140; inset:0; display:grid; place-items:center; padding:clamp(16px,4vw,46px); color:#183f71; background:radial-gradient(circle at 50% 12%,rgba(89,184,255,.33),transparent 42%),rgba(5,23,49,.75); backdrop-filter:blur(14px); } #npc-dialog-modal.hidden { display:none; } .npc-dialog-shell { position:relative; display:grid; grid-template-columns:minmax(0,.72fr) minmax(340px,1.28fr); width:min(980px,100%); min-height:min(620px,calc(100dvh - 72px)); overflow:hidden; border:2px solid rgba(255,255,255,.83); border-radius:28px; background:linear-gradient(145deg,rgba(251,254,255,.98),rgba(222,242,255,.96)); box-shadow:0 24px 0 rgba(0,18,48,.22),0 38px 100px rgba(0,0,0,.38); } .npc-dialog-profile { display:flex; flex-direction:column; justify-content:space-between; gap:18px; padding:34px; color:#e9f7ff; background:linear-gradient(155deg,#0a315d,#157da5); } .npc-dialog-kicker { color:#9eeeff; font-size:10px; font-weight:900; letter-spacing:.16em; } .npc-dialog-profile h2 { margin:8px 0 8px; color:#fff; font-size:clamp(32px,5vw,55px); line-height:.92; } .npc-dialog-profile p { margin:0; color:#c7ecff; font-size:13px; line-height:1.65; } .npc-dialog-chips { display:flex; flex-wrap:wrap; gap:7px; } .npc-dialog-chips span { padding:6px 8px; border:1px solid rgba(203,244,255,.35); border-radius:999px; background:rgba(0,22,54,.22); color:#dbf6ff; font-size:9px; font-weight:900; } .npc-dialog-conversation { display:flex; min-width:0; flex-direction:column; padding:24px; } .npc-dialog-close { position:absolute; z-index:2; top:14px; right:15px; display:grid; width:36px; height:36px; place-items:center; border:1px solid #cfdfef; border-radius:11px; color:#3970a6; background:#f8fcff; font-size:22px; } .npc-dialog-heading { padding:2px 46px 15px 0; border-bottom:1px solid #d7e6f4; color:#285a8d; font-size:11px; font-weight:900; letter-spacing:.12em; } #npc-dialog-log { flex:1; min-height:275px; max-height:48dvh; margin:14px 0; overflow:auto; padding:3px 8px 3px 0; color:#31597f; font-size:14px; line-height:1.6; } .npc-dialog-line { max-width:88%; margin:9px 0; padding:10px 12px; border:1px solid #d5e8f7; border-radius:14px 14px 14px 4px; background:#fff; } .npc-dialog-line.player { margin-left:auto; border-color:#77bdf4; border-radius:14px 14px 4px 14px; color:#114f86; background:#daf0ff; } .npc-dialog-line small { display:block; margin-bottom:3px; color:#5d88af; font-size:9px; font-weight:900; letter-spacing:.08em; } #npc-dialog-form { display:flex; gap:8px; padding-top:14px; border-top:1px solid #d7e6f4; } #npc-dialog-input { flex:1; min-width:0; min-height:46px; padding:0 12px; border:1px solid #c8dfef; border-radius:13px; color:#204d79; background:#fff; font:inherit; } #npc-dialog-send { min-width:82px; border:0; border-radius:13px; color:#fff; background:linear-gradient(180deg,#55a8ff,#2579e8); font-weight:900; } .ai-model-status { margin:10px 0 0; color:#6a91b6; font-size:10px; line-height:1.5; } @media (max-width:700px) { #npc-dialog-modal { padding:10px; align-items:end; } .npc-dialog-shell { grid-template-columns:1fr; min-height:min(740px,calc(100dvh - 20px)); border-radius:24px; } .npc-dialog-profile { min-height:180px; padding:24px; } .npc-dialog-profile h2 { font-size:38px; } .npc-dialog-conversation { min-height:0; padding:18px; } #npc-dialog-log { min-height:210px; max-height:35dvh; } }
 
+
+        /* Hide gameplay HUD while a title or pre-join layer is active. */
+        #title-screen:not(.hidden) ~ #game-topbar,#title-screen:not(.hidden) ~ #world-readout,#title-screen:not(.hidden) ~ #build-status,#title-screen:not(.hidden) ~ #build-belt,#title-screen:not(.hidden) ~ #context-actions,#title-screen:not(.hidden) ~ #mobile-action-rail,#title-screen:not(.hidden) ~ #zoom-readout,#title-screen:not(.hidden) ~ .ui-container,#title-screen:not(.hidden) ~ #map-container,#title-screen:not(.hidden) ~ #chat-ui,#title-screen:not(.hidden) ~ #joystick-container,#title-screen:not(.hidden) ~ #run-button { display:none !important; }
+
+        /* Phase 10: City Worlds, input recovery, and decluttered HUD. */
+        #title-screen { display:grid; place-items:center; padding:clamp(14px,3vw,44px); background:linear-gradient(105deg,rgba(2,13,32,.88),rgba(7,44,88,.48) 52%,rgba(3,14,32,.50)),url('assets/title-skyline.png') center/cover; overflow:auto; }
+        .world-browser-shell,.join-setup-shell { width:min(1180px,100%); display:grid; grid-template-columns:minmax(280px,.78fr) minmax(520px,1.22fr); gap:clamp(22px,4vw,72px); align-items:center; color:#eef9ff; }
+        .world-browser-intro,.join-setup-intro { position:relative; padding:clamp(20px,3vw,42px); border:1px solid rgba(183,230,255,.22); border-radius:28px; background:linear-gradient(145deg,rgba(4,30,68,.90),rgba(9,68,116,.68)); box-shadow:0 20px 72px rgba(0,0,0,.28); backdrop-filter:blur(18px); }
+        .world-browser-kicker { color:#87e4ff; font-size:11px; font-weight:900; letter-spacing:.18em; } .world-browser-kicker::before { display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:#60e4a8; box-shadow:0 0 16px #60e4a8; content:''; }
+        .world-browser-intro h2,.join-setup-intro h2 { margin:16px 0; color:#fff; font-size:clamp(42px,6vw,76px); line-height:.88; letter-spacing:-.075em; } .world-browser-intro h2 em,.join-setup-intro h2 em { color:#8ddcff; font-style:normal; }
+        .world-browser-intro p,.join-setup-intro p { max-width:420px; margin:0; color:#c7eaff; font-size:14px; font-weight:650; line-height:1.75; }
+        .world-browser-legend { display:grid; gap:9px; margin:26px 0; } .world-browser-legend span { display:flex; align-items:center; gap:8px; color:#e4f7ff; font-size:11px; font-weight:800; } .world-browser-legend i { width:8px; height:8px; border-radius:50%; background:#6ee6b0; box-shadow:0 0 12px #6ee6b0; }
+        .world-help { margin-top:0; text-align:left; }
+        .world-card-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .world-card { position:relative; display:flex; min-height:205px; flex-direction:column; justify-content:space-between; gap:16px; overflow:hidden; padding:20px; border:2px solid rgba(232,248,255,.50); border-radius:22px; color:#eff9ff; background:linear-gradient(145deg,rgba(15,79,129,.88),rgba(5,33,74,.94)); box-shadow:0 9px 0 rgba(0,15,45,.26),0 20px 38px rgba(0,0,0,.24); text-align:left; transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease; } .world-card::before { position:absolute; inset:auto -20% -54% auto; width:190px; height:190px; border:1px solid rgba(139,225,255,.34); border-radius:50%; box-shadow:0 0 0 24px rgba(139,225,255,.05),0 0 0 48px rgba(139,225,255,.03); content:''; } .world-card:nth-child(2){background:linear-gradient(145deg,rgba(82,45,126,.93),rgba(13,27,70,.96));}.world-card:nth-child(3){background:linear-gradient(145deg,rgba(25,105,87,.92),rgba(8,52,74,.96));}.world-card:hover,.world-card:focus-visible,.world-card.selected { transform:translateY(-4px); border-color:#a9eeff; box-shadow:0 13px 0 rgba(0,15,45,.26),0 26px 48px rgba(0,0,0,.28),0 0 0 3px rgba(105,219,255,.19); outline:none; } .world-card-top { position:relative; z-index:1; display:flex; align-items:start; justify-content:space-between; gap:10px; } .world-card-top b { font-size:24px; line-height:.86; letter-spacing:-.05em; } .world-card-score { padding:5px 7px; border:1px solid rgba(255,255,255,.34); border-radius:99px; color:#caffed; background:rgba(2,24,44,.25); font-size:8px; font-weight:900; letter-spacing:.06em; white-space:nowrap; } .world-card-copy { position:relative; z-index:1; max-width:240px; color:#d8efff; font-size:12px; font-weight:650; line-height:1.5; } .world-card-meta { position:relative; z-index:1; display:flex; flex-wrap:wrap; gap:6px; } .world-card-meta span { padding:5px 7px; border-radius:7px; color:#d9f5ff; background:rgba(1,20,48,.34); font-size:8px; font-weight:900; letter-spacing:.05em; }
+        .world-browser-primary { grid-column:1/-1; min-height:60px; display:flex; align-items:center; justify-content:center; gap:9px; border:2px solid #dff7ff; border-radius:18px; color:#123e6b; background:linear-gradient(180deg,#e7fbff,#7cd4ff); box-shadow:0 7px 0 #1766b8,0 14px 35px rgba(0,31,78,.30); font-size:14px; font-weight:950; } .world-browser-primary:active,.join-world-button:active { transform:translateY(4px); box-shadow:0 2px 0 #1766b8; }
+        .join-setup-shell.hidden,.world-browser-shell.hidden { display:none; } .join-back { width:42px; height:42px; margin-bottom:22px; border:1px solid rgba(188,231,255,.42); border-radius:13px; color:#e8f8ff; background:rgba(255,255,255,.09); font-size:22px; } .join-world-summary { display:flex; flex-wrap:wrap; gap:7px; margin-top:25px; } .join-world-summary span { padding:7px 9px; border-radius:9px; color:#ccefff; background:rgba(0,24,55,.28); font-size:10px; font-weight:900; letter-spacing:.06em; }
+        .join-settings-panel { display:grid; gap:14px; padding:clamp(20px,3vw,38px); border:2px solid rgba(255,255,255,.72); border-radius:28px; color:#173f6f; background:linear-gradient(145deg,rgba(253,254,255,.98),rgba(217,241,255,.96)); box-shadow:0 18px 0 rgba(0,23,58,.24),0 30px 68px rgba(0,0,0,.24); } .join-setting { display:grid; grid-template-columns:minmax(130px,.58fr) minmax(0,1.42fr); align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid #d8e8f4; } .join-setting label { color:#2a5e91; font-size:11px; font-weight:900; letter-spacing:.06em; } .join-setting select { min-width:0; min-height:44px; padding:0 12px; border:1px solid #bdd8ed; border-radius:12px; color:#1c507f; background:#fff; font:inherit; font-size:12px; font-weight:800; } .join-toggle { display:flex; align-items:center; gap:10px; min-height:42px; padding:0 2px; color:#315e89; font-size:12px; font-weight:800; } .join-toggle input { width:18px; height:18px; accent-color:#2585ef; } .join-world-button { min-height:66px; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; margin-top:6px; padding:0 18px; border:2px solid #fff; border-radius:18px; color:#fff; background:linear-gradient(180deg,#57abff,#2273e7); box-shadow:0 7px 0 #1558b4,0 15px 28px rgba(8,62,135,.25); font-size:15px; font-weight:950; text-align:left; } .join-world-button small { color:#d5f4ff; font-size:9px; font-weight:900; letter-spacing:.06em; } .join-note { margin:0; color:#6689aa; font-size:10px; line-height:1.5; }
+        /* Only one compact HUD is persistent. Secondary panels open on demand. */
+        #world-readout { z-index:35; top:calc(66px + env(safe-area-inset-top)); left:calc(12px + env(safe-area-inset-left)); width:178px; padding:8px; border-radius:14px; box-shadow:0 6px 20px rgba(4,29,66,.18); } #world-readout .readout-row { grid-template-columns:1fr 1fr; gap:4px; } #world-readout .readout-chip { min-width:0; padding:5px; } #world-readout .readout-chip small { font-size:7px; } #world-readout .readout-chip strong { font-size:8px; white-space:normal; overflow:visible; } #build-status { z-index:34; top:calc(66px + env(safe-area-inset-top)); max-width:calc(100vw - 220px); padding:7px 10px; } #build-status span { display:none; }
+        #city-desk-button { z-index:42; top:calc(12px + env(safe-area-inset-top)); right:calc(74px + env(safe-area-inset-right)); } #game-topbar { z-index:41; inset:calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) auto calc(10px + env(safe-area-inset-left)); } .brand-lockup { display:none; } .top-actions .round-button { width:50px; padding:0; } .top-actions .button-label { display:none; }
+        #context-actions { z-index:37; right:calc(12px + env(safe-area-inset-right)); bottom:calc(202px + env(safe-area-inset-bottom)); } .context-action { width:50px; min-height:48px; padding:0; } .context-label { display:none; } .ui-container { z-index:50; top:calc(70px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); width:min(360px,calc(100vw - 24px)); max-height:calc(100dvh - 150px); } #chat-ui.conversation-dock { z-index:36; left:calc(12px + env(safe-area-inset-left)); bottom:calc(96px + env(safe-area-inset-bottom)); width:min(430px,calc(100vw - 218px)); min-width:0; } #chat-ui.conversation-dock.collapsed { transform:translateY(calc(100% - 44px)); } #build-belt { z-index:39; bottom:calc(10px + env(safe-area-inset-bottom)); width:min(630px,calc(100vw - 28px)); }
+        #map-container { z-index:38; right:calc(12px + env(safe-area-inset-right)); bottom:calc(12px + env(safe-area-inset-bottom)); width:150px; height:150px; border-radius:22px; cursor:pointer; } #map-container::before { content:'CITY RADAR · TAP'; }
+        #mobile-action-rail { display:none !important; } @media (pointer:coarse),(max-width:760px) { #world-readout { width:142px; } #world-readout .readout-row { grid-template-columns:1fr; } #world-readout .readout-chip:nth-child(2) { display:none; } #build-status { top:calc(63px + env(safe-area-inset-top)); max-width:calc(100vw - 166px); font-size:9px; } #city-desk-button { right:calc(66px + env(safe-area-inset-right)); min-width:44px; padding:0 8px; font-size:0; } #city-desk-button .bi-icon { margin:0; } #map-container { right:calc(10px + env(safe-area-inset-right)); bottom:calc(94px + env(safe-area-inset-bottom)); width:126px; height:126px; } #context-actions { display:none; } #chat-ui.conversation-dock { left:calc(10px + env(safe-area-inset-left)); bottom:calc(15px + env(safe-area-inset-bottom)); width:min(330px,calc(100vw - 152px)); } #chat-ui.conversation-dock.collapsed { transform:translateY(calc(100% - 42px)); } #build-belt { bottom:calc(10px + env(safe-area-inset-bottom)); left:50%; width:calc(100vw - 24px); max-width:none; padding:4px; border-radius:16px; } #build-belt .belt-slot { min-width:44px; min-height:47px; padding:4px; font-size:7px; } #build-belt .slot-key { display:none; } #mobile-action-rail { position:fixed; z-index:43; right:calc(10px + env(safe-area-inset-right)); bottom:calc(236px + env(safe-area-inset-bottom)); display:grid !important; grid-template-columns:repeat(2,52px); gap:7px; pointer-events:auto; } #mobile-action-rail .mobile-action { display:none; width:52px; min-height:48px; border-radius:14px; font-size:8px; } #mobile-action-rail #mobile-interact-button,#mobile-action-rail #mobile-camera-button,#mobile-action-rail #mobile-map-button,#mobile-action-rail #mobile-pause-button { display:flex; } #joystick-container { bottom:calc(14px + env(safe-area-inset-bottom)); left:calc(12px + env(safe-area-inset-left)); transform:scale(.84); transform-origin:bottom left; } #run-button { right:calc(16px + env(safe-area-inset-right)); bottom:calc(22px + env(safe-area-inset-bottom)); width:64px; height:64px; } }
+        @media (max-width:820px) { .world-browser-shell,.join-setup-shell { grid-template-columns:1fr; max-width:620px; } .world-browser-intro { padding:24px; } .world-browser-intro h2,.join-setup-intro h2 { font-size:clamp(40px,12vw,60px); } .world-card-grid { grid-template-columns:1fr; } .world-card { min-height:142px; } .world-browser-primary { grid-column:auto; } .join-setting { grid-template-columns:1fr; gap:7px; } #title-screen { align-items:start; padding:calc(14px + env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom)); } }
+
         </style>
 </head>
 <body>
-    <div id="title-screen" class="game-overlay" role="dialog" aria-modal="true" aria-label="タイトル画面">
-        <main class="title-card">
-            <div class="kicker">CREATIVE CITY SANDBOX</div>
-            <h2>ULTIMATE<br><em>3D CITY</em></h2>
-            <p>乗り物に乗って、街を走って、好きな場所に好きなものを置こう。自由に遊べる高速サンドボックス。</p>
-            <div class="title-features"><span>乗り物</span><span>自由配置</span><span>モバイル対応</span><span>高品質描画</span></div>
-            <button id="start-game-button" class="title-primary"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg>街へ入る</button>
-            <button id="title-help-button" class="title-secondary">操作ガイドを見る</button>
+    <div id="title-screen" class="game-overlay" role="dialog" aria-modal="true" aria-label="City Worlds">
+        <main id="world-browser" class="world-browser-shell">
+            <section class="world-browser-intro"><div class="world-browser-kicker">CITY WORLDS</div><h2>SELECT A<br><em>PLACE TO PLAY.</em></h2><p>好きな都市スタイルを選び、環境を整えてから自由探索へ参加します。固定ミッションはありません。</p><div class="world-browser-legend"><span><i></i>ローカルセッション</span><span><i></i>City Score</span><span><i></i>モバイル対応</span></div><button id="title-help-button" class="title-secondary world-help" type="button">操作ガイドを見る</button></section>
+            <section class="world-card-grid" aria-label="選択可能なワールド">
+                <button class="world-card selected" type="button" data-world-id="harbor" onclick="window.__ultimateCityWorld&&window.__ultimateCityWorld.select('harbor')"><span class="world-card-top"><b>HARBOR<br>HEART</b><span class="world-card-score">94% CITY SCORE</span></span><span class="world-card-copy">海辺の高層街。交通と建築をバランスよく楽しめます。</span><span class="world-card-meta"><span>12 LOCAL</span><span>24 NPC</span><span>PREMIUM</span></span></button>
+                <button class="world-card" type="button" data-world-id="neon" onclick="window.__ultimateCityWorld&&window.__ultimateCityWorld.select('neon')"><span class="world-card-top"><b>NEON<br>AVENUE</b><span class="world-card-score">91% CITY SCORE</span></span><span class="world-card-copy">夜景と公共交通を中心にした、光量の多い都市エリアです。</span><span class="world-card-meta"><span>8 LOCAL</span><span>32 NPC</span><span>VISUAL</span></span></button>
+                <button class="world-card" type="button" data-world-id="green" onclick="window.__ultimateCityWorld&&window.__ultimateCityWorld.select('green')"><span class="world-card-top"><b>GREEN<br>DISTRICT</b><span class="world-card-score">96% CITY SCORE</span></span><span class="world-card-copy">公園、住宅、屋内探索をゆっくり楽しむ明るい街区です。</span><span class="world-card-meta"><span>16 LOCAL</span><span>18 NPC</span><span>BALANCED</span></span></button>
+                <button id="open-join-setup" class="world-browser-primary" type="button" onclick="window.__ultimateCityWorld&&window.__ultimateCityWorld.setup()"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#sliders2"></use></svg>選択したワールドを設定する</button>
+            </section>
+        </main>
+        <main id="join-setup" class="join-setup-shell hidden" aria-label="参加前設定">
+            <section class="join-setup-intro"><button id="join-setup-back" class="join-back" type="button" aria-label="ワールド選択へ戻る" onclick="window.__ultimateCityWorld&&window.__ultimateCityWorld.browser()">←</button><div class="world-browser-kicker">JOIN SETUP</div><h2>MAKE IT<br><em>YOUR CITY.</em></h2><p id="join-world-description">HARBOR HEARTへ参加する前に、描画と街の活動を調整できます。</p><div class="join-world-summary"><span id="join-world-name">HARBOR HEART</span><span id="join-world-live">12 LOCAL · 24 NPC</span></div></section>
+            <section class="join-settings-panel"><div class="join-setting"><label for="join-quality-select">描画品質</label><select id="join-quality-select"><option value="performance">軽量 — 反応性優先</option><option value="balanced" selected>プレミアム — 推奨</option><option value="visual">ウルトラ — 詳細優先</option></select></div><div class="join-setting"><label for="join-weather-select">開始時の天気</label><select id="join-weather-select"><option value="sunny" selected>晴れ</option><option value="cloudy">くもり</option><option value="rainy">雨</option><option value="snowy">雪</option></select></div><div class="join-setting"><label for="join-time-select">開始時刻</label><select id="join-time-select"><option value="9">09:00</option><option value="12" selected>12:00</option><option value="18">18:00</option><option value="22">22:00</option></select></div><label class="join-toggle"><input id="join-traffic-toggle" type="checkbox" checked><span>公共交通と交通車両を有効にする</span></label><label class="join-toggle"><input id="join-npc-toggle" type="checkbox" checked><span>街のNPCアクティビティを有効にする</span></label><button id="join-world-button" class="join-world-button" type="button" onclick="window.__ultimateCityWorld&&window.__ultimateCityWorld.join()"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg><span>このワールドに参加</span><small>HARBOR HEART</small></button><p class="join-note">参加人数とCity Scoreは、この端末上のローカルセッション情報です。</p></section>
         </main>
     </div>
     <div id="pause-screen" class="game-overlay hidden" role="dialog" aria-modal="true" aria-label="City Pause Hub">
@@ -874,6 +904,9 @@
         const firstPersonEuler = new THREE.Euler(0, 0, 0, 'YXZ');
         let nextNpcChatTime = 0;
         let cameraZoom = 1, freeCamSpeed = 16, freeCamAnchor = new THREE.Vector3();
+        let activeLookPointerId = null, freeCamYaw = 0, freeCamPitch = -0.18, firstPersonPitch = 0;
+        const freeCamDirection = new THREE.Vector3(), freeCamLookTarget = new THREE.Vector3();
+        let selectedWorldId = 'harbor';
 
         const NPC_MESSAGES = [
             "こんにちは！", "やあ！", "いい天気だね。", "元気？", "調子はどう？", "また会ったね！", "今日は何を？", "どこへ行くの？", "良い一日を！", "こんばんは。",
@@ -973,6 +1006,7 @@
 
             setupEventListeners();
             setupMegaUi();
+            setupWorldBrowserControls();
 
             createCityMap();
             createSandboxWorld();
@@ -1040,7 +1074,6 @@
             document.getElementById('clear-props-btn').addEventListener('click', clearPlacedProps);
             document.getElementById('traffic-toggle').addEventListener('change', (e) => { trafficEnabled = e.target.checked; });
             document.getElementById('quality-select').addEventListener('change', (e) => setQuality(e.target.value));
-            document.getElementById('start-game-button').addEventListener('click', startGame);
             document.getElementById('resume-game-button').addEventListener('click', () => setPaused(false));
             document.getElementById('pause-button').addEventListener('click', () => togglePause());
             document.getElementById('return-title-button').addEventListener('click', returnToTitle);
@@ -1051,7 +1084,7 @@
             document.getElementById('pause-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
             document.getElementById('drawer-toggle').addEventListener('click', () => togglePause());
             document.getElementById('quick-camera').addEventListener('click', changeCamera);
-            document.getElementById('quick-car').addEventListener('click', () => { spawnVehicle(); setSandboxMessage('乗り物を近くに出しました。Eキーで乗車できます。'); });
+            document.getElementById('quick-car').addEventListener('click', () => { spawnVehicle(); setSandboxMessage('乗り物を近くに出しました。Eキーまたはモバイルの「使う」で乗車できます。'); });
             document.getElementById('quick-map').addEventListener('click', () => { document.getElementById('map-container').classList.toggle('map-emphasis'); setSandboxMessage('ミニマップをクリックして目的地を決められます。'); });
             document.getElementById('mobile-interact-button').addEventListener('click', handlePrimaryInteract);
             document.getElementById('mobile-build-button').addEventListener('click', togglePlaceMode);
@@ -1126,6 +1159,11 @@
             renderer.domElement.addEventListener('pointercancel', onPointerUp, { passive: false });
             renderer.domElement.addEventListener('contextmenu', (e) => { if (placeMode || removeMode) e.preventDefault(); });
             renderer.domElement.addEventListener('wheel', (e) => { if (!gameStarted || gamePaused || e.ctrlKey) return; e.preventDefault(); adjustCameraZoom(e.deltaY < 0 ? 1 : -1, Math.abs(e.deltaY) > 80 ? 1.4 : 0.65); }, { passive:false });
+            document.querySelectorAll('.world-card').forEach(card => card.addEventListener('click', () => selectWorld(card.dataset.worldId)));
+            document.getElementById('open-join-setup').addEventListener('click', openJoinSetup);
+            document.getElementById('join-setup-back').addEventListener('click', openWorldBrowser);
+            document.getElementById('join-world-button').addEventListener('click', joinSelectedWorld);
+            mapCanvas.addEventListener('click', (e) => { if (!gameStarted) return; e.preventDefault(); e.stopImmediatePropagation(); openCityAtlas(); }, true);
         }
 
         function createCityMap() {
@@ -1139,7 +1177,7 @@
 
         function createChunkAssets() {
             const loader=new THREE.TextureLoader();const facadeTexture=loader.load('assets/generated/urban-facade-atlas.png');facadeTexture.colorSpace=THREE.SRGBColorSpace;facadeTexture.wrapS=facadeTexture.wrapT=THREE.RepeatWrapping;facadeTexture.anisotropy=Math.min(8,renderer?.capabilities?.getMaxAnisotropy?.()||1);
-            const groundMaterial=new THREE.MeshStandardMaterial({color:0x94bd83,roughness:.92,metalness:0});const roadMaterial=new THREE.MeshStandardMaterial({color:0x344451,roughness:.68,metalness:.16});buildingMaterial=new THREE.MeshStandardMaterial({color:0xffffff,vertexColors:true,roughness:.43,metalness:.16});const facadeMaterial=new THREE.MeshStandardMaterial({color:0xffffff,map:facadeTexture,roughness:.28,metalness:.28,emissive:0x183547,emissiveIntensity:.12});const entryMaterial=new THREE.MeshStandardMaterial({color:0x99edff,roughness:.14,metalness:.68,emissive:0x196f95,emissiveIntensity:.42});const barkMaterial=new THREE.MeshStandardMaterial({color:0x5b3825,roughness:.93,metalness:0});const leafMaterial=new THREE.MeshStandardMaterial({color:0x287b4a,roughness:.82,metalness:0});const leafLightMaterial=new THREE.MeshStandardMaterial({color:0x4fa96a,roughness:.74,metalness:0});
+            const groundMaterial=new THREE.MeshStandardMaterial({color:0x5e8b6d,roughness:.86,metalness:0});const roadMaterial=new THREE.MeshStandardMaterial({color:0x202c35,roughness:.49,metalness:.24});buildingMaterial=new THREE.MeshStandardMaterial({color:0xffffff,vertexColors:true,roughness:.34,metalness:.20});const facadeMaterial=new THREE.MeshStandardMaterial({color:0xe9f7ff,map:facadeTexture,roughness:.26,metalness:.24,emissive:0x102d42,emissiveIntensity:.12});const entryMaterial=new THREE.MeshStandardMaterial({color:0xa7f3ff,roughness:.10,metalness:.74,emissive:0x1d91bc,emissiveIntensity:.66});const barkMaterial=new THREE.MeshStandardMaterial({color:0x4b2d1d,roughness:.88,metalness:0});const leafMaterial=new THREE.MeshStandardMaterial({color:0x226b43,roughness:.72,metalness:0});const leafLightMaterial=new THREE.MeshStandardMaterial({color:0x59b776,roughness:.64,metalness:0});
             return {groundGeometry:new THREE.PlaneGeometry(CHUNK_SIZE,CHUNK_SIZE),unitPlane:new THREE.PlaneGeometry(1,1),buildingGeometry:new THREE.BoxGeometry(1,1,1),facadeGeometry:new THREE.BoxGeometry(1,1,.05),roofGeometry:new THREE.BoxGeometry(1,1,1),entryGeometry:new THREE.BoxGeometry(1,1,.07),trunkGeometry:new THREE.CylinderGeometry(.18,.29,1,8),crownGeometry:new THREE.IcosahedronGeometry(1,1),groundMaterial,roadMaterial,buildingMaterial,facadeMaterial,entryMaterial,barkMaterial,leafMaterial,leafLightMaterial};
         }
 
@@ -1198,9 +1236,9 @@
             const helper=new THREE.Object3D(),roadMesh=new THREE.InstancedMesh(chunkAssets.unitPlane,chunkAssets.roadMaterial,roadLayouts.length);roadLayouts.forEach((road,index)=>{helper.position.set(road.x,.012,road.z);helper.rotation.set(-Math.PI/2,0,0);helper.scale.set(road.sx,road.sz,1);helper.updateMatrix();roadMesh.setMatrixAt(index,helper.matrix);});roadMesh.instanceMatrix.needsUpdate=true;roadMesh.receiveShadow=true;group.add(roadMesh);
             const specs=[],kinds=[{name:'RESIDENCE',height:[8,16],color:0xb8c8d4},{name:'COMMERCIAL',height:[10,20],color:0xc7b6a7},{name:'OFFICE',height:[20,36],color:0x93acc5},{name:'FACTORY',height:[7,13],color:0xa9a9a2},{name:'STATION',height:[8,15],color:0x9eb8ae},{name:'ATRIUM',height:[12,24],color:0xb7a8c1}];const attempts=qualityConfig().chunkBuildings*3;
             for(let index=0;index<attempts&&specs.length<qualityConfig().chunkBuildings;index++){const seed=hash2D(cx*101+index,cz*67-index,11),seed2=hash2D(cx*43-index,cz*97+index,29),x=origin.x+4+seed*(CHUNK_SIZE-8),z=origin.z+4+seed2*(CHUNK_SIZE-8),isHubLot=cx===0&&cz===0&&Math.abs(x-20)<9&&Math.abs(z-20)<9;if(isRoadCoordinate(x)||isRoadCoordinate(z)||isHubLot)continue;const kind=kinds[Math.floor(hash2D(cx+index,cz-index,337)*kinds.length)];const height=kind.height[0]+hash2D(cx+index,cz-index,53)*(kind.height[1]-kind.height[0]),size=4+hash2D(cx-index,cz+index,71)*4;const entrance=new THREE.Vector3(x,0,z-size/2-.45);specs.push({x,z,height,size,kind,color:new THREE.Color(kind.color).lerp(new THREE.Color(0xffffff),hash2D(cx,index,343)*.16),entrance,label:kind.name});}
-            const buildingSurfaceMaterial=new THREE.MeshStandardMaterial({color:0xc8d6de,roughness:.46,metalness:.08,emissive:0x2d4d60,emissiveIntensity:.34});const buildingMesh=new THREE.InstancedMesh(chunkAssets.buildingGeometry,buildingSurfaceMaterial,Math.max(specs.length,1));specs.forEach((spec,index)=>{helper.rotation.set(0,0,0);helper.position.set(spec.x,spec.height/2,spec.z);helper.scale.set(spec.size,spec.height,spec.size);helper.updateMatrix();buildingMesh.setMatrixAt(index,helper.matrix);});buildingMesh.count=specs.length;buildingMesh.instanceMatrix.needsUpdate=true;buildingMesh.castShadow=false;buildingMesh.receiveShadow=true;buildingMesh.userData.dynamicShadowCaster=true;group.add(buildingMesh);
+            const buildingSurfaceMaterial=new THREE.MeshStandardMaterial({color:0xc9d8e1,roughness:.38,metalness:.13,emissive:0x0c1f2c,emissiveIntensity:.025});const buildingMesh=new THREE.InstancedMesh(chunkAssets.buildingGeometry,buildingSurfaceMaterial,Math.max(specs.length,1));specs.forEach((spec,index)=>{helper.rotation.set(0,0,0);helper.position.set(spec.x,spec.height/2,spec.z);helper.scale.set(spec.size,spec.height,spec.size);helper.updateMatrix();buildingMesh.setMatrixAt(index,helper.matrix);});buildingMesh.count=specs.length;buildingMesh.instanceMatrix.needsUpdate=true;buildingMesh.castShadow=false;buildingMesh.receiveShadow=true;buildingMesh.userData.dynamicShadowCaster=true;group.add(buildingMesh);
             const roofMaterial=new THREE.MeshStandardMaterial({color:0xe7eef3,roughness:.28,metalness:.3,emissive:0x173a50,emissiveIntensity:.12});const roofMesh=new THREE.InstancedMesh(chunkAssets.roofGeometry,roofMaterial,Math.max(specs.length,1));const roofUnits=new THREE.InstancedMesh(chunkAssets.roofGeometry,new THREE.MeshStandardMaterial({color:0x526979,roughness:.46,metalness:.36}),Math.max(specs.length,1));specs.forEach((spec,index)=>{helper.rotation.set(0,0,0);helper.position.set(spec.x,spec.height+.13,spec.z);helper.scale.set(spec.size*1.08,.26,spec.size*1.08);helper.updateMatrix();roofMesh.setMatrixAt(index,helper.matrix);helper.position.set(spec.x+spec.size*.16,spec.height+.52,spec.z);helper.scale.set(Math.max(.7,spec.size*.28),.55,Math.max(.7,spec.size*.28));helper.updateMatrix();roofUnits.setMatrixAt(index,helper.matrix);});roofMesh.count=roofUnits.count=specs.length;roofMesh.instanceMatrix.needsUpdate=true;roofUnits.instanceMatrix.needsUpdate=true;roofMesh.userData.dynamicShadowCaster=roofUnits.userData.dynamicShadowCaster=true;group.add(roofMesh,roofUnits);
-            const facadeMesh=new THREE.InstancedMesh(chunkAssets.facadeGeometry,chunkAssets.facadeMaterial,Math.max(specs.length*12,1));let facadeIndex=0;const sides=[{axis:'z',sign:1},{axis:'z',sign:-1},{axis:'x',sign:1},{axis:'x',sign:-1}];specs.forEach(spec=>sides.forEach(side=>[-.31,0,.31].forEach(offset=>{helper.rotation.set(0,side.axis==='x'?Math.PI/2:0,0);if(side.axis==='z')helper.position.set(spec.x+offset*spec.size,spec.height*.54,spec.z+side.sign*(spec.size/2+.04));else helper.position.set(spec.x+side.sign*(spec.size/2+.04),spec.height*.54,spec.z+offset*spec.size);helper.scale.set(spec.size*.19,spec.height*.7,1);helper.updateMatrix();facadeMesh.setMatrixAt(facadeIndex++,helper.matrix);})));facadeMesh.count=facadeIndex;facadeMesh.instanceMatrix.needsUpdate=true;facadeMesh.userData.dynamicShadowCaster=true;group.add(facadeMesh);
+            const facadeMesh=new THREE.InstancedMesh(chunkAssets.facadeGeometry,chunkAssets.facadeMaterial,Math.max(specs.length*12,1));let facadeIndex=0;const sides=[{axis:'z',sign:1},{axis:'z',sign:-1},{axis:'x',sign:1},{axis:'x',sign:-1}];specs.forEach(spec=>sides.forEach(side=>[-.31,0,.31].forEach(offset=>{helper.rotation.set(0,side.axis==='x'?Math.PI/2:0,0);if(side.axis==='z')helper.position.set(spec.x+offset*spec.size,spec.height*.54,spec.z+side.sign*(spec.size/2+.04));else helper.position.set(spec.x+side.sign*(spec.size/2+.04),spec.height*.54,spec.z+offset*spec.size);helper.scale.set(spec.size*.19,spec.height*.7,1);helper.updateMatrix();facadeMesh.setMatrixAt(facadeIndex,helper.matrix);facadeIndex++;})));facadeMesh.count=facadeIndex;facadeMesh.instanceMatrix.needsUpdate=true;facadeMesh.userData.dynamicShadowCaster=true;group.add(facadeMesh);
             const entryMesh=new THREE.InstancedMesh(chunkAssets.entryGeometry,chunkAssets.entryMaterial,Math.max(specs.length,1));specs.forEach((spec,index)=>{helper.position.set(spec.entrance.x,1.35,spec.entrance.z+.1);helper.rotation.set(0,0,0);helper.scale.set(Math.min(2.3,spec.size*.38),2.7,1);helper.updateMatrix();entryMesh.setMatrixAt(index,helper.matrix);});entryMesh.count=specs.length;entryMesh.instanceMatrix.needsUpdate=true;entryMesh.userData.dynamicShadowCaster=true;group.add(entryMesh);
             const treeLocations=[];for(let index=0;index<9;index++){const x=origin.x+5+hash2D(cx+index,cz,151)*(CHUNK_SIZE-10),z=origin.z+5+hash2D(cx,cz-index,173)*(CHUNK_SIZE-10);if(!isRoadCoordinate(x)&&!isRoadCoordinate(z)&&!specs.some(spec=>Math.abs(spec.x-x)<spec.size&&Math.abs(spec.z-z)<spec.size))treeLocations.push({x,z,s:.75+hash2D(cx,cz,index)*.62});}
             if(treeLocations.length){const trunks=new THREE.InstancedMesh(chunkAssets.trunkGeometry,chunkAssets.barkMaterial,treeLocations.length),crowns=new THREE.InstancedMesh(chunkAssets.crownGeometry,chunkAssets.leafMaterial,treeLocations.length*3),highlights=new THREE.InstancedMesh(chunkAssets.crownGeometry,chunkAssets.leafLightMaterial,treeLocations.length*2);let crownIndex=0,lightIndex=0;treeLocations.forEach((tree,index)=>{helper.position.set(tree.x,1.2*tree.s,tree.z);helper.rotation.set(0,hash2D(cx,cz,index+191)*Math.PI*2,0);helper.scale.set(tree.s,2.4*tree.s,tree.s);helper.updateMatrix();trunks.setMatrixAt(index,helper.matrix);[[-.42,.35,.42],[.42,.42,.35],[0,.78,.52]].forEach((offset,j)=>{helper.position.set(tree.x+offset[0]*tree.s,2.25*tree.s+offset[1]*tree.s,tree.z+offset[2]*tree.s);helper.scale.set(1.15*tree.s,1.05*tree.s,1.05*tree.s);helper.updateMatrix();crowns.setMatrixAt(crownIndex++,helper.matrix);if(j<2){helper.position.y+=.22*tree.s;helper.scale.multiplyScalar(.72);helper.updateMatrix();highlights.setMatrixAt(lightIndex++,helper.matrix);}});});trunks.instanceMatrix.needsUpdate=true;crowns.instanceMatrix.needsUpdate=true;highlights.instanceMatrix.needsUpdate=true;[trunks,crowns,highlights].forEach(mesh=>{mesh.receiveShadow=true;mesh.userData.dynamicShadowCaster=true;});group.add(trunks,crowns,highlights);}
@@ -1327,7 +1365,7 @@
         }
         function getNearestBuildingEntry(position) { const candidates=buildings.filter(entry=>entry.visible);return candidates.reduce((best,entry)=>{const distanceSq=entry.position.distanceToSquared(position);return(!best||distanceSq<best.distanceSq)?{entry,distanceSq}:best;},null); }
         function ensureBuildingEntryPrompt() { if(buildingEntryPrompt)return buildingEntryPrompt;const div=document.createElement('div');div.className='building-proximity';div.innerHTML='<b>E</b><span>建物に入る</span><small>BUILDING ENTRY</small>';buildingEntryPrompt=new CSS2DObject(div);buildingEntryPrompt.visible=false;scene.add(buildingEntryPrompt);return buildingEntryPrompt; }
-        function updateInteractionPrompts() { const prompt=ensureBuildingEntryPrompt();if(interiorState||controlledVehicle||ridingTransit){prompt.visible=false;return;}const nearest=getNearestBuildingEntry(playerGroup.position);const hub=getNearestCityHub(playerGroup.position);const target=hub&&(!nearest||hub.distanceSq<nearest.distanceSq)?{position:hub.hub.entrance,label:'CITY HUB',distanceSq:hub.distanceSq}:{position:nearest?.entry.position,label:nearest?.entry.label,distanceSq:nearest?.distanceSq};if(target?.position&&target.distanceSq<7.4*7.4){prompt.position.copy(target.position).add(new THREE.Vector3(0,2.45,0));prompt.visible=true;prompt.element.innerHTML=`<b>E</b><span>${target.label} に入る</span><small>BUILDING ENTRY</small>`;labelRenderUntil=Math.max(labelRenderUntil,performance.now()+240);}else prompt.visible=false; }
+        function updateInteractionPrompts() { const prompt=ensureBuildingEntryPrompt();if(interiorState||controlledVehicle||ridingTransit){prompt.visible=false;return;}const nearest=getNearestBuildingEntry(playerGroup.position);const hub=getNearestCityHub(playerGroup.position);const target=hub&&(!nearest||hub.distanceSq<nearest.distanceSq)?{position:hub.hub.entrance,label:'CITY HUB',distanceSq:hub.distanceSq}:{position:nearest?.entry.position,label:nearest?.entry.label,distanceSq:nearest?.distanceSq};if(target?.position&&target.distanceSq<7.4*7.4){prompt.position.copy(target.position).add(new THREE.Vector3(0,2.45,0));prompt.visible=true;prompt.element.innerHTML=`<b>E / 使う</b><span>${target.label} に入る</span><small>BUILDING ENTRY</small>`;labelRenderUntil=Math.max(labelRenderUntil,performance.now()+240);}else prompt.visible=false; }
         function tryEnterOrExitInterior() {
             if(interiorState){const origin=interiorState.origin;const exit=origin.clone().add(new THREE.Vector3(0,0,8.2));if(playerGroup.position.distanceToSquared(exit)>30){setSandboxMessage('出口ゲートに近づいて「使う」を押してください。');return true;}playerGroup.position.copy(interiorState.exitPosition.clone().add(new THREE.Vector3(0,0,-1.8)));interiorState=null;cameraOffsetSpherical.radius=Math.max(cameraOffsetSpherical.radius,8);updateChunkStreaming(playerGroup.position,true);setSandboxMessage('街の外へ戻りました。');return true;}
             if(controlledVehicle||ridingTransit){setSandboxMessage('建物へ入る前に乗り物を降りてください。');return true;}const hub=getNearestCityHub(playerGroup.position);const building=getNearestBuildingEntry(playerGroup.position);const useHub=hub&&(!building||hub.distanceSq<building.distanceSq);if(!useHub&&(!building||building.distanceSq>7.4*7.4))return false;
@@ -1459,20 +1497,20 @@
             if(controlledVehicle){const exitOffset=new THREE.Vector3(1.8,0,0).applyQuaternion(controlledVehicle.quaternion);const exitPosition=resolveCollisionMove(controlledVehicle.position,controlledVehicle.position.clone().add(exitOffset),PLAYER_COLLISION_RADIUS,controlledVehicle);if(exitPosition.distanceToSquared(controlledVehicle.position)<1){setSandboxMessage('ここでは安全に降車できません。少し広い場所へ移動してください。');return;}playerGroup.position.copy(exitPosition);playerGroup.rotation.y=controlledVehicle.rotation.y;playerGroup.visible=true;controlledVehicle.userData.active=false;controlledVehicle=null;vehicleSpeed=0;vehicleSteer=0;stopAutoDrive();setSandboxMessage('徒歩に戻りました。自由に探索を続けられます。');updateVehicleUi();return;}
             const nearest=getNearestVehicle();if(!nearest||nearest.distance>5.5*5.5){setSandboxMessage('近くに乗れる車両がありません。「乗り物を出す」で出現させてください。');return;}
             if(nearest.vehicle.userData.boardable){ridingTransit=nearest.vehicle;playerGroup.position.copy(ridingTransit.position);playerGroup.visible=false;stopAutoDrive();setSandboxMessage(`${ridingTransit.userData.label}に乗車しました。Eまたは「使う」で降車できます。`);updateVehicleUi();return;}
-            controlledVehicle=nearest.vehicle;selectedVehicle=nearest.vehicle;controlledVehicle.userData.active=true;playerGroup.position.copy(controlledVehicle.position);playerGroup.visible=false;stopAutoDrive();setSandboxMessage(`${controlledVehicle.userData.label}に乗車しました。画面の上方向と同じ進行方向へ、なめらかに操舵します。Eで降車します。`);updateVehicleUi();
+            controlledVehicle=nearest.vehicle;selectedVehicle=nearest.vehicle;controlledVehicle.userData.active=true;playerGroup.position.copy(controlledVehicle.position);playerGroup.visible=false;stopAutoDrive();setSandboxMessage(`${controlledVehicle.userData.label}に乗車しました。画面の上方向と同じ進行方向へ、なめらかに操舵します。Eキーまたは「使う」で降車します。`);updateVehicleUi();
         }
         function updateVehicleProximityPrompt(vehicle, show, mode) {
-            const prompt=vehicle.userData.prompt;if(!prompt)return;prompt.visible=show;if(!show)return;const key=mode==='ride'?'降車':vehicle.userData.boardable?'乗車':'運転';prompt.element.innerHTML=`<b>E</b><span>${vehicle.userData.label} ${key}</span><small>${vehicle.userData.boardable?'CITY TRANSIT':'DRIVE READY'}</small>`;
+            const prompt=vehicle.userData.prompt;if(!prompt)return;prompt.visible=show;if(!show)return;const key=mode==='ride'?'降車':vehicle.userData.boardable?'乗車':'運転';prompt.element.innerHTML=`<b>E / 使う</b><span>${vehicle.userData.label} ${key}</span><small>${vehicle.userData.boardable?'CITY TRANSIT':'DRIVE READY'}</small>`;
         }
         function updateVehicleUi() {
             nearestVehicle=(controlledVehicle||ridingTransit)?(controlledVehicle||ridingTransit):(getNearestVehicle()?.vehicle||null);const nearby=getNearestVehicle();const isNear=!controlledVehicle&&!ridingTransit&&nearby&&nearby.distance<5.5*5.5;
             [...vehicles,...trafficVehicles].forEach(vehicle=>{const focus=vehicle===controlledVehicle||vehicle===ridingTransit||(!controlledVehicle&&!ridingTransit&&vehicle===nearestVehicle);vehicle.userData.ring.material.opacity=focus?.78:0;vehicle.userData.ring.scale.setScalar(focus?1+Math.sin(performance.now()*.006)*.05:1);updateVehicleProximityPrompt(vehicle,(vehicle===nearestVehicle&&(isNear||controlledVehicle||ridingTransit)),(controlledVehicle||ridingTransit)?'ride':'enter');});
             if(isNear||controlledVehicle||ridingTransit)labelRenderUntil=Math.max(labelRenderUntil,performance.now()+240);
             const nextKey=controlledVehicle?`driving:${controlledVehicle.uuid}`:ridingTransit?`transit:${ridingTransit.uuid}`:isNear?`near:${nearestVehicle.uuid}`:'walking';if(nextKey===vehicleUiKey)return;vehicleUiKey=nextKey;const action=document.getElementById('vehicle-action-btn'),status=document.getElementById('vehicle-status'),hint=document.getElementById('vehicle-hint');
-            if(controlledVehicle){action.disabled=false;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-right"></use></svg>降車';status.textContent=`${controlledVehicle.userData.label}を運転中`;hint.textContent='Eで降車 · City Atlasで車両自動運転';}
-            else if(ridingTransit){action.disabled=false;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-right"></use></svg>降車';status.textContent=`${ridingTransit.userData.label}に乗車中`;hint.textContent='Eで降車 · 路線を自動走行中';}
-            else if(isNear){action.disabled=false;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車';status.textContent=`${nearestVehicle.userData.label}が近くにあります`;hint.textContent=nearestVehicle.userData.boardable?'Eで公共交通に乗車':'Eで乗車';}
-            else {action.disabled=true;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車';status.textContent='徒歩で探索中';hint.textContent='近くの乗り物に E';}
+            if(controlledVehicle){action.disabled=false;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-right"></use></svg>降車';status.textContent=`${controlledVehicle.userData.label}を運転中`;hint.textContent='E / 使うで降車 · City Atlasで車両自動運転';}
+            else if(ridingTransit){action.disabled=false;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-right"></use></svg>降車';status.textContent=`${ridingTransit.userData.label}に乗車中`;hint.textContent='E / 使うで降車 · 路線を自動走行中';}
+            else if(isNear){action.disabled=false;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車';status.textContent=`${nearestVehicle.userData.label}が近くにあります`;hint.textContent=nearestVehicle.userData.boardable?'E / 使うで公共交通に乗車':'E / 使うで乗車';}
+            else {action.disabled=true;action.innerHTML='<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車';status.textContent='徒歩で探索中';hint.textContent='近くの乗り物に E / 使う';}
         }
         function updateVehicleVisuals(vehicle, delta, speed) { const data=vehicle.userData;data.rolling=(data.rolling||0)+speed*delta/Math.max(.2,data.type==='bus'||data.type==='tram'?.43:.32);(data.wheels||[]).forEach(wheel=>wheel.rotation.x=data.rolling); }
         function updateControlledVehicle(delta) {
@@ -2199,23 +2237,22 @@
         function beginFreeCamNearActor() {
             const actor = getControlledObject();
             const forward = new THREE.Vector3();
-            cameras.thirdPerson.getWorldDirection(forward); forward.y = 0; if (forward.lengthSq() < .001) forward.set(0,0,-1); forward.normalize();
+            cameras.thirdPerson.getWorldDirection(forward);
+            if (forward.lengthSq() < .001) forward.set(0,0,-1);
+            forward.normalize();
             freeCamAnchor.copy(actor.position);
-            cameras.freeLook.position.copy(actor.position).addScaledVector(forward, -10).add(new THREE.Vector3(0,6,0));
-            orbitControls.target.copy(actor.position).add(new THREE.Vector3(0,1.4,0));
-            orbitControls.enableDamping = true;
-            orbitControls.dampingFactor = 0.075;
-            orbitControls.enablePan = true;
-            orbitControls.minDistance = 1;
-            orbitControls.maxDistance = 90;
-            orbitControls.update();
+            cameras.freeLook.position.copy(actor.position).addScaledVector(forward, -10).add(new THREE.Vector3(0,5.2,0));
+            freeCamYaw = Math.atan2(-forward.x, -forward.z);
+            freeCamPitch = Math.asin(THREE.MathUtils.clamp(forward.y, -0.92, 0.92));
+            orbitControls.enabled = false;
+            applyFreeCamLook();
         }
         function changeCamera() {
             currentCameraIndex = (currentCameraIndex + 1) % cameraTypes.length;
             const cameraName = cameraTypes[currentCameraIndex];
             currentCamera = (cameraName === 'Third Person') ? cameras.thirdPerson : (cameraName === 'First Person') ? cameras.firstPerson : cameras.freeLook;
             if (cameraName === 'Free Cam') beginFreeCamNearActor();
-            orbitControls.enabled = (cameraName === 'Free Cam');
+            orbitControls.enabled = false;
             document.getElementById('change-camera-btn').innerHTML = '<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点: ' + cameraName;
             updateZoomReadout();
             onWindowResize();
@@ -2224,12 +2261,12 @@
             const inputX = ((keys.d || keys.ArrowRight) ? 1 : 0) - ((keys.a || keys.ArrowLeft) ? 1 : 0) + mobileInput.x;
             const inputZ = ((keys.s || keys.ArrowDown) ? 1 : 0) - ((keys.w || keys.ArrowUp) ? 1 : 0) + mobileInput.z;
             const inputY = (keys.e ? 1 : 0) - (keys.q ? 1 : 0);
-            const forward = new THREE.Vector3(); currentCamera.getWorldDirection(forward); forward.y = 0; if (forward.lengthSq() < .001) forward.set(0,0,-1); forward.normalize();
+            const forward = new THREE.Vector3(-Math.sin(freeCamYaw), 0, -Math.cos(freeCamYaw)).normalize();
             const right = new THREE.Vector3().crossVectors(forward, WORLD_UP).normalize();
             const move = new THREE.Vector3().addScaledVector(forward, -inputZ).addScaledVector(right, inputX).addScaledVector(WORLD_UP, inputY);
-            if (move.lengthSq() > .001) { move.normalize().multiplyScalar(freeCamSpeed * (keys.Shift ? 1.8 : 1) * delta); currentCamera.position.add(move); orbitControls.target.add(move); freeCamAnchor.add(move); }
+            if (move.lengthSq() > .001) { move.normalize().multiplyScalar(freeCamSpeed * (keys.Shift ? 1.8 : 1) * delta); currentCamera.position.add(move); freeCamAnchor.add(move); }
             currentSpeedMs = move.lengthSq() ? freeCamSpeed : 0;
-            orbitControls.update();
+            applyFreeCamLook();
         }
         function handleMapClick(event) {
             const rect = mapCanvas.getBoundingClientRect();
@@ -2415,43 +2452,53 @@
         }
 
         function onPointerDown(event) {
-            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
-            if (event.target !== renderer.domElement) return;
-            if (event.pointerType === 'touch') {
-                event.preventDefault();
-                renderer.domElement.setPointerCapture?.(event.pointerId);
-            }
+            if (!gameStarted || gamePaused || event.target !== renderer.domElement) return;
+            if (event.pointerType === 'touch') event.preventDefault();
             if (event.button === 2) { if (placeMode || removeMode) removePropAtPointer(event); return; }
             if (event.button !== 0) return;
-            if (removeMode) { removePropAtPointer(event); return; }
+            if (removeMode) { placeMode = false; removePropAtPointer(event); return; }
             if (placeMode) { placePropAtPointer(event); return; }
+            activeLookPointerId = event.pointerId;
             isPointerDown = true;
-            pointerPosition.x = event.clientX;
-            pointerPosition.y = event.clientY;
+            pointerPosition.set(event.clientX, event.clientY);
+            renderer.domElement.setPointerCapture?.(event.pointerId);
+            renderer.domElement.focus?.({ preventScroll:true });
         }
         function onPointerMove(event) {
             if (event.pointerType === 'touch') event.preventDefault();
             if (placeMode || removeMode) updateBuildGhost(event);
-            if (!isPointerDown || currentCameraIndex === 2) return;
+            if (!isPointerDown || activeLookPointerId !== event.pointerId) return;
             const deltaX = event.clientX - pointerPosition.x;
             const deltaY = event.clientY - pointerPosition.y;
-
-            if (currentCameraIndex === 1) {
-                playerGroup.rotation.y -= deltaX * 0.002;
+            const lookScale = event.pointerType === 'touch' ? 0.0054 : 0.0042;
+            if (Math.abs(deltaX) + Math.abs(deltaY) < 0.01) return;
+            if (currentCameraIndex === 0) {
+                cameraOffsetSpherical.theta -= deltaX * lookScale;
+                cameraOffsetSpherical.phi = THREE.MathUtils.clamp(cameraOffsetSpherical.phi - deltaY * lookScale, 0.18, Math.PI - 0.52);
+            } else if (currentCameraIndex === 1) {
+                const actor = getControlledObject();
+                actor.rotation.y -= deltaX * lookScale;
+                firstPersonPitch = THREE.MathUtils.clamp(firstPersonPitch - deltaY * lookScale, -1.32, 1.32);
             } else {
-                cameraOffsetSpherical.theta -= deltaX * 0.005;
-                cameraOffsetSpherical.phi -= deltaY * 0.005;
-                cameraOffsetSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.5, cameraOffsetSpherical.phi));
+                freeCamYaw -= deltaX * lookScale;
+                freeCamPitch = THREE.MathUtils.clamp(freeCamPitch - deltaY * lookScale, -1.42, 1.42);
+                applyFreeCamLook();
             }
-            pointerPosition.x = event.clientX;
-            pointerPosition.y = event.clientY;
+            pointerPosition.set(event.clientX, event.clientY);
         }
         function onPointerUp(event) {
-            if (event?.pointerType === 'touch') {
-                event.preventDefault();
-                if (renderer.domElement.hasPointerCapture?.(event.pointerId)) renderer.domElement.releasePointerCapture?.(event.pointerId);
+            if (event?.pointerType === 'touch') event.preventDefault();
+            if (activeLookPointerId !== null && (!event || event.pointerId === activeLookPointerId)) {
+                if (event && renderer.domElement.hasPointerCapture?.(event.pointerId)) renderer.domElement.releasePointerCapture?.(event.pointerId);
+                activeLookPointerId = null;
+                isPointerDown = false;
             }
-            isPointerDown = false;
+        }
+        function applyFreeCamLook() {
+            const cp = Math.cos(freeCamPitch);
+            freeCamDirection.set(-Math.sin(freeCamYaw) * cp, Math.sin(freeCamPitch), -Math.cos(freeCamYaw) * cp).normalize();
+            freeCamLookTarget.copy(cameras.freeLook.position).add(freeCamDirection);
+            cameras.freeLook.lookAt(freeCamLookTarget);
         }
 
         function setupMobileTouchSafety() {
@@ -2560,18 +2607,21 @@
         function drawCityAtlas() {
             if (!cityAtlasCanvas || document.getElementById('city-atlas-screen').classList.contains('hidden')) return;
             const ctx = cityAtlasCtx, w = cityAtlasCanvas.width, h = cityAtlasCanvas.height, range = atlasRange();
-            ctx.clearRect(0,0,w,h); const grd=ctx.createLinearGradient(0,0,w,h); grd.addColorStop(0,'#0d3967'); grd.addColorStop(1,'#081b37'); ctx.fillStyle=grd; ctx.fillRect(0,0,w,h);
-            const scale = w / range; const roadStartX = Math.floor((cityAtlasCenter.x-range/2)/ROAD_INTERVAL)*ROAD_INTERVAL; const roadStartZ = Math.floor((cityAtlasCenter.z-range/2)/ROAD_INTERVAL)*ROAD_INTERVAL;
-            loadedChunks.forEach(chunk=>{ const origin=chunkOrigin(chunk.cx,chunk.cz); const p=atlasWorldToPixel(origin); const s=CHUNK_SIZE*scale; ctx.fillStyle='rgba(79,160,205,.15)';ctx.fillRect(p.x,p.y,s,s);ctx.strokeStyle='rgba(126,213,255,.22)';ctx.lineWidth=2;ctx.strokeRect(p.x,p.y,s,s); });
-            ctx.strokeStyle='rgba(222,239,249,.52)'; ctx.lineWidth=Math.max(5,ROAD_WIDTH*scale); for(let x=roadStartX;x<=cityAtlasCenter.x+range/2;x+=ROAD_INTERVAL){const p=atlasWorldToPixel(new THREE.Vector3(x,0,cityAtlasCenter.z));ctx.beginPath();ctx.moveTo(p.x,0);ctx.lineTo(p.x,h);ctx.stroke();} for(let z=roadStartZ;z<=cityAtlasCenter.z+range/2;z+=ROAD_INTERVAL){const p=atlasWorldToPixel(new THREE.Vector3(cityAtlasCenter.x,0,z));ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(w,p.y);ctx.stroke();}
-            buildings.forEach(b=>{ if(!b.visible) return; const p=atlasWorldToPixel(b.position); if(p.x<-18||p.x>w+18||p.y<-18||p.y>h+18)return; ctx.fillStyle='rgba(149,202,227,.45)';ctx.fillRect(p.x-7,p.y-7,14,14); });
-            if (document.getElementById('atlas-layer-npcs').checked) { ctx.fillStyle='#bdeeff';npcs.forEach(n=>{const p=atlasWorldToPixel(n.position);ctx.fillRect(p.x-3,p.y-3,6,6);}); }
-            if (document.getElementById('atlas-layer-transit').checked) { trafficVehicles.forEach(v=>{const p=atlasWorldToPixel(v.position);ctx.fillStyle=v.userData?.transit?'#ffdc6d':'#f2a45f';ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fill();}); }
-            if(path.length>1){ctx.strokeStyle=isAutoDriving?'#58e7ff':'#ff8a70';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();let p=atlasWorldToPixel(path[0]);ctx.moveTo(p.x,p.y);for(let i=1;i<path.length;i++){p=atlasWorldToPixel(path[i]);ctx.lineTo(p.x,p.y);}ctx.stroke();}
-            if(destination){const p=atlasWorldToPixel(destination);ctx.fillStyle='#ff806b';ctx.beginPath();ctx.arc(p.x,p.y,13,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();}
-            const actor=getControlledObject(); const p=atlasWorldToPixel(actor.position);ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(p.x,p.y,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1d9dea';ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fill();
-            ctx.fillStyle='rgba(220,247,255,.9)';ctx.font='700 24px system-ui';ctx.fillText(`RANGE ±${Math.round(range/2)}m`,20,h-24);document.getElementById('atlas-zoom-label').textContent=`ZOOM ${cityAtlasZoom.toFixed(1)}× · ${Math.round(range)}m`;
-            document.getElementById('atlas-destination-readout').textContent=destination?`目的地 X:${destination.x.toFixed(0)} Z:${destination.z.toFixed(0)} · ${path.length} points`:'目的地を選択してください';
+            ctx.clearRect(0,0,w,h);
+            const grd=ctx.createLinearGradient(0,0,w,h);grd.addColorStop(0,'#102f50');grd.addColorStop(.55,'#0b223c');grd.addColorStop(1,'#06182e');ctx.fillStyle=grd;ctx.fillRect(0,0,w,h);
+            const scale=w/range, roadStartX=Math.floor((cityAtlasCenter.x-range/2)/ROAD_INTERVAL)*ROAD_INTERVAL, roadStartZ=Math.floor((cityAtlasCenter.z-range/2)/ROAD_INTERVAL)*ROAD_INTERVAL;
+            ctx.save();ctx.strokeStyle='rgba(91,163,202,.18)';ctx.lineWidth=1;for(let g=0;g<=w;g+=64){ctx.beginPath();ctx.moveTo(g,0);ctx.lineTo(g,h);ctx.stroke();ctx.beginPath();ctx.moveTo(0,g);ctx.lineTo(w,g);ctx.stroke();}ctx.restore();
+            loadedChunks.forEach(chunk=>{const origin=chunkOrigin(chunk.cx,chunk.cz),p=atlasWorldToPixel(origin),s=CHUNK_SIZE*scale;ctx.fillStyle='rgba(57,122,158,.22)';ctx.fillRect(p.x,p.y,s,s);ctx.strokeStyle='rgba(145,218,250,.22)';ctx.lineWidth=2;ctx.strokeRect(p.x,p.y,s,s);});
+            ctx.strokeStyle='#6f8795';ctx.lineWidth=Math.max(7,ROAD_WIDTH*scale);ctx.lineCap='round';for(let x=roadStartX;x<=cityAtlasCenter.x+range/2;x+=ROAD_INTERVAL){const p=atlasWorldToPixel(new THREE.Vector3(x,0,cityAtlasCenter.z));ctx.beginPath();ctx.moveTo(p.x,0);ctx.lineTo(p.x,h);ctx.stroke();}for(let z=roadStartZ;z<=cityAtlasCenter.z+range/2;z+=ROAD_INTERVAL){const p=atlasWorldToPixel(new THREE.Vector3(cityAtlasCenter.x,0,z));ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(w,p.y);ctx.stroke();}
+            ctx.strokeStyle='rgba(235,250,255,.30)';ctx.lineWidth=1.5;for(let x=roadStartX;x<=cityAtlasCenter.x+range/2;x+=ROAD_INTERVAL){const p=atlasWorldToPixel(new THREE.Vector3(x,0,cityAtlasCenter.z));ctx.setLineDash([8,9]);ctx.beginPath();ctx.moveTo(p.x,0);ctx.lineTo(p.x,h);ctx.stroke();}for(let z=roadStartZ;z<=cityAtlasCenter.z+range/2;z+=ROAD_INTERVAL){const p=atlasWorldToPixel(new THREE.Vector3(cityAtlasCenter.x,0,z));ctx.setLineDash([8,9]);ctx.beginPath();ctx.moveTo(0,p.y);ctx.lineTo(w,p.y);ctx.stroke();}ctx.setLineDash([]);
+            buildings.forEach(b=>{if(!b.visible)return;const p=atlasWorldToPixel(b.position);if(p.x<-20||p.x>w+20||p.y<-20||p.y>h+20)return;ctx.fillStyle=b.userData?.buildingType==='park'?'#2f9c70':'#6ba7c4';ctx.fillRect(p.x-8,p.y-8,16,16);ctx.strokeStyle='rgba(218,246,255,.45)';ctx.lineWidth=1;ctx.strokeRect(p.x-8,p.y-8,16,16);});
+            if(document.getElementById('atlas-layer-npcs').checked){npcs.forEach(n=>{const p=atlasWorldToPixel(n.position);ctx.fillStyle='#d5ecff';ctx.fillRect(p.x-3,p.y-3,6,6);});}
+            if(document.getElementById('atlas-layer-transit').checked){trafficVehicles.forEach(v=>{const p=atlasWorldToPixel(v.position);ctx.fillStyle=v.userData?.transit?'#ffd166':'#fd9b68';ctx.beginPath();ctx.moveTo(p.x,p.y-7);ctx.lineTo(p.x+6,p.y+5);ctx.lineTo(p.x-6,p.y+5);ctx.closePath();ctx.fill();});}
+            if(path.length>1){ctx.strokeStyle=isAutoDriving?'#4de5ff':'#ff8d77';ctx.shadowColor=ctx.strokeStyle;ctx.shadowBlur=12;ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();let p=atlasWorldToPixel(path[0]);ctx.moveTo(p.x,p.y);for(let i=1;i<path.length;i++){p=atlasWorldToPixel(path[i]);ctx.lineTo(p.x,p.y);}ctx.stroke();ctx.shadowBlur=0;}
+            if(destination){const p=atlasWorldToPixel(destination);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.fillStyle='#ff735f';ctx.beginPath();ctx.arc(p.x,p.y,13,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y-29);ctx.lineTo(p.x,p.y-12);ctx.stroke();}
+            const actor=getControlledObject(),p=atlasWorldToPixel(actor.position),heading=actor.rotation?.y||0;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-heading);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(10,11);ctx.lineTo(0,7);ctx.lineTo(-10,11);ctx.closePath();ctx.fill();ctx.fillStyle='#1a9dec';ctx.beginPath();ctx.arc(0,3,4,0,Math.PI*2);ctx.fill();ctx.restore();
+            ctx.fillStyle='rgba(221,246,255,.92)';ctx.font='900 21px system-ui';ctx.fillText('N',w/2-7,28);ctx.strokeStyle='rgba(185,233,255,.48)';ctx.beginPath();ctx.moveTo(w/2,36);ctx.lineTo(w/2,62);ctx.stroke();
+            ctx.fillStyle='rgba(220,247,255,.92)';ctx.font='800 18px system-ui';ctx.fillText(`RADIUS ${Math.round(range/2)}m`,20,h-24);document.getElementById('atlas-zoom-label').textContent=`ZOOM ${cityAtlasZoom.toFixed(1)}× · ${Math.round(range)}m`;document.getElementById('atlas-destination-readout').textContent=destination?`目的地 X:${destination.x.toFixed(0)} Z:${destination.z.toFixed(0)} · ${path.length} points`:'地図をタップして目的地を置く';
         }
         function atlasPointerToWorld(event) { const rect=cityAtlasCanvas.getBoundingClientRect(); const x=(event.clientX-rect.left)/rect.width*cityAtlasCanvas.width;const y=(event.clientY-rect.top)/rect.height*cityAtlasCanvas.height;const range=atlasRange();return new THREE.Vector3(cityAtlasCenter.x+(x/cityAtlasCanvas.width-.5)*range,0,cityAtlasCenter.z+(y/cityAtlasCanvas.height-.5)*range); }
         function setAtlasDestination(event) { const point=atlasPointerToWorld(event); if(document.getElementById('atlas-teleport').checked){ playerGroup.position.copy(point);if(controlledVehicle)controlledVehicle.position.copy(point);updateChunkStreaming(point,true);destination=null;path=[];stopAutoDrive();setSandboxMessage('City Atlasからテレポートしました。'); } else { destination=point; path=findPath(getControlledObject().position,destination); stopAutoDrive(); setSandboxMessage(path.length?'目的地を設定しました。City Atlasから自動運転を開始できます。':'目的地への経路を作成できませんでした。'); } drawCityAtlas(); }
@@ -2589,6 +2639,62 @@
             cityAtlasCanvas.addEventListener('pointermove',e=>{if(!cityAtlasDragging)return;const rect=cityAtlasCanvas.getBoundingClientRect();const range=atlasRange();const dx=e.clientX-cityAtlasDragStart.x,dy=e.clientY-cityAtlasDragStart.y;if(Math.hypot(dx,dy)>8){cityAtlasCenter.x=cityAtlasDragStart.cx-dx/rect.width*range;cityAtlasCenter.z=cityAtlasDragStart.cz-dy/rect.height*range;drawCityAtlas();}});
             cityAtlasCanvas.addEventListener('pointerup',e=>{const d=Math.hypot(e.clientX-cityAtlasDragStart.x,e.clientY-cityAtlasDragStart.y);cityAtlasDragging=false;if(d<8)setAtlasDestination(e);});
         }
+
+        const WORLD_PROFILES = {
+            harbor:{name:'HARBOR HEART',live:'12 LOCAL · 24 NPC',description:'海辺の高層街。交通と建築をバランスよく楽しめます。',quality:'balanced',weather:'sunny',time:'12',traffic:true,npcs:true},
+            neon:{name:'NEON AVENUE',live:'8 LOCAL · 32 NPC',description:'夜景と公共交通を中心にした、光量の多い都市エリアです。',quality:'visual',weather:'cloudy',time:'22',traffic:true,npcs:true},
+            green:{name:'GREEN DISTRICT',live:'16 LOCAL · 18 NPC',description:'公園、住宅、屋内探索をゆっくり楽しむ明るい街区です。',quality:'balanced',weather:'sunny',time:'9',traffic:true,npcs:true}
+        };
+        function setupWorldBrowserControls() {
+            document.querySelectorAll('.world-card').forEach(card => { if (card.dataset.worldBound) return; card.dataset.worldBound='1'; card.addEventListener('click', () => selectWorld(card.dataset.worldId)); });
+            const setupButton=document.getElementById('open-join-setup'); if(setupButton && !setupButton.dataset.worldBound){setupButton.dataset.worldBound='1';setupButton.addEventListener('click', openJoinSetup);}
+            const backButton=document.getElementById('join-setup-back'); if(backButton && !backButton.dataset.worldBound){backButton.dataset.worldBound='1';backButton.addEventListener('click', openWorldBrowser);}
+            const joinButton=document.getElementById('join-world-button'); if(joinButton && !joinButton.dataset.worldBound){joinButton.dataset.worldBound='1';joinButton.addEventListener('click', joinSelectedWorld);}
+        }
+        function selectWorld(id) {
+            const profile = WORLD_PROFILES[id] || WORLD_PROFILES.harbor;
+            selectedWorldId = id in WORLD_PROFILES ? id : 'harbor';
+            document.querySelectorAll('.world-card').forEach(card => card.classList.toggle('selected', card.dataset.worldId === selectedWorldId));
+            document.getElementById('join-world-name').textContent = profile.name;
+            document.getElementById('join-world-live').textContent = profile.live;
+            document.getElementById('join-world-description').textContent = `${profile.name}へ参加する前に、描画と街の活動を調整できます。`;
+            document.getElementById('join-quality-select').value = profile.quality;
+            document.getElementById('join-weather-select').value = profile.weather;
+            document.getElementById('join-time-select').value = profile.time;
+            document.getElementById('join-traffic-toggle').checked = profile.traffic;
+            document.getElementById('join-npc-toggle').checked = profile.npcs;
+            document.querySelector('#join-world-button small').textContent = profile.name;
+        }
+        function openWorldBrowser() {
+            document.getElementById('world-browser').classList.remove('hidden');
+            document.getElementById('join-setup').classList.add('hidden');
+            selectWorld(selectedWorldId);
+        }
+        function openJoinSetup() {
+            document.getElementById('world-browser').classList.add('hidden');
+            document.getElementById('join-setup').classList.remove('hidden');
+            selectWorld(selectedWorldId);
+        }
+        function joinSelectedWorld() {
+            const quality = document.getElementById('join-quality-select').value;
+            const weather = document.getElementById('join-weather-select').value;
+            const hour = Number(document.getElementById('join-time-select').value);
+            document.getElementById('quality-select').value = quality;
+            setQuality(quality);
+            document.getElementById('weather-select').value = weather;
+            changeWeather(weather);
+            document.getElementById('time-slider').value = hour;
+            updateTime(hour);
+            document.getElementById('traffic-toggle').checked = document.getElementById('join-traffic-toggle').checked;
+            trafficEnabled = document.getElementById('traffic-toggle').checked;
+            const npcToggle = document.getElementById('join-npc-toggle').checked;
+            if (!npcToggle) { document.getElementById('npc-slider').value = 0; updateNpcCount(); }
+            else if (Number(document.getElementById('npc-slider').value) === 0) { document.getElementById('npc-slider').value = 12; updateNpcCount(); }
+            startGame();
+            setSandboxMessage(`${WORLD_PROFILES[selectedWorldId].name}へ参加しました。ドラッグ／スワイプで視点を動かせます。`);
+        }
+
+        window.__ultimateCityWorld = { select:selectWorld, setup:openJoinSetup, browser:openWorldBrowser, join:joinSelectedWorld };
 
         function startGame() {
             gameStarted = true;
@@ -2628,6 +2734,7 @@
             document.getElementById('world-settings-screen').classList.add('hidden');
             pauseBgm();
             document.getElementById('title-screen').classList.remove('hidden');
+            openWorldBrowser();
             toggleDrawer(false);
         }
 
@@ -2667,7 +2774,7 @@
             lastShadowUpdateTime = 0;
             lastShadowChunkSignature = '';
             shadowFocusPosition.set(Infinity, Infinity, Infinity);
-            renderer.toneMappingExposure = qualityMode === 'visual' ? 1.58 : qualityMode === 'balanced' ? 1.46 : 1.30;
+            renderer.toneMappingExposure = qualityMode === 'visual' ? 1.28 : qualityMode === 'balanced' ? 1.16 : 1.04;
             const npcSlider = document.getElementById('npc-slider');
             npcSlider.max = config.npcCap;
             if (parseInt(npcSlider.value) > config.npcCap) npcSlider.value = config.npcCap;
@@ -2813,9 +2920,10 @@
                 currentCamera.lookAt(controlledObject.position);
             } else if (currentCamera === cameras.firstPerson) {
                 currentCamera.position.copy(controlledObject.position).add(new THREE.Vector3(0, controlledVehicle ? 1.2 : 1.5, 0));
-                currentCamera.quaternion.copy(controlledObject.quaternion);
+                firstPersonEuler.set(firstPersonPitch, controlledObject.rotation.y, 0, 'YXZ');
+                currentCamera.quaternion.setFromEuler(firstPersonEuler);
             } else {
-                orbitControls.update();
+                applyFreeCamLook();
             }
             updateDynamicShadow(currentCamera === cameras.freeLook ? cameras.freeLook.position : controlledObject.position, time);
 
