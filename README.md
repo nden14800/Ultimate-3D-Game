@@ -1,52 +1,55 @@
 # Ultimate 3D Sandbox
 
-**Ultimate 3D Sandbox** は、ブラウザ上で無限に続く創作都市を歩き、乗り物を運転し、街を建築できる3Dサンドボックスです。Three.jsによる単一の静的HTMLとして配信されるため、ビルド工程やバックエンドを必要とせず、Cloudflare Pagesでそのまま動作します。
+**Ultimate 3D Sandbox** は、無限に続く創作都市を歩き、乗り物を運転し、建築し、NPCと会話できる3Dブラウザサンドボックスです。Three.jsを使う単一の静的HTMLとして配信され、ビルド工程やゲームサーバーなしにCloudflare Pagesで動作します。
 
-> 固定ミッションは採用していません。自由探索、無限チャンク、車両、天候、時刻、テレポート、自動運転、NPC、モバイル操作を維持したまま、独自の建築・会話システムを拡張しています。
+> 固定ミッションはありません。自由探索、無限チャンク、車両、天候、時刻、テレポート、自動運転、NPC、建築、モバイル操作を一つの自由な街として提供します。
 
 ## 主な機能
 
 | 区分 | 内容 |
 |---|---|
-| 無限都市 | 64×64単位の決定論的な都市チャンクを、プレイヤーまたは操作中の車両周辺に生成・保持・解放します。固定マップの端はありません。 |
-| 自由探索 | WASD／矢印キー／モバイルジョイスティックによるカメラ相対移動を提供します。三人称・一人称・フリールックを切り替えられます。 |
+| 無限都市 | 64×64単位の決定論的チャンクを、プレイヤーまたは操作中の車両の周辺に生成・保持・解放します。固定マップの端はありません。 |
+| 統一した操作 | 徒歩と車両のいずれも、**画面の上方向が前進**となるカメラ相対操作です。WASD、矢印キー、モバイルジョイスティックで同じ移動の期待にそろえています。 |
+| 衝突 | 建物、City Hubの外壁、配置済みモジュール、車両、屋内壁を軽量な境界判定の対象にします。壁をすり抜けず、移動時は壁沿いに滑るよう解決します。 |
+| City Hub | 近傍チャンクに高密度のCity Hubを配置します。入口の近くで`E`または「使う」を選ぶとロビーへ入館でき、退出ゲートで街へ戻れます。ロビーにはカーテンウォール、レセプション、植栽、照明、出口ゲートがあります。 |
+| 都市と車両の表現 | 遠景はインスタンシングで軽く保ち、City Hubとプレイヤー車両にはPBR系マテリアル、階層化外壁、窓、庇、植栽、独立した車輪、ガラス、バンパー、フードなどを加えています。 |
 | Build Belt | 画面下中央の独自クイックバーで、五つの建築素材、回転、削除、Field Packを即時に操作できます。既存作品のUI・名称・アセットには依存しません。 |
 | Field Pack | `Tab`またはBuild Beltから開く創作インベントリです。Turf Deck、Stone Core、Timber Stack、Clear Prism、Alloy Moduleを選択できます。 |
 | 建築 | グリッドにスナップするゴースト表示を使い、左クリックで素材別モジュールを配置します。`R`で90度回転し、右クリックまたはRemoveモードで除去できます。セッションごとに最大240個を配置できます。 |
-| 明るい都市表現 | タイトルとプレイ中で、青空、緑地、淡い暖色・寒色の建築、明るい道路を共有するアート方向に統一しています。遠景の建築はインスタンシングで描画します。 |
-| 車両 | クルーザー、スポーツカー、ホバーバイクを出現させ、近づいて`E`で乗降できます。交通車両の有効・無効も切り替えられます。 |
+| 全画面ポーズハブ | 右上のポーズ、`Esc`、`P`で**City Pause Hub**を開きます。再開、Field Pack、ワールド、乗り物、会話とAI、操作ガイド、タイトル復帰を一画面に集約しています。 |
+| モバイル完全操作 | ジョイスティック、走る、使う、建築、会話、Build Belt、視点、乗り物、マップ、ポーズから全主要機能に到達できます。キーボードを使う端末では移動用モバイルUIを自動で隠し、タッチで再表示します。 |
 | NPC行動AI | NPCは道路・歩道を目的地として巡回・散策し、到着時は待機します。プレイヤー、車両、他NPC、配置物への近接を回避し、会話中の状態も持ちます。 |
-| Conversation Dock | 左下の広い会話ドックに会話履歴、近隣NPC、活動人数、ローカルAI状態を表示します。NPCの発言はワールド内の吹き出しにも反映されます。 |
-| 任意起動ローカルAI | WebGPU対応端末では、Conversation Dockの**LOCAL AIを開始**からWebLLMを明示的に起動できます。モデル推論はブラウザ内で行われ、APIキーやゲームサーバーは使用しません。[1] [2] |
+| Conversation Dock | 左下の広い会話ドックに会話履歴、近隣NPC、活動人数、ローカルAI状態を表示します。モバイルでは初期状態を折り畳み、開いた時は安全領域内で全幅表示します。 |
+| 複数ローカルAI | WebGPU対応端末では、明示的にLOCAL AIを開始した後、複数NPCが人格別の履歴を保ちながら自律会話します。プレイヤーの発言には近傍NPCの応答が優先されます。推論は一つのブラウザ内エンジンへ順番に送るため、複数モデルを同時に読み込みません。 |
 | 環境と品質 | 天候、時刻、描画距離、軽量・プレミアム・ウルトラ品質を切り替えられます。PCFソフト影、トーンマッピング、近傍影キャスター、描画更新の間引きで軽さと視認性を両立します。 |
 
 ## 操作方法
 
-| 操作 | キー／操作 |
-|---|---|
-| 徒歩移動 | `W` `A` `S` `D` または矢印キー。画面上方向が常に前進するカメラ基準操作です。 |
-| 走る | `Shift`。徒歩は16 km/h、走行は64 km/hです。 |
-| モバイル移動 | 左下ジョイスティック。右下の「走る」を長押しすると走ります。 |
-| 視点操作 | ゲーム画面のマウスドラッグまたはタッチスワイプ。 |
-| 視点切替 | Context Actionsまたはメニュー内の「視点」。 |
-| 一時停止 | 右上の「ポーズ」、または `Esc`／`P`。 |
-| 乗車／降車 | 乗り物の近くで`E`、またはメニューの乗車／降車ボタン。 |
-| 車両生成 | メニューから車種を選び「乗り物を出す」、またはContext Actionsの「乗り物」。 |
-| 素材選択 | Build Beltの`1`〜`5`、またはField Pack内の素材カード。選択時に建築モードになります。 |
-| 建築モード | `B`でオン・オフ。ゴーストがシアンなら配置可能、赤なら近接物との干渉などで配置不可です。 |
-| 配置 | 建築モード中に左クリック。 |
-| 回転 | `R`またはBuild BeltのRotate。90度ずつ向きが変わります。 |
-| 削除 | 右クリック、またはBuild BeltのRemoveを選んで左クリック。 |
-| Field Pack | `Tab`またはBuild BeltのPack。 |
-| NPC会話 | Conversation Dockへ入力して送信。LOCAL AI未起動・未対応・ロード失敗時は端末内のテンプレート会話へ安全にフォールバックします。 |
-| LOCAL AI | Conversation Dockの「LOCAL AIを開始」。初回のみモデル取得に時間がかかる場合があります。ゲーム起動時に自動ロードはしません。 |
-| マップ指定 | 右下のCity Radarをクリック。テレポート設定時は即時移動、通常時は目的地設定です。 |
+| 操作 | キーボード | タッチ／画面操作 |
+|---|---|---|
+| 徒歩移動 | `W` `A` `S` `D` または矢印キー | 左下ジョイスティック |
+| 走る | `Shift` | 右下の「走る」を長押し |
+| 視点操作 | マウスドラッグ | ゲーム画面をスワイプ |
+| 視点切替 | メニュー内の視点 | Context Actionsの「視点」 |
+| 一時停止 | `Esc`または`P` | 右上の「ポーズ」 |
+| 乗車／降車 | 近くの車両で`E` | メニューまたは「使う」 |
+| City Hub入退室 | 入口／退出ゲートの近くで`E` | 「使う」 |
+| 車両生成 | メニューから車種を選択 | Context Actionsの「乗り物」またはメニュー |
+| 素材選択 | Build Beltの`1`〜`5` | Build BeltまたはField Pack内の素材カード |
+| 建築モード | `B` | モバイルの「建築」またはメニュー |
+| 配置 | 建築モード中に左クリック | 建築モード中に地面をタップ |
+| 回転 | `R` | Build BeltのRotate |
+| 削除 | 右クリックまたは`7` | Build BeltのRemoveを選び対象をタップ |
+| Field Pack | `Tab` | Build BeltのPack |
+| NPC会話 | Conversation Dockへ入力して送信 | Conversation Dockを開いて入力・送信 |
+| LOCAL AI | Conversation Dockの「LOCAL AIを開始」 | 同左 |
+| マップ指定 | City Radarをクリック | City Radarをタップ |
 
 ## ローカルAIの利用条件
 
-WebLLMはWebGPUを利用してブラウザ内で推論を行い、OpenAI互換のストリーミングチャットAPIを提供します。[1] 本ゲームでは低リソース対応として登録されている`Qwen2.5-0.5B-Instruct-q4f16_1-MLC`を、ユーザーの明示操作時だけ読み込みます。公式設定上の必要VRAM目安は約944.62MBです。[2]
+WebLLMはWebGPUを利用してブラウザ内で推論を行い、OpenAI互換のストリーミングチャットAPIを提供します。[1] 本ゲームでは`Qwen2.5-0.5B-Instruct-q4f16_1-MLC`を、利用者がConversation Dockで明示操作した時だけ読み込みます。公式設定上の必要VRAM目安は約944.62MBです。[2]
 
-このため、LOCAL AIはネットワーク上の生成APIを呼び出さず、APIキーも不要です。ただし、初回のモデル取得、WebGPU対応、端末メモリ、ブラウザの設定には依存します。条件を満たさない場合も、建築・探索・NPC行動を含むゲーム全体は通常どおり利用できます。
+LOCAL AIが起動すると、NPCごとの人格・履歴を分けながら一つの推論エンジンを共有します。ゲーム開始時にはモデルを自動ロードしません。WebGPU非対応、モデル取得失敗、端末メモリ不足の場合も、テンプレート会話によるNPC間の発言とプレイヤー応答へフォールバックし、建築・探索・NPC行動を含むゲーム本体は通常どおり利用できます。
 
 ## パフォーマンス設定
 
@@ -89,10 +92,10 @@ python3 validate_refresh.py
 
 [2] [WebLLM official model configuration](https://raw.githubusercontent.com/mlc-ai/web-llm/main/src/config.ts)
 
-[3] [Three.js — InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html)
+[3] [Three.js — GLTFLoader](https://threejs.org/docs/pages/GLTFLoader.html)
 
-[4] [Three.js — Cleanup](https://threejs.org/manual/en/cleanup.html)
+[4] [MDN — Bounding Volume Collision Detection with Three.js](https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection/bounding_volume_collision_detection_with_THREE.js)
 
-[5] [Roblox Creator Hub — UI and UX design](https://create.roblox.com/docs/production/game-design/ui-ux-design)
+[5] [Three.js — InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html)
 
 [6] [Cloudflare Pages — Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/)

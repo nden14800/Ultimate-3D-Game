@@ -463,6 +463,79 @@
             .conversation-status-row { font-size: 8px; padding-inline: 10px; }
         }
 
+
+
+        /* Interaction Refresh: pause hub, wide conversation dock, and input parity. */
+        #drawer-toggle { display: none; }
+        #pause-screen { z-index: 160; align-items: stretch; justify-content: stretch; padding: 0; background: radial-gradient(circle at 75% 16%, rgba(75,161,255,.33), transparent 36%), linear-gradient(135deg, rgba(4,21,48,.98), rgba(13,61,114,.96)); }
+        .pause-hub { width: 100%; min-height: 100%; display: grid; grid-template-columns: minmax(260px, .78fr) minmax(420px, 1.22fr); gap: clamp(18px, 4vw, 58px); align-items: center; padding: clamp(28px, 7vw, 96px); color: #ecf8ff; }
+        .pause-hub-intro { max-width: 470px; }
+        .pause-hub-kicker { display: inline-flex; align-items: center; gap: 8px; color: #9ddaff; font-size: 11px; font-weight: 900; letter-spacing: .16em; }
+        .pause-hub-kicker::before { content: ''; width: 8px; height: 8px; border-radius: 99px; background: #55d493; box-shadow: 0 0 16px #55d493; }
+        .pause-hub h2 { margin: 14px 0 9px; font-size: clamp(38px, 5vw, 68px); line-height: .95; letter-spacing: -.06em; }
+        .pause-hub h2 em { display: block; color: #81d6ff; font-style: normal; }
+        .pause-hub-intro p { max-width: 400px; color: #c6e7fb; font-size: 14px; font-weight: 650; line-height: 1.7; }
+        .pause-hub-status { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+        .pause-hub-status span { padding: 7px 10px; border: 1px solid rgba(160,218,255,.25); border-radius: 999px; color: #d9f3ff; background: rgba(255,255,255,.08); font-size: 10px; font-weight: 800; }
+        .pause-hub-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; max-width: 650px; }
+        .pause-hub-button { display: flex; min-height: 96px; align-items: center; gap: 13px; padding: 16px; border: 2px solid rgba(255,255,255,.64); border-radius: 20px; color: #143e70; background: rgba(250,254,255,.96); box-shadow: 0 7px 0 rgba(3,33,78,.22), 0 18px 36px rgba(0,11,33,.2); text-align: left; transition: transform .16s ease, box-shadow .16s ease; }
+        .pause-hub-button:hover { transform: translateY(-3px); box-shadow: 0 10px 0 rgba(3,33,78,.22), 0 22px 40px rgba(0,11,33,.24); }
+        .pause-hub-button:active { transform: translateY(4px); box-shadow: none; }
+        .pause-hub-button .bi-icon { width: 28px; height: 28px; color: #2d86f4; }
+        .pause-hub-button strong { display: block; font-size: 13px; }
+        .pause-hub-button small { display: block; margin-top: 4px; color: #6284aa; font-size: 10px; font-weight: 750; line-height: 1.4; }
+        .pause-hub-button.primary { grid-column: span 2; min-height: 82px; color: white; border-color: #8fceff; background: linear-gradient(180deg, #53aaff, #2071e6); }
+        .pause-hub-button.primary .bi-icon, .pause-hub-button.primary small { color: white; }
+        .pause-hub-button.warn { color: #854a00; background: #fff2db; border-color: #ffd08b; }
+        .pause-hub-button.warn .bi-icon { color: #e98929; }
+        .pause-hub-button.danger { color: #983447; background: #fff0f3; border-color: #ffadb9; }
+        .pause-hub-button.danger .bi-icon { color: #e55b73; }
+
+        #chat-ui.conversation-dock { width: min(710px, calc(100vw - 316px)); min-width: 390px; bottom: 104px; }
+        #chat-ui.conversation-dock:not(.collapsed) { max-height: min(430px, calc(100dvh - 150px)); }
+        .conversation-head { position: sticky; top: 0; z-index: 2; background: rgba(249,253,255,.98); }
+        #chat-log { height: min(210px, 28dvh); padding: 12px 15px; font-size: 12px; overflow-wrap: anywhere; }
+        #chat-log p { padding: 6px 0; }
+        #chat-form { padding: 11px; }
+        #chat-input { min-height: 42px; font-size: 13px; }
+        #chat-send { min-width: 80px; }
+        #chat-ui.conversation-dock.collapsed { transform: translateY(calc(100% - 46px)); }
+
+        #mobile-action-rail { position: absolute; z-index: 25; bottom: 194px; left: 14px; display: none; gap: 7px; pointer-events: auto; }
+        .mobile-action { display: grid; width: 54px; min-height: 48px; place-items: center; gap: 1px; padding: 5px; border: 2px solid rgba(255,255,255,.86); border-radius: 15px; color: #1e5f9d; background: rgba(248,253,255,.94); box-shadow: 0 4px 0 rgba(7,54,116,.16), 0 10px 20px rgba(7,35,70,.16); font-size: 8px; font-weight: 900; }
+        .mobile-action .bi-icon { width: 18px; height: 18px; color: #2a83ef; }
+        .mobile-action.active { color: white; background: linear-gradient(180deg, #5aafff, #2474e9); border-color: white; }
+        .mobile-action.active .bi-icon { color: white; }
+        body.keyboard-active .mobile-ui { opacity: 0; pointer-events: none; transform: translateY(14px); }
+        .mobile-ui { transition: opacity .18s ease, transform .18s ease; }
+
+        @media (pointer: coarse), (max-width: 760px) {
+            #mobile-action-rail { display: grid; }
+            #chat-ui.conversation-dock { right: calc(8px + env(safe-area-inset-right)); left: calc(8px + env(safe-area-inset-left)); width: auto; min-width: 0; bottom: calc(72px + env(safe-area-inset-bottom)); transform: none; }
+            #chat-ui.conversation-dock:not(.collapsed) { max-height: min(48dvh, calc(100dvh - 132px)); }
+            #chat-log { height: min(22dvh, 172px); }
+            #chat-ui.conversation-dock.collapsed { bottom: calc(72px + env(safe-area-inset-bottom)); left: calc(106px + env(safe-area-inset-left)); }
+            .pause-hub { grid-template-columns: 1fr; gap: 20px; align-content: center; overflow-y: auto; padding: 28px 18px max(28px, env(safe-area-inset-bottom)); }
+            .pause-hub-intro { max-width: none; }
+            .pause-hub h2 { font-size: clamp(34px, 12vw, 52px); }
+            .pause-hub-intro p { margin: 10px 0 0; font-size: 12px; }
+            .pause-hub-status { margin-top: 14px; }
+            .pause-hub-actions { gap: 8px; }
+            .pause-hub-button { min-height: 76px; padding: 11px; border-radius: 16px; }
+            .pause-hub-button .bi-icon { width: 23px; height: 23px; }
+            .pause-hub-button strong { font-size: 11px; }
+            .pause-hub-button small { font-size: 8px; }
+        }
+        @media (max-width: 430px) {
+            #mobile-action-rail { bottom: 164px; left: 10px; gap: 5px; }
+            .mobile-action { width: 48px; min-height: 43px; font-size: 7px; border-radius: 13px; }
+            .mobile-action .bi-icon { width: 16px; height: 16px; }
+            #chat-ui.conversation-dock:not(.collapsed) { bottom: calc(65px + env(safe-area-inset-bottom)); max-height: min(52dvh, calc(100dvh - 120px)); }
+            #chat-log { height: min(23dvh, 165px); font-size: 11px; }
+            #chat-ui.conversation-dock.collapsed { bottom: calc(67px + env(safe-area-inset-bottom)); left: calc(94px + env(safe-area-inset-left)); }
+            .pause-hub-actions { grid-template-columns: 1fr 1fr; }
+        }
+
         </style>
 </head>
 <body>
@@ -476,8 +549,19 @@
             <button id="title-help-button" class="title-secondary">操作ガイドを見る</button>
         </main>
     </div>
-    <div id="pause-screen" class="game-overlay hidden" role="dialog" aria-modal="true" aria-label="一時停止画面">
-        <section class="pause-card"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#pause-circle-fill"></use></svg><h2>一時停止</h2><p>街の時間を止めています。</p><button id="resume-game-button" class="pause-primary"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg>ゲームを続ける</button><button id="pause-settings-button" class="pause-secondary">設定を開く</button><button id="return-title-button" class="pause-secondary">タイトルへ戻る</button></section>
+    <div id="pause-screen" class="game-overlay hidden" role="dialog" aria-modal="true" aria-label="City Pause Hub">
+        <section class="pause-hub">
+            <div class="pause-hub-intro"><div class="pause-hub-kicker">CITY PAUSE HUB</div><h2>CREATE.<em>EXPLORE.</em>CONNECT.</h2><p>ゲームは停止中です。街の設定、建築、乗り物、会話をここからまとめて扱えます。</p><div class="pause-hub-status"><span id="pause-status-world">WORLD READY</span><span id="pause-status-input">INPUT READY</span><span id="pause-status-ai">LOCAL AI OPTIONAL</span></div></div>
+            <div class="pause-hub-actions">
+                <button id="resume-game-button" class="pause-hub-button primary"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg><span><strong>ゲームを続ける</strong><small>街へ戻る</small></span></button>
+                <button id="pause-pack-button" class="pause-hub-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg><span><strong>Field Pack</strong><small>建築素材と操作を確認</small></span></button>
+                <button id="pause-world-button" class="pause-hub-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#globe2"></use></svg><span><strong>ワールド設定</strong><small>品質・天候・描画距離</small></span></button>
+                <button id="pause-vehicle-button" class="pause-hub-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg><span><strong>乗り物</strong><small>出現・乗車・操作</small></span></button>
+                <button id="pause-social-button" class="pause-hub-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg><span><strong>会話とAI</strong><small>NPCとLOCAL AIの管理</small></span></button>
+                <button id="pause-help-button" class="pause-hub-button warn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#question-circle-fill"></use></svg><span><strong>操作ガイド</strong><small>キーボード・タッチ両対応</small></span></button>
+                <button id="return-title-button" class="pause-hub-button danger"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-left"></use></svg><span><strong>タイトルへ戻る</strong><small>現在の探索を終了</small></span></button>
+            </div>
+        </section>
     </div>
     <header id="game-topbar" aria-label="ゲーム上部メニュー">
         <div class="brand-lockup"><div class="brand-mark"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-fill"></use></svg></div><div><span>CREATIVE CITY</span><h1>ULTIMATE 3D</h1></div></div>
@@ -500,6 +584,7 @@
         <button id="field-pack-button" class="belt-slot utility" type="button" aria-label="Field Packを開く"><span class="slot-key">Tab</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg>Pack</button>
     </nav>
     <aside id="context-actions" aria-label="すばやいアクション"><button id="quick-camera" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg><span class="context-label">視点</span></button><button id="quick-car" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg><span class="context-label">乗り物</span></button><button id="quick-map" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg><span class="context-label">マップ</span></button></aside>
+    <aside id="mobile-action-rail" class="mobile-ui" aria-label="モバイル追加操作"><button id="mobile-interact-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>使う</button><button id="mobile-build-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>建築</button><button id="mobile-chat-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg>会話</button></aside>
 
     <div class="ui-container" aria-label="ゲームコントロール">
         <header class="console-header">
@@ -655,6 +740,7 @@
         let worldReady = false;
         let chunkLoadCount = 0, chunkUnloadCount = 0;
         let npcs = [], mapObjects = new THREE.Group(), buildings = [], streetLights = [];
+        let interiorState = null, interiorGroup = null, activeCityHub = null;
 
         let weatherParticles, directionalLight, ambientLight, hemisphereLight, sandboxGround;
         let destination = null, path = [], isAutoDriving = false;
@@ -666,7 +752,12 @@
         let gameStarted = false, gamePaused = false;
         let selectedBuildMaterial = 'turf', buildRotationQuarter = 0, buildGhost = null, buildGhostValid = false, removeMode = false;
         const MAX_PLACED_PROPS = 240;
-        let localAiEngine = null, localAiStatus = 'idle', localAiSending = false, localAiHistory = [];
+        const PLAYER_COLLISION_RADIUS = 0.62;
+        const VEHICLE_COLLISION_RADIUS = 1.12;
+        const INTERIOR_ORIGIN = new THREE.Vector3(0, 0, -180);
+        let localAiEngine = null, localAiStatus = 'idle', localAiSending = false;
+        let localAiQueue = [], localAiQueueBusy = false, lastAutonomousAiAt = 0;
+        const npcAiHistories = new Map();
         let lastNpcActivityUi = 0;
         const LOCAL_AI_MODEL = 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC';
         const LOCAL_AI_MODULE_URL = 'https://esm.run/@mlc-ai/web-llm@0.2.84';
@@ -711,6 +802,14 @@
             alloy: { label: 'Alloy Module', shortLabel: 'Alloy', color: 0x557ca5, accent: 0x79e4ff, baseHeight: 2, icon: 'cpu-fill' }
         };
         const NPC_BEHAVIOR_LABELS = { patrol: '巡回', wander: '散策', wait: '休憩', yield: '回避', talk: '会話中' };
+        const NPC_PERSONAS = [
+            '建築や素材の組み合わせを観察する、穏やかな都市設計者',
+            '乗り物と道路の景色が好きな、少し行動的な案内人',
+            '空、天候、緑地について話す、落ち着いた散策者',
+            'City Hubの内装や街の生活に詳しい、親しみやすい居住者',
+            '新しい発見を短く共有する、好奇心旺盛な探索者',
+            '夜景と光の表情が好きな、静かなクリエイター'
+        ];
 
         function init() {
             scene = new THREE.Scene();
@@ -821,6 +920,7 @@
                 isRunning = false;
             };
             document.addEventListener('keydown', (e) => {
+                setInputMethod('keyboard');
                 const key = normalizedKey(e.key);
                 const editable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
                 if (!e.repeat && (key === 'Escape' || key === 'p') && gameStarted && !editable) { e.preventDefault(); togglePause(); return; }
@@ -831,7 +931,7 @@
                 if (!e.repeat && key === 'r') { e.preventDefault(); rotateBuildModule(); return; }
                 keys[key] = true;
                 if (!controlledVehicle) stopAutoDrive();
-                if (!e.repeat && key === 'e') toggleVehicleControl();
+                if (!e.repeat && key === 'e') handlePrimaryInteract();
                 if (!e.repeat && key === 'b') togglePlaceMode();
             });
             document.addEventListener('keyup', (e) => { keys[normalizedKey(e.key)] = false; });
@@ -850,11 +950,18 @@
             document.getElementById('resume-game-button').addEventListener('click', () => setPaused(false));
             document.getElementById('pause-button').addEventListener('click', () => togglePause());
             document.getElementById('return-title-button').addEventListener('click', returnToTitle);
-            document.getElementById('pause-settings-button').addEventListener('click', () => { setPaused(false); toggleDrawer(true); });
-            document.getElementById('drawer-toggle').addEventListener('click', () => toggleDrawer());
+            document.getElementById('pause-pack-button').addEventListener('click', () => { setPaused(false); toggleFieldPack(true); });
+            document.getElementById('pause-world-button').addEventListener('click', () => openControlPanel('world'));
+            document.getElementById('pause-vehicle-button').addEventListener('click', () => openControlPanel('play'));
+            document.getElementById('pause-social-button').addEventListener('click', () => { setPaused(false); document.getElementById('chat-ui').classList.remove('collapsed'); document.getElementById('chat-input').focus(); });
+            document.getElementById('pause-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
+            document.getElementById('drawer-toggle').addEventListener('click', () => togglePause());
             document.getElementById('quick-camera').addEventListener('click', changeCamera);
             document.getElementById('quick-car').addEventListener('click', () => { spawnVehicle(); setSandboxMessage('乗り物を近くに出しました。Eキーで乗車できます。'); });
             document.getElementById('quick-map').addEventListener('click', () => { document.getElementById('map-container').classList.toggle('map-emphasis'); setSandboxMessage('ミニマップをクリックして目的地を決められます。'); });
+            document.getElementById('mobile-interact-button').addEventListener('click', handlePrimaryInteract);
+            document.getElementById('mobile-build-button').addEventListener('click', togglePlaceMode);
+            document.getElementById('mobile-chat-button').addEventListener('click', () => { document.getElementById('chat-ui').classList.remove('collapsed'); document.getElementById('chat-input').focus(); });
             document.querySelectorAll('[data-build-material]').forEach(button => button.addEventListener('click', () => selectBuildMaterial(button.dataset.buildMaterial)));
             document.getElementById('belt-rotate').addEventListener('click', rotateBuildModule);
             document.getElementById('belt-remove').addEventListener('click', toggleRemoveMode);
@@ -1023,7 +1130,8 @@
                 const seed2 = hash2D(cx * 43 - index, cz * 97 + index, 29);
                 const x = origin.x + 4 + seed * (CHUNK_SIZE - 8);
                 const z = origin.z + 4 + seed2 * (CHUNK_SIZE - 8);
-                if (isRoadCoordinate(x) || isRoadCoordinate(z)) continue;
+                const isHubLot = cx === 0 && cz === 0 && Math.abs(x - 20) < 9 && Math.abs(z - 20) < 9;
+                if (isRoadCoordinate(x) || isRoadCoordinate(z) || isHubLot) continue;
                 const height = 9 + hash2D(cx + index, cz - index, 53) * 24;
                 const size = 4 + hash2D(cx - index, cz + index, 71) * 4;
                 specs.push({ x, z, height, size, color: new THREE.Color(palette[Math.floor(hash2D(cx + index, cz + index, 101) * palette.length)]) });
@@ -1097,10 +1205,170 @@
                 treeMesh.instanceMatrix.needsUpdate = true;
                 group.add(treeMesh);
             }
+            const colliders = specs.map(spec => ({ minX: spec.x - spec.size * 0.53, maxX: spec.x + spec.size * 0.53, minZ: spec.z - spec.size * 0.53, maxZ: spec.z + spec.size * 0.53, kind: 'building' }));
+            let hub = null;
+            if (cx === 0 && cz === 0) {
+                hub = createCityHubExterior(new THREE.Vector3(20, 0, 20));
+                group.add(hub.group);
+                colliders.push(...hub.colliders);
+                activeCityHub = hub;
+            }
             mapObjects.add(group);
-            loadedChunks.set(chunkKey(cx, cz), { cx, cz, group, ground, specs });
+            loadedChunks.set(chunkKey(cx, cz), { cx, cz, group, ground, specs, colliders, hub });
             sandboxGround = ground;
             chunkLoadCount++;
+        }
+
+
+
+        function createCityHubExterior(center) {
+            const group = new THREE.Group();
+            group.name = 'city-hub';
+            const concrete = new THREE.MeshStandardMaterial({ color: 0xdce9f1, roughness: 0.46, metalness: 0.12 });
+            const stone = new THREE.MeshStandardMaterial({ color: 0x7790a3, roughness: 0.62, metalness: 0.18 });
+            const bronze = new THREE.MeshStandardMaterial({ color: 0xc99453, roughness: 0.28, metalness: 0.72 });
+            const glass = new THREE.MeshPhysicalMaterial({ color: 0x6ecdf3, metalness: 0.16, roughness: 0.12, transmission: 0.08, transparent: true, opacity: 0.82, emissive: 0x113c58, emissiveIntensity: 0.24 });
+            const warm = new THREE.MeshStandardMaterial({ color: 0xffcb7c, roughness: 0.3, metalness: 0.3, emissive: 0xffa44c, emissiveIntensity: 0.5 });
+            const add = (geometry, material, position, rotation = null) => {
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.copy(position);
+                if (rotation) mesh.rotation.set(rotation.x || 0, rotation.y || 0, rotation.z || 0);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                mesh.userData.dynamicShadowCaster = true;
+                group.add(mesh);
+                return mesh;
+            };
+            add(new THREE.BoxGeometry(12, 0.7, 12), stone, center.clone().add(new THREE.Vector3(0, 0.35, 0)));
+            add(new THREE.BoxGeometry(10.2, 4.8, 10.2), concrete, center.clone().add(new THREE.Vector3(0, 2.75, 0)));
+            add(new THREE.BoxGeometry(7.3, 16.4, 7.3), glass, center.clone().add(new THREE.Vector3(0, 12.5, 0)));
+            add(new THREE.BoxGeometry(8.1, 0.5, 8.1), bronze, center.clone().add(new THREE.Vector3(0, 20.9, 0)));
+            add(new THREE.BoxGeometry(11.8, 0.45, 2.4), concrete, center.clone().add(new THREE.Vector3(0, 4.6, -5.6)));
+            add(new THREE.BoxGeometry(3.0, 3.3, 0.14), glass, center.clone().add(new THREE.Vector3(0, 2.15, -5.17)));
+            [-3.5, 3.5].forEach(x => add(new THREE.BoxGeometry(0.35, 4.4, 0.45), bronze, center.clone().add(new THREE.Vector3(x, 2.2, -5.0))));
+            for (let floor = 0; floor < 7; floor++) {
+                const y = 5.4 + floor * 2.05;
+                add(new THREE.BoxGeometry(7.62, 0.12, 0.24), bronze, center.clone().add(new THREE.Vector3(0, y, -3.78)));
+                add(new THREE.BoxGeometry(7.62, 0.12, 0.24), bronze, center.clone().add(new THREE.Vector3(0, y, 3.78)));
+                add(new THREE.BoxGeometry(0.24, 0.12, 7.62), bronze, center.clone().add(new THREE.Vector3(-3.78, y, 0)));
+                add(new THREE.BoxGeometry(0.24, 0.12, 7.62), bronze, center.clone().add(new THREE.Vector3(3.78, y, 0)));
+            }
+            [-4.7, 4.7].forEach(x => [-4.7, 4.7].forEach(z => {
+                const planter = add(new THREE.CylinderGeometry(0.66, 0.82, 0.75, 12), stone, center.clone().add(new THREE.Vector3(x, 0.38, z)));
+                const foliage = add(new THREE.SphereGeometry(0.72, 12, 10), new THREE.MeshStandardMaterial({ color: 0x3eaa71, roughness: 0.75 }), center.clone().add(new THREE.Vector3(x, 1.2, z)));
+                planter.userData.dynamicShadowCaster = foliage.userData.dynamicShadowCaster = true;
+            }));
+            [-2.1, 2.1].forEach(x => add(new THREE.BoxGeometry(0.18, 0.18, 0.22), warm, center.clone().add(new THREE.Vector3(x, 3.9, -5.38))));
+            const entrance = center.clone().add(new THREE.Vector3(0, 0, -6.7));
+            return { group, center: center.clone(), entrance, colliders: [{ minX: center.x - 5.25, maxX: center.x + 5.25, minZ: center.z - 5.25, maxZ: center.z + 5.25, kind: 'city-hub' }] };
+        }
+
+        function ensureCityHubInterior() {
+            if (interiorGroup) return interiorGroup;
+            const group = new THREE.Group();
+            group.name = 'city-hub-interior';
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0xcbd8de, roughness: 0.34, metalness: 0.18 });
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0xe9f1f2, roughness: 0.56, metalness: 0.05 });
+            const accentMat = new THREE.MeshStandardMaterial({ color: 0x2c6fa8, roughness: 0.24, metalness: 0.46, emissive: 0x0d3254, emissiveIntensity: 0.18 });
+            const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x90dfff, transparent: true, opacity: 0.55, roughness: 0.08, metalness: 0.16, transmission: 0.12 });
+            const add = (geo, mat, x, y, z) => { const mesh = new THREE.Mesh(geo, mat); mesh.position.set(INTERIOR_ORIGIN.x + x, y, INTERIOR_ORIGIN.z + z); mesh.castShadow = true; mesh.receiveShadow = true; group.add(mesh); return mesh; };
+            add(new THREE.BoxGeometry(20, 0.3, 20), floorMat, 0, -0.15, 0);
+            add(new THREE.BoxGeometry(20, 7, 0.45), wallMat, 0, 3.5, -10);
+            add(new THREE.BoxGeometry(20, 7, 0.45), wallMat, 0, 3.5, 10);
+            add(new THREE.BoxGeometry(0.45, 7, 20), wallMat, -10, 3.5, 0);
+            add(new THREE.BoxGeometry(0.45, 7, 20), wallMat, 10, 3.5, 0);
+            add(new THREE.BoxGeometry(8, 0.18, 0.18), accentMat, 0, 5.7, -9.65);
+            add(new THREE.BoxGeometry(7.5, 0.16, 0.18), accentMat, 0, 5.2, 9.65);
+            add(new THREE.BoxGeometry(4.6, 3.2, 0.18), glassMat, 0, 2.8, 9.65);
+            [-5.8, 0, 5.8].forEach(x => { add(new THREE.BoxGeometry(3.1, 0.7, 1.3), accentMat, x, 0.7, 1.4); add(new THREE.BoxGeometry(3.4, 0.12, 0.12), accentMat, x, 1.15, 1.4); });
+            const desk = add(new THREE.BoxGeometry(5.3, 1.1, 1.5), new THREE.MeshStandardMaterial({ color: 0x8d5f3d, roughness: 0.48, metalness: 0.08 }), 0, 0.55, -2.0);
+            desk.userData.dynamicShadowCaster = true;
+            const welcomeDesk = add(new THREE.BoxGeometry(4.4, 1.05, 1.25), new THREE.MeshStandardMaterial({ color: 0x406d91, roughness: 0.28, metalness: 0.48, emissive: 0x0b2b47, emissiveIntensity: 0.18 }), 0, 0.53, 3.5);
+            welcomeDesk.userData.dynamicShadowCaster = true;
+            const runnerMat = new THREE.MeshStandardMaterial({ color: 0x2d6f9f, roughness: 0.55, metalness: 0.1, emissive: 0x0d2d44, emissiveIntensity: 0.14 });
+            add(new THREE.BoxGeometry(3.6, 0.035, 10.8), runnerMat, 0, 0.03, 0.8);
+            const plantMat = new THREE.MeshStandardMaterial({ color: 0x4dad76, roughness: 0.75, metalness: 0.02 });
+            [-6.4, 6.4].forEach(x => {
+                add(new THREE.CylinderGeometry(0.72, 0.82, 0.75, 12), accentMat, x, 0.38, 4.4);
+                add(new THREE.SphereGeometry(0.92, 12, 10), plantMat, x, 1.35, 4.4);
+            });
+            const exitGate = add(new THREE.BoxGeometry(4.9, 0.12, 0.18), new THREE.MeshStandardMaterial({ color: 0x7de3ff, emissive: 0x1a8db5, emissiveIntensity: 0.75, metalness: 0.34, roughness: 0.17 }), 0, 2.7, 8.95);
+            exitGate.userData.dynamicShadowCaster = true;
+            [-6, 0, 6].forEach(x => { const lamp = new THREE.PointLight(0xffcc8c, 0.72, 11, 2); lamp.position.set(INTERIOR_ORIGIN.x + x, 5.6, INTERIOR_ORIGIN.z - 1); group.add(lamp); });
+            scene.add(group);
+            interiorGroup = group;
+            return group;
+        }
+
+        function getActiveCollisionBoxes() {
+            if (interiorState) return interiorState.colliders;
+            const boxes = [];
+            loadedChunks.forEach(chunk => { if (chunk.group.visible) boxes.push(...(chunk.colliders || [])); });
+            return boxes;
+        }
+
+        function isPositionBlocked(position, radius, ignoreObject = null) {
+            const minX = position.x - radius, maxX = position.x + radius, minZ = position.z - radius, maxZ = position.z + radius;
+            const blockedByBox = getActiveCollisionBoxes().some(box => maxX > box.minX && minX < box.maxX && maxZ > box.minZ && minZ < box.maxZ);
+            if (blockedByBox) return true;
+            if (interiorState) return false;
+            if (placedProps.some(prop => prop !== ignoreObject && Math.abs(position.x - prop.position.x) < radius + 1.05 && Math.abs(position.z - prop.position.z) < radius + 1.05)) return true;
+            return [...vehicles, ...trafficVehicles].some(vehicle => vehicle !== ignoreObject && vehicle !== controlledVehicle && Math.abs(position.x - vehicle.position.x) < radius + 0.85 && Math.abs(position.z - vehicle.position.z) < radius + 1.55);
+        }
+
+        function resolveCollisionMove(current, desired, radius, ignoreObject = null) {
+            const resolved = current.clone();
+            const xAttempt = current.clone(); xAttempt.x = desired.x;
+            if (!isPositionBlocked(xAttempt, radius, ignoreObject)) resolved.x = desired.x;
+            const zAttempt = resolved.clone(); zAttempt.z = desired.z;
+            if (!isPositionBlocked(zAttempt, radius, ignoreObject)) resolved.z = desired.z;
+            resolved.y = desired.y;
+            return resolved;
+        }
+
+        function getNearestCityHub(position) {
+            let best = null;
+            loadedChunks.forEach(chunk => {
+                if (!chunk.hub) return;
+                const distanceSq = chunk.hub.entrance.distanceToSquared(position);
+                if (!best || distanceSq < best.distanceSq) best = { hub: chunk.hub, distanceSq };
+            });
+            return best;
+        }
+
+        function tryEnterOrExitInterior() {
+            if (interiorState) {
+                const exit = INTERIOR_ORIGIN.clone().add(new THREE.Vector3(0, 0, 8.2));
+                if (playerGroup.position.distanceToSquared(exit) > 30) { setSandboxMessage('出口ゲートに近づいて「使う」を押してください。'); return true; }
+                const hub = interiorState.hub;
+                playerGroup.position.copy(hub.entrance.clone().add(new THREE.Vector3(0, 0, -1.8)));
+                interiorState = null;
+                cameraOffsetSpherical.radius = Math.max(cameraOffsetSpherical.radius, 8);
+                cameraOffsetSpherical.theta = 0;
+                updateChunkStreaming(playerGroup.position, true);
+                setSandboxMessage('City Hubの外へ戻りました。');
+                return true;
+            }
+            if (controlledVehicle) { setSandboxMessage('建物へ入る前に乗り物を降りてください。'); return true; }
+            const nearest = getNearestCityHub(playerGroup.position);
+            if (!nearest || nearest.distanceSq > 8.5 * 8.5) return false;
+            ensureCityHubInterior();
+            interiorState = {
+                hub: nearest.hub,
+                colliders: [
+                    { minX: INTERIOR_ORIGIN.x - 10, maxX: INTERIOR_ORIGIN.x + 10, minZ: INTERIOR_ORIGIN.z - 10, maxZ: INTERIOR_ORIGIN.z - 9.45, kind: 'interior-wall' },
+                    { minX: INTERIOR_ORIGIN.x - 10, maxX: INTERIOR_ORIGIN.x + 10, minZ: INTERIOR_ORIGIN.z + 9.45, maxZ: INTERIOR_ORIGIN.z + 10, kind: 'interior-wall' },
+                    { minX: INTERIOR_ORIGIN.x - 10, maxX: INTERIOR_ORIGIN.x - 9.45, minZ: INTERIOR_ORIGIN.z - 10, maxZ: INTERIOR_ORIGIN.z + 10, kind: 'interior-wall' },
+                    { minX: INTERIOR_ORIGIN.x + 9.45, maxX: INTERIOR_ORIGIN.x + 10, minZ: INTERIOR_ORIGIN.z - 10, maxZ: INTERIOR_ORIGIN.z + 10, kind: 'interior-wall' },
+                    { minX: INTERIOR_ORIGIN.x - 2.8, maxX: INTERIOR_ORIGIN.x + 2.8, minZ: INTERIOR_ORIGIN.z - 2.8, maxZ: INTERIOR_ORIGIN.z - 1.1, kind: 'interior-desk' }
+                ]
+            };
+            playerGroup.position.copy(INTERIOR_ORIGIN.clone().add(new THREE.Vector3(0, 0, 6.4)));
+            playerGroup.rotation.y = Math.PI;
+            cameraOffsetSpherical.radius = Math.min(cameraOffsetSpherical.radius, 5.2);
+            cameraOffsetSpherical.theta = Math.PI;
+            setSandboxMessage('City Hubへ入館しました。出口ゲートで「使う」を押すと街へ戻れます。');
+            return true;
         }
 
         function unloadChunk(key) {
@@ -1156,9 +1424,25 @@
                 chassis.position.y = 0.7;
                 const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.28, 0.55, 1.52), glassMat);
                 cabin.position.set(0, 1.12, -0.18);
+                const hood = new THREE.Mesh(new THREE.BoxGeometry(1.62, 0.23, 0.9), bodyMat);
+                hood.position.set(0, 0.97, 1.06);
+                const rearDeck = new THREE.Mesh(new THREE.BoxGeometry(1.58, 0.20, 0.6), bodyMat);
+                rearDeck.position.set(0, 0.98, -1.42);
                 const bumper = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.18, 0.25), trimMat);
                 bumper.position.set(0, 0.52, 1.72);
-                group.add(chassis, cabin, bumper);
+                const rearBumper = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.18, 0.25), trimMat);
+                rearBumper.position.set(0, 0.52, -1.72);
+                [-0.68, 0.68].forEach(x => {
+                    const sideGlass = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.43, 1.18), glassMat);
+                    sideGlass.position.set(x, 1.14, -0.17);
+                    group.add(sideGlass);
+                });
+                if (type === 'sports') {
+                    const spoiler = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.10, 0.22), trimMat);
+                    spoiler.position.set(0, 1.32, -1.38);
+                    group.add(spoiler);
+                }
+                group.add(chassis, cabin, hood, rearDeck, bumper, rearBumper);
                 const wheelGeometry = new THREE.CylinderGeometry(0.32, 0.32, 0.23, 12);
                 [[-0.88, 1.06], [0.88, 1.06], [-0.88, -1.06], [0.88, -1.06]].forEach(([x, z]) => {
                     const wheel = new THREE.Mesh(wheelGeometry, wheelMat);
@@ -1242,7 +1526,9 @@
         function toggleVehicleControl() {
             if (controlledVehicle) {
                 const exitOffset = new THREE.Vector3(1.8, 0, 0).applyQuaternion(controlledVehicle.quaternion);
-                playerGroup.position.copy(controlledVehicle.position).add(exitOffset);
+                const exitPosition = resolveCollisionMove(controlledVehicle.position, controlledVehicle.position.clone().add(exitOffset), PLAYER_COLLISION_RADIUS, controlledVehicle);
+                if (exitPosition.distanceToSquared(controlledVehicle.position) < 1.0) { setSandboxMessage('ここでは安全に降車できません。少し広い場所へ移動してください。'); return; }
+                playerGroup.position.copy(exitPosition);
                 playerGroup.rotation.y = controlledVehicle.rotation.y;
                 playerGroup.visible = true;
                 controlledVehicle.userData.active = false;
@@ -1301,21 +1587,29 @@
 
         function updateControlledVehicle(delta) {
             if (!controlledVehicle) return false;
-            const forwardInput = (keys.w || keys.ArrowUp ? 1 : 0) - (keys.s || keys.ArrowDown ? 1 : 0) - mobileInput.z;
-            const steerInput = (keys.d || keys.ArrowRight ? 1 : 0) - (keys.a || keys.ArrowLeft ? 1 : 0) + mobileInput.x;
+            const inputX = ((keys.d || keys.ArrowRight) ? 1 : 0) - ((keys.a || keys.ArrowLeft) ? 1 : 0) + mobileInput.x;
+            const inputZ = ((keys.s || keys.ArrowDown) ? 1 : 0) - ((keys.w || keys.ArrowUp) ? 1 : 0) + mobileInput.z;
+            const desired = getCameraRelativeMove(inputX, inputZ);
             const data = controlledVehicle.userData;
-            vehicleSpeed += forwardInput * data.accel * delta;
-            vehicleSpeed *= 1 - Math.min(0.88 * delta, 0.16);
-            vehicleSpeed = Math.max(-data.max * 0.35, Math.min(data.max, vehicleSpeed));
-            vehicleSteer += (steerInput - vehicleSteer) * Math.min(8 * delta, 1);
-            const steeringPower = data.turn * (0.28 + Math.min(Math.abs(vehicleSpeed) / data.max, 1));
-            controlledVehicle.rotation.y += vehicleSteer * steeringPower * delta * (vehicleSpeed >= 0 ? 1 : -1);
+            const hasInput = desired.lengthSq() > 0.002;
+            if (hasInput) {
+                desired.normalize();
+                const targetAngle = Math.atan2(desired.x, desired.z);
+                const turnDelta = THREE.MathUtils.euclideanModulo(targetAngle - controlledVehicle.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
+                controlledVehicle.rotation.y += turnDelta * Math.min(9 * delta, 1);
+                vehicleSpeed += data.accel * delta;
+            } else {
+                vehicleSpeed *= 1 - Math.min(3.6 * delta, 0.22);
+            }
+            vehicleSpeed = Math.max(0, Math.min(data.max, vehicleSpeed));
             const direction = new THREE.Vector3(Math.sin(controlledVehicle.rotation.y), 0, Math.cos(controlledVehicle.rotation.y));
-            const next = controlledVehicle.position.clone().add(direction.multiplyScalar(vehicleSpeed * delta));
+            const desiredPosition = controlledVehicle.position.clone().addScaledVector(direction, vehicleSpeed * delta);
+            const next = resolveCollisionMove(controlledVehicle.position, desiredPosition, VEHICLE_COLLISION_RADIUS, controlledVehicle);
+            if (next.distanceToSquared(desiredPosition) > 0.001) vehicleSpeed *= 0.18;
             controlledVehicle.position.copy(next);
             playerGroup.position.copy(next);
             playerGroup.rotation.y = controlledVehicle.rotation.y;
-            currentSpeedMs = Math.abs(vehicleSpeed);
+            currentSpeedMs = vehicleSpeed;
             updateChunkStreaming(next);
             updateVehicleUi();
             return true;
@@ -1417,7 +1711,7 @@
         function canPlaceBuildAt(position) {
             const occupied = placedProps.some(prop => prop.position.distanceToSquared(position) < 1.2);
             const nearCharacter = [playerGroup, ...npcs, ...vehicles, ...trafficVehicles].some(object => object && object.position.distanceToSquared(position) < 3.2);
-            return !occupied && !nearCharacter && placedProps.length < MAX_PLACED_PROPS;
+            return !interiorState && !occupied && !nearCharacter && !isPositionBlocked(position, 1.05) && placedProps.length < MAX_PLACED_PROPS;
         }
 
         function ensureBuildGhost() {
@@ -1670,7 +1964,8 @@
             const newCount = Math.min(parseInt(document.getElementById('npc-slider').value), qualityConfig().npcCap);
             while (npcs.length < newCount) {
                 const npc = changeCharacter(false);
-                npc.userData = { name: "NPC " + (npcs.length + 1), id: 1000 + npcs.length + 1 };
+                const npcIndex = npcs.length;
+                npc.userData = { name: "NPC " + (npcIndex + 1), id: 1000 + npcIndex + 1, persona: NPC_PERSONAS[npcIndex % NPC_PERSONAS.length] };
                 resetNpcPosition(npc);
                 createNpcBrain(npc);
                 npcs.push(npc);
@@ -1902,9 +2197,12 @@
                     }
                 });
                 localAiStatus = 'ready';
-                setChatModeStatus('LOCAL AI: この端末で稼働中');
+                npcAiHistories.clear();
+                localAiQueue = [];
+                lastAutonomousAiAt = performance.now() + 2400;
+                setChatModeStatus('LOCAL AI: 複数NPCがこの端末で会話中');
                 updateLocalAiButton();
-                addChatSystemNote('LOCAL AIの準備ができました。会話はこのブラウザ内で処理され、APIキーは使用しません。');
+                addChatSystemNote('LOCAL AIの準備ができました。複数のNPCが一つの端末内モデルを共有し、人格ごとの会話履歴で自律会話します。APIキーは使用しません。');
             } catch (error) {
                 console.warn('LOCAL AI initialization failed', error);
                 localAiEngine = null;
@@ -1915,6 +2213,101 @@
             }
         }
 
+        function getNpcHistory(npc) {
+            const id = npc?.userData?.id || 'city';
+            if (!npcAiHistories.has(id)) npcAiHistories.set(id, []);
+            return npcAiHistories.get(id);
+        }
+
+        function appendNpcHistory(npc, role, content) {
+            const history = getNpcHistory(npc);
+            history.push({ role, content });
+            while (history.length > 8) history.shift();
+        }
+
+        function pickConversationPartner(speaker) {
+            const candidates = npcs.filter(npc => npc !== speaker && npc.userData?.brain?.state !== 'talk');
+            if (!candidates.length) return null;
+            const nearby = candidates.filter(npc => npc.position.distanceToSquared(speaker.position) < 22 * 22);
+            return (nearby.length ? nearby : candidates)[Math.floor(Math.random() * (nearby.length ? nearby.length : candidates.length))] || null;
+        }
+
+        function makeAmbientTopic(speaker, listener) {
+            const topics = [
+                'この通りの建物の素材や光の見え方について、短く意見を聞かせて。',
+                '近くの乗り物、空、天候、緑地のどれかを一つ話題にしてみて。',
+                'City Hubや建物の中で過ごすなら何をしたいか、自然に話して。',
+                'この街を歩いて見つけた小さな発見を一つ共有して。'
+            ];
+            return `${listener.userData.name}に向けて、${topics[Math.floor(Math.random() * topics.length)]}`;
+        }
+
+        function enqueueLocalAiTurn(task, priority = false) {
+            return new Promise(resolve => {
+                const entry = { ...task, resolve };
+                if (priority) localAiQueue.unshift(entry); else localAiQueue.push(entry);
+                processLocalAiQueue();
+            });
+        }
+
+        async function processLocalAiQueue() {
+            if (localAiQueueBusy || !localAiQueue.length || localAiStatus !== 'ready' || !localAiEngine) return;
+            localAiQueueBusy = true;
+            const task = localAiQueue.shift();
+            const speaker = task.speaker || getConversationNpc();
+            const listener = task.listener || null;
+            let reply = '';
+            let streamNode = null;
+            try {
+                markNpcTalking(speaker, task.kind === 'player' ? 12000 : 7200);
+                if (listener) markNpcTalking(listener, 7200);
+                if (task.kind === 'player') {
+                    streamNode = document.createElement('p');
+                    streamNode.className = 'ai-stream';
+                    streamNode.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: `;
+                    const log = document.getElementById('chat-log');
+                    log.appendChild(streamNode);
+                    log.scrollTop = log.scrollHeight;
+                }
+                const persona = speaker.userData?.persona || '親しみやすい創作都市の居住者';
+                const context = listener ? `${listener.userData?.name || '別の居住者'}と短く会話中です。` : 'プレイヤーと会話中です。';
+                const systemPrompt = `あなたは創作都市「Ultimate 3D City」のNPCです。あなたの人物像は「${persona}」。${context}日本語で親しみやすく最大2文、80文字程度で返答してください。建築、探索、車、天候、City Hub、街の生活を自然に話題にできます。現実世界の権限、個人情報、外部サービス、秘密の知識を持つとは言わないでください。`;
+                const messages = [
+                    { role: 'system', content: systemPrompt },
+                    ...getNpcHistory(speaker),
+                    { role: 'user', content: task.prompt }
+                ];
+                const chunks = await localAiEngine.chat.completions.create({ messages, temperature: task.kind === 'ambient' ? 0.92 : 0.72, max_tokens: 96, stream: true });
+                for await (const chunk of chunks) {
+                    reply += chunk.choices?.[0]?.delta?.content || '';
+                    if (streamNode) {
+                        streamNode.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: ${reply}`;
+                        document.getElementById('chat-log').scrollTop = document.getElementById('chat-log').scrollHeight;
+                    }
+                }
+                reply = reply.trim() || getFallbackReply(task.prompt);
+                appendNpcHistory(speaker, 'user', task.prompt);
+                appendNpcHistory(speaker, 'assistant', reply);
+                if (listener) appendNpcHistory(listener, 'user', `${speaker.userData?.name || 'NPC'}: ${reply}`);
+                if (streamNode) streamNode.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: ${reply}`;
+                else addChatMessage(speaker, reply, { className: 'ai-stream' });
+                showNpcBubble(speaker, reply);
+                task.resolve?.(reply);
+            } catch (error) {
+                console.warn('LOCAL AI queued chat failed', error);
+                const fallback = getFallbackReply(task.prompt);
+                if (streamNode) {
+                    streamNode.classList.remove('ai-stream');
+                    streamNode.textContent = `[${speaker.userData?.name || 'NPC'}]: ${fallback}`;
+                } else addChatMessage(speaker, fallback);
+                showNpcBubble(speaker, fallback);
+                task.resolve?.(fallback);
+            } finally {
+                localAiQueueBusy = false;
+                setTimeout(processLocalAiQueue, 60);
+            }
+        }
+
         async function requestLocalAiResponse(npc, message) {
             const speaker = npc || getConversationNpc();
             localAiSending = true;
@@ -1922,58 +2315,33 @@
             const input = document.getElementById('chat-input');
             sendButton.disabled = true;
             input.disabled = true;
-            markNpcTalking(speaker, 12000);
-            const log = document.getElementById('chat-log');
-            const p = document.createElement('p');
-            p.className = 'ai-stream';
-            p.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: `;
-            log.appendChild(p);
-            log.scrollTop = log.scrollHeight;
-            let reply = '';
-            try {
-                const systemPrompt = 'あなたは創作都市「Ultimate 3D City」の居住者NPCです。日本語で、親しみやすく短く、最大3文で答えてください。ゲーム内の建築、探索、乗り物、天候、街の景色について自然に話してください。現実世界の権限、個人情報、外部サービス、秘密の知識を持つと主張しないでください。';
-                const messages = [
-                    { role: 'system', content: systemPrompt },
-                    ...localAiHistory.slice(-10),
-                    { role: 'user', content: message }
-                ];
-                const chunks = await localAiEngine.chat.completions.create({ messages, temperature: 0.75, max_tokens: 128, stream: true });
-                for await (const chunk of chunks) {
-                    reply += chunk.choices?.[0]?.delta?.content || '';
-                    p.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: ${reply}`;
-                    log.scrollTop = log.scrollHeight;
-                }
-                reply = reply.trim() || getFallbackReply(message);
-                p.textContent = `[${speaker.userData?.name || 'NPC'} / LOCAL AI]: ${reply}`;
-                localAiHistory.push({ role: 'user', content: message }, { role: 'assistant', content: reply });
-                localAiHistory = localAiHistory.slice(-10);
-                showNpcBubble(speaker, reply);
-            } catch (error) {
-                console.warn('LOCAL AI chat failed', error);
-                const fallback = getFallbackReply(message);
-                p.classList.remove('ai-stream');
-                p.textContent = `[${speaker.userData?.name || 'NPC'}]: ${fallback}`;
-                showNpcBubble(speaker, fallback);
-                setChatModeStatus('LOCAL AI応答失敗・テンプレート会話');
-            } finally {
-                localAiSending = false;
-                sendButton.disabled = false;
-                input.disabled = false;
-                input.focus();
-            }
+            await enqueueLocalAiTurn({ speaker, prompt: `プレイヤーが「${message}」と言いました。返答してください。`, kind: 'player' }, true);
+            localAiSending = false;
+            sendButton.disabled = false;
+            input.disabled = false;
+            input.focus();
         }
 
         function handleNpcChat(time) {
             const chatSpeed = parseFloat(document.getElementById('chat-speed-slider').value);
-            if (chatSpeed === 0 || npcs.length === 0 || time < nextNpcChatTime) return;
-            const interval = 1000 / chatSpeed;
-            nextNpcChatTime = time + Math.random() * interval * 2;
+            if (chatSpeed === 0 || npcs.length < 2 || time < nextNpcChatTime) return;
+            const interval = Math.max(1800, 1000 / chatSpeed * 4.5);
+            nextNpcChatTime = time + interval + Math.random() * interval * 0.7;
             const candidates = npcs.filter(npc => npc.userData.brain?.state !== 'talk');
-            const randomNpc = candidates[Math.floor(Math.random() * candidates.length)] || npcs[0];
-            if (!randomNpc) return;
-            markNpcTalking(randomNpc, 2200);
-            const randomMessage = NPC_MESSAGES[Math.floor(Math.random() * NPC_MESSAGES.length)];
-            addChatMessage(randomNpc, randomMessage);
+            const speaker = candidates[Math.floor(Math.random() * candidates.length)] || npcs[0];
+            const listener = speaker ? pickConversationPartner(speaker) : null;
+            if (!speaker || !listener) return;
+            markNpcTalking(speaker, 5200);
+            markNpcTalking(listener, 5200);
+            if (localAiStatus === 'ready' && localAiEngine && localAiQueue.length < 2) {
+                lastAutonomousAiAt = time;
+                enqueueLocalAiTurn({ speaker, listener, prompt: makeAmbientTopic(speaker, listener), kind: 'ambient' });
+            } else {
+                const first = NPC_MESSAGES[Math.floor(Math.random() * NPC_MESSAGES.length)];
+                const second = getFallbackReply(first);
+                addChatMessage(speaker, first);
+                setTimeout(() => addChatMessage(listener, second), 640);
+            }
         }
 
         function changeCamera() {
@@ -2190,8 +2558,8 @@
                 mobileInput.x = 0;
                 mobileInput.z = 0;
             };
-            base.addEventListener('touchstart', (e) => { e.preventDefault(); setInputFromTouch(e.touches[0]); }, { passive: false });
-            base.addEventListener('touchmove', (e) => { e.preventDefault(); setInputFromTouch(e.touches[0]); }, { passive: false });
+            base.addEventListener('touchstart', (e) => { setInputMethod('touch'); e.preventDefault(); setInputFromTouch(e.touches[0]); }, { passive: false });
+            base.addEventListener('touchmove', (e) => { setInputMethod('touch'); e.preventDefault(); setInputFromTouch(e.touches[0]); }, { passive: false });
             base.addEventListener('touchend', releaseJoystick);
             base.addEventListener('touchcancel', releaseJoystick);
             runButton.addEventListener('touchstart', (e) => { e.preventDefault(); isRunning = true; }, { passive: false });
@@ -2266,6 +2634,25 @@
             window.addEventListener('orientationchange', () => setTimeout(syncMobileHudLayout, 80), { passive: true });
         }
 
+        function setInputMethod(method) {
+            document.body.classList.toggle('keyboard-active', method === 'keyboard');
+            document.body.dataset.inputMethod = method;
+            const inputStatus = document.getElementById('pause-status-input');
+            if (inputStatus) inputStatus.textContent = method === 'keyboard' ? 'KEYBOARD MODE' : 'TOUCH MODE';
+        }
+
+        function openControlPanel(panelName) {
+            setPaused(false);
+            document.querySelectorAll('[data-panel-target]').forEach(item => item.classList.toggle('active', item.dataset.panelTarget === panelName));
+            document.querySelectorAll('[data-panel]').forEach(panel => { panel.hidden = panel.dataset.panel !== panelName; });
+            toggleDrawer(true);
+        }
+
+        function handlePrimaryInteract() {
+            if (tryEnterOrExitInterior?.()) return;
+            toggleVehicleControl();
+        }
+
         function toggleDrawer(force) {
             const open = typeof force === 'boolean' ? force : !document.body.classList.contains('drawer-open');
             document.body.classList.toggle('drawer-open', open);
@@ -2302,7 +2689,13 @@
             mobileInput.x = 0;
             mobileInput.z = 0;
             document.getElementById('pause-screen').classList.toggle('hidden', !value);
-            if (value) toggleDrawer(false);
+            if (value) {
+                toggleDrawer(false);
+                const world = document.getElementById('pause-status-world');
+                const ai = document.getElementById('pause-status-ai');
+                if (world) world.textContent = `${loadedChunks.size} CHUNKS ACTIVE`;
+                if (ai) ai.textContent = localAiStatus === 'ready' ? 'LOCAL AI ONLINE' : 'LOCAL AI OPTIONAL';
+            }
         }
 
         function togglePause() { setPaused(!gamePaused); }
@@ -2480,9 +2873,11 @@
                         const targetQuat = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), targetAngle);
                         playerGroup.quaternion.slerp(targetQuat, 0.1);
                     }
-                    const newPosition = playerGroup.position.clone().add(moveVector.multiplyScalar(moveDistance));
+                    const desiredPosition = playerGroup.position.clone().add(moveVector.multiplyScalar(moveDistance));
+                    const newPosition = resolveCollisionMove(playerGroup.position, desiredPosition, PLAYER_COLLISION_RADIUS);
+                    if (newPosition.distanceToSquared(playerGroup.position) < 0.00001 && isAutoDriving) stopAutoDrive();
                     playerGroup.position.copy(newPosition);
-                    updateChunkStreaming(newPosition);
+                    if (!interiorState) updateChunkStreaming(newPosition);
                 }
             }
 
@@ -2499,7 +2894,7 @@
             }
             updateDynamicShadow(controlledObject.position, time);
 
-            updateChunkStreaming(controlledObject.position);
+            if (!interiorState) updateChunkStreaming(controlledObject.position);
             moveNpcs(delta, time);
             updateTraffic(delta);
             updateVehicleUi();
