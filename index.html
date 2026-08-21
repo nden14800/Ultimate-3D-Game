@@ -536,6 +536,21 @@
             .pause-hub-actions { grid-template-columns: 1fr 1fr; }
         }
 
+
+        /* Original soundtrack and full-screen World Settings. */
+        #world-settings-screen { position:fixed !important; inset:0 !important; z-index:9999 !important; isolation:isolate; align-items:stretch; justify-content:stretch; padding:0; background:radial-gradient(circle at 82% 9%,rgba(54,153,255,.30),transparent 31%),radial-gradient(circle at 13% 89%,rgba(63,218,174,.16),transparent 32%),linear-gradient(135deg,rgba(3,18,42,.985),rgba(8,49,94,.975)); }
+        .world-settings-shell { width:100%; min-height:100%; display:grid; grid-template-columns:minmax(260px,.75fr) minmax(470px,1.25fr); gap:clamp(22px,4vw,66px); align-items:center; padding:clamp(28px,7vw,96px); color:#eef9ff; }
+        .world-settings-intro { max-width:470px; } .settings-kicker { display:inline-flex; align-items:center; gap:8px; color:#9ddaff; font-size:11px; font-weight:900; letter-spacing:.16em; } .settings-kicker::before { content:''; width:8px; height:8px; border-radius:99px; background:#59d79b; box-shadow:0 0 18px #59d79b; }
+        .world-settings-intro h2 { margin:14px 0 12px; font-size:clamp(38px,5vw,70px); line-height:.93; letter-spacing:-.065em; } .world-settings-intro h2 em { display:block; color:#81d6ff; font-style:normal; } .world-settings-intro p { max-width:420px; color:#c7e8fd; font-size:14px; font-weight:650; line-height:1.7; }
+        .settings-live-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; } .settings-live-row span { padding:7px 10px; border:1px solid rgba(160,218,255,.24); border-radius:999px; color:#dbf5ff; background:rgba(255,255,255,.08); font-size:10px; font-weight:850; }
+        .world-settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; max-width:790px; } .world-settings-card { min-height:185px; padding:17px; border:2px solid rgba(255,255,255,.76); border-radius:22px; color:#173f70; background:rgba(250,254,255,.96); box-shadow:0 8px 0 rgba(3,33,78,.22),0 18px 38px rgba(0,10,33,.22); } .world-settings-card.soundtrack { background:linear-gradient(145deg,#effaff,#dff4ff); }
+        .world-settings-card h3 { display:flex; align-items:center; gap:8px; margin:0 0 13px; color:#245a91; font-size:12px; letter-spacing:.05em; } .world-settings-card h3 .bi-icon { width:19px; height:19px; color:#2b86ef; }
+        .settings-field { display:grid; gap:6px; margin-top:11px; } .settings-field:first-of-type { margin-top:0; } .settings-field label { display:flex; justify-content:space-between; gap:10px; color:#4c7097; font-size:10px; font-weight:850; } .settings-field label span { color:#2581e7; } .settings-field select,.settings-field input[type="range"] { width:100%; } .settings-field select { min-height:38px; padding:7px 10px; border:1px solid #c5ddef; border-radius:10px; color:#1f578f; background:#fff; font:inherit; font-size:11px; font-weight:800; }
+        .settings-toggle { display:flex; align-items:center; gap:9px; margin-top:13px; color:#315b85; font-size:11px; font-weight:800; } .settings-toggle input { accent-color:#2d86f4; width:18px; height:18px; } .track-readout { display:flex; align-items:center; gap:9px; margin-top:12px; padding:9px; border:1px solid #bfddf3; border-radius:12px; color:#47739d; background:rgba(255,255,255,.72); font-size:9px; font-weight:800; line-height:1.45; } .track-readout .bi-icon { width:19px; height:19px; flex:0 0 auto; color:#247ce5; }
+        .world-settings-actions { grid-column:1 / -1; display:flex; justify-content:flex-end; gap:10px; padding-top:4px; } .world-settings-back { display:inline-flex; min-height:52px; align-items:center; justify-content:center; gap:8px; padding:0 19px; border:2px solid #a8d9ff; border-radius:15px; color:#fff; background:linear-gradient(180deg,#55aaff,#206fe1); box-shadow:0 5px 0 rgba(2,41,92,.36),0 12px 25px rgba(0,0,0,.22); font-weight:900; } .world-settings-back:active { transform:translateY(4px); box-shadow:none; }
+        .world-settings-close { position:absolute; top:clamp(14px,3vw,34px); right:clamp(14px,3vw,34px); width:46px; height:46px; display:grid; place-items:center; border:2px solid rgba(255,255,255,.7); border-radius:15px; color:white; background:rgba(255,255,255,.12); font-size:23px; }
+        @media (pointer:coarse),(max-width:760px) { .world-settings-shell { grid-template-columns:1fr; align-content:start; gap:18px; overflow-y:auto; padding:68px 16px max(28px,env(safe-area-inset-bottom)); } .world-settings-intro h2 { font-size:clamp(34px,12vw,52px); } .world-settings-intro p { margin:9px 0 0; font-size:12px; } .settings-live-row { margin-top:13px; } .world-settings-grid { grid-template-columns:1fr; max-width:none; } .world-settings-card { min-height:0; padding:15px; border-radius:18px; } .world-settings-actions { padding-bottom:8px; } }
+
         </style>
 </head>
 <body>
@@ -560,6 +575,20 @@
                 <button id="pause-social-button" class="pause-hub-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg><span><strong>会話とAI</strong><small>NPCとLOCAL AIの管理</small></span></button>
                 <button id="pause-help-button" class="pause-hub-button warn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#question-circle-fill"></use></svg><span><strong>操作ガイド</strong><small>キーボード・タッチ両対応</small></span></button>
                 <button id="return-title-button" class="pause-hub-button danger"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-left"></use></svg><span><strong>タイトルへ戻る</strong><small>現在の探索を終了</small></span></button>
+            </div>
+        </section>
+    </div>
+
+    <div id="world-settings-screen" class="game-overlay hidden" role="dialog" aria-modal="true" aria-label="World Settings">
+        <button id="world-settings-close" class="world-settings-close" type="button" aria-label="設定を閉じる">×</button>
+        <section class="world-settings-shell">
+            <div class="world-settings-intro"><div class="settings-kicker">WORLD SETTINGS</div><h2>TUNE THE<em>CITY.</em></h2><p>街の空、描画、活動、サウンドトラックを一つの集中画面で整えます。ここでの変更はすぐに探索へ反映されます。</p><div class="settings-live-row"><span id="settings-world-status">25 CHUNKS ACTIVE</span><span id="settings-audio-status">BGM READY</span><span>ORIGINAL SOUNDTRACK</span></div></div>
+            <div class="world-settings-grid">
+                <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cloud-sun-fill"></use></svg>WORLD ATMOSPHERE</h3><div class="settings-field"><label for="weather-select">天気</label><select id="weather-select"><option value="sunny">晴れ</option><option value="cloudy">くもり</option><option value="rainy">雨</option><option value="snowy">雪</option></select></div><div class="settings-field"><label for="time-slider">時間 <span id="time-label">12:00</span></label><input type="range" id="time-slider" min="0" max="23.99" value="12" step="0.01"></div></section>
+                <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#speedometer2"></use></svg>RENDER PROFILE</h3><div class="settings-field"><label for="quality-select">品質プリセット <span id="perf-readout">最適化モード</span></label><select id="quality-select"><option value="performance">軽量</option><option value="balanced" selected>プレミアム（推奨）</option><option value="visual">ウルトラ画質</option></select></div><div class="settings-field"><label for="draw-distance-slider">描画チャンク <span id="draw-distance-label">2 chunks</span></label><input type="range" id="draw-distance-slider" min="1" max="3" value="2" step="1"></div></section>
+                <section class="world-settings-card soundtrack"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#music-note-beamed"></use></svg>ORIGINAL SOUNDTRACK</h3><label class="settings-toggle"><input type="checkbox" id="bgm-toggle" checked>探索BGMを再生する</label><div class="settings-field"><label for="bgm-volume">音量 <span id="bgm-volume-label">42%</span></label><input type="range" id="bgm-volume" min="0" max="100" value="42" step="1"></div><div class="track-readout"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#soundwave"></use></svg><span><b>Neon City Drift</b><br>完全オリジナル・インストゥルメンタル</span></div></section>
+                <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#buildings-fill"></use></svg>CITY ACTIVITY</h3><label class="settings-toggle"><input type="checkbox" id="traffic-toggle" checked>交通車両を動かす</label><div class="button-grid" style="margin-top:15px"><button class="action-button warm" id="place-prop-btn" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>ブロック配置</button><button class="action-button danger" id="clear-props-btn" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#trash3-fill"></use></svg>配置を消す</button></div></section>
+                <div class="world-settings-actions"><button id="world-settings-back" class="world-settings-back" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg>ゲームへ戻る</button></div>
             </div>
         </section>
     </div>
@@ -625,26 +654,6 @@
                         <button class="action-button" id="vehicle-action-btn" disabled><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車</button>
                     </div>
                     <div class="status-line"><strong id="vehicle-status">徒歩で探索中</strong><span id="vehicle-hint">近くの乗り物に E</span></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="control-panel" data-panel="world" hidden>
-            <div class="panel-stack">
-                <div class="control-card">
-                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#speedometer2"></use></svg>PERFORMANCE</h2>
-                    <div class="field"><label for="quality-select">品質プリセット <span id="perf-readout">最適化モード</span></label><select id="quality-select"><option value="performance">軽量</option><option value="balanced" selected>プレミアム（推奨）</option><option value="visual">ウルトラ画質</option></select></div>
-                    <div class="field"><label for="draw-distance-slider">描画チャンク <span id="draw-distance-label">2 chunks</span></label><input type="range" id="draw-distance-slider" min="1" max="3" value="2" step="1"></div>
-                </div>
-                <div class="control-card">
-                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cloud-sun-fill"></use></svg>ENVIRONMENT</h2>
-                    <div class="field"><label for="weather-select">天気</label><select id="weather-select"><option value="sunny">晴れ</option><option value="cloudy">くもり</option><option value="rainy">雨</option><option value="snowy">雪</option></select></div>
-                    <div class="field"><label for="time-slider">時間 <span id="time-label">12:00</span></label><input type="range" id="time-slider" min="0" max="23.99" value="12" step="0.01"></div>
-                </div>
-                <div class="control-card">
-                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>WORLD TOOLS</h2>
-                    <div class="button-grid"><button class="action-button warm" id="place-prop-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>ブロック配置</button><button class="action-button danger" id="clear-props-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#trash3-fill"></use></svg>配置を消す</button></div>
-                    <label class="inline-toggle"><input type="checkbox" id="traffic-toggle" checked>交通車両を動かす</label>
                 </div>
             </div>
         </section>
@@ -951,7 +960,7 @@
             document.getElementById('pause-button').addEventListener('click', () => togglePause());
             document.getElementById('return-title-button').addEventListener('click', returnToTitle);
             document.getElementById('pause-pack-button').addEventListener('click', () => { setPaused(false); toggleFieldPack(true); });
-            document.getElementById('pause-world-button').addEventListener('click', () => openControlPanel('world'));
+            document.getElementById('pause-world-button').addEventListener('click', openWorldSettings);
             document.getElementById('pause-vehicle-button').addEventListener('click', () => openControlPanel('play'));
             document.getElementById('pause-social-button').addEventListener('click', () => { setPaused(false); document.getElementById('chat-ui').classList.remove('collapsed'); document.getElementById('chat-input').focus(); });
             document.getElementById('pause-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
@@ -970,6 +979,10 @@
             document.getElementById('chat-drawer-toggle').addEventListener('click', toggleChatDock);
             document.getElementById('local-ai-button').addEventListener('click', startLocalAi);
             document.getElementById('title-help-button').addEventListener('click', () => { document.getElementById('title-screen').classList.add('hidden'); document.getElementById('help-modal').style.display = 'block'; });
+            document.getElementById('world-settings-close').addEventListener('click', closeWorldSettings);
+            document.getElementById('world-settings-back').addEventListener('click', closeWorldSettings);
+            document.getElementById('bgm-toggle').addEventListener('change', (e) => setBgmEnabled(e.target.checked));
+            document.getElementById('bgm-volume').addEventListener('input', (e) => setBgmVolume(Number(e.target.value) / 100));
             setupPanelTabs();
             document.getElementById('help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
             document.getElementById('close-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'none'; if (!gameStarted) document.getElementById('title-screen').classList.remove('hidden'); });
@@ -2673,12 +2686,39 @@
             document.getElementById('chat-drawer-toggle').setAttribute('aria-label', collapsed ? '会話欄を開く' : '会話欄を折り畳む');
         }
 
+
+        let bgmAudio = null, bgmEnabled = true, bgmVolume = 0.42, bgmDucked = false;
+        function syncBgmUi(statusText) {
+            const toggle = document.getElementById('bgm-toggle'), slider = document.getElementById('bgm-volume'), label = document.getElementById('bgm-volume-label'), status = document.getElementById('settings-audio-status');
+            if (toggle) toggle.checked = bgmEnabled;
+            if (slider) slider.value = Math.round(bgmVolume * 100);
+            if (label) label.textContent = `${Math.round(bgmVolume * 100)}%`;
+            if (status) status.textContent = statusText || (bgmEnabled ? 'BGM READY' : 'BGM OFF');
+        }
+        function ensureBgm() {
+            if (bgmAudio) return bgmAudio;
+            bgmAudio = new Audio('assets/audio/neon-city-drift.mp3'); bgmAudio.loop = true; bgmAudio.preload = 'metadata';
+            bgmAudio.addEventListener('error', () => syncBgmUi('BGM UNAVAILABLE'));
+            bgmAudio.addEventListener('canplay', () => syncBgmUi(bgmEnabled ? 'BGM READY' : 'BGM OFF'), { once: true });
+            return bgmAudio;
+        }
+        function applyBgmVolume() { if (bgmAudio) bgmAudio.volume = Math.max(0, Math.min(1, bgmVolume * (bgmDucked ? 0.26 : 1))); }
+        function playBgm() { if (!bgmEnabled || !gameStarted) return; const audio = ensureBgm(); applyBgmVolume(); audio.play().then(() => syncBgmUi('BGM PLAYING')).catch(() => syncBgmUi('BGM READY')); }
+        function pauseBgm() { if (bgmAudio) bgmAudio.pause(); syncBgmUi('BGM PAUSED'); }
+        function setBgmEnabled(value) { bgmEnabled = Boolean(value); if (bgmEnabled) playBgm(); else pauseBgm(); syncBgmUi(bgmEnabled && gameStarted ? 'BGM PLAYING' : 'BGM OFF'); }
+        function setBgmVolume(value) { bgmVolume = Math.max(0, Math.min(1, value)); applyBgmVolume(); syncBgmUi(bgmEnabled ? (gameStarted ? 'BGM PLAYING' : 'BGM READY') : 'BGM OFF'); }
+        function duckBgm(value) { bgmDucked = Boolean(value); applyBgmVolume(); }
+        function openWorldSettings() { if (!gameStarted) return; setPaused(true); document.getElementById('pause-screen').classList.add('hidden'); document.getElementById('world-settings-screen').classList.remove('hidden'); document.getElementById('settings-world-status').textContent = `${loadedChunks.size} CHUNKS ACTIVE`; duckBgm(true); syncBgmUi(bgmEnabled ? 'BGM DUCKED' : 'BGM OFF'); }
+        function closeWorldSettings() { document.getElementById('world-settings-screen').classList.add('hidden'); duckBgm(false); setPaused(false); playBgm(); }
+
         function startGame() {
             gameStarted = true;
             gamePaused = false;
             document.getElementById('title-screen').classList.add('hidden');
             document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('world-settings-screen').classList.add('hidden');
             toggleDrawer(false);
+            playBgm();
             setSandboxMessage('街へようこそ。好きなように遊ぼう！');
         }
 
@@ -2688,7 +2728,8 @@
             Object.keys(keys).forEach(key => { keys[key] = false; });
             mobileInput.x = 0;
             mobileInput.z = 0;
-            document.getElementById('pause-screen').classList.toggle('hidden', !value);
+            document.getElementById('pause-screen').classList.toggle('hidden', !value || !document.getElementById('world-settings-screen').classList.contains('hidden'));
+            duckBgm(value);
             if (value) {
                 toggleDrawer(false);
                 const world = document.getElementById('pause-status-world');
@@ -2705,6 +2746,8 @@
             gamePaused = false;
             Object.keys(keys).forEach(key => { keys[key] = false; });
             document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('world-settings-screen').classList.add('hidden');
+            pauseBgm();
             document.getElementById('title-screen').classList.remove('hidden');
             toggleDrawer(false);
         }
@@ -2713,6 +2756,7 @@
             document.querySelectorAll('[data-panel-target]').forEach(button => {
                 button.addEventListener('click', () => {
                     const target = button.dataset.panelTarget;
+                    if (target === 'world') { openWorldSettings(); return; }
                     document.querySelectorAll('[data-panel-target]').forEach(item => item.classList.toggle('active', item === button));
                     document.querySelectorAll('[data-panel]').forEach(panel => { panel.hidden = panel.dataset.panel !== target; });
                 });

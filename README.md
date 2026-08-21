@@ -17,6 +17,8 @@
 | Field Pack | `Tab`またはBuild Beltから開く創作インベントリです。Turf Deck、Stone Core、Timber Stack、Clear Prism、Alloy Moduleを選択できます。 |
 | 建築 | グリッドにスナップするゴースト表示を使い、左クリックで素材別モジュールを配置します。`R`で90度回転し、右クリックまたはRemoveモードで除去できます。セッションごとに最大240個を配置できます。 |
 | 全画面ポーズハブ | 右上のポーズ、`Esc`、`P`で**City Pause Hub**を開きます。再開、Field Pack、ワールド、乗り物、会話とAI、操作ガイド、タイトル復帰を一画面に集約しています。 |
+| 全画面World Settings | WORLDタブまたはCity Pause Hubの「ワールド設定」から、天候、時刻、品質、描画チャンク、交通、サウンドトラックを扱う集中設定画面を開けます。従来の小型カード型設定は廃止しました。 |
+| オリジナルBGM | `Neon City Drift`は本ゲーム向けに生成した完全オリジナルの歌詞なしBGMです。第三者のNCS配布曲は同梱していません。ゲーム開始後のみループ再生し、World Settingsからオン／オフと音量を変更できます。 |
 | モバイル完全操作 | ジョイスティック、走る、使う、建築、会話、Build Belt、視点、乗り物、マップ、ポーズから全主要機能に到達できます。キーボードを使う端末では移動用モバイルUIを自動で隠し、タッチで再表示します。 |
 | NPC行動AI | NPCは道路・歩道を目的地として巡回・散策し、到着時は待機します。プレイヤー、車両、他NPC、配置物への近接を回避し、会話中の状態も持ちます。 |
 | Conversation Dock | 左下の広い会話ドックに会話履歴、近隣NPC、活動人数、ローカルAI状態を表示します。モバイルでは初期状態を折り畳み、開いた時は安全領域内で全幅表示します。 |
@@ -32,6 +34,8 @@
 | 視点操作 | マウスドラッグ | ゲーム画面をスワイプ |
 | 視点切替 | メニュー内の視点 | Context Actionsの「視点」 |
 | 一時停止 | `Esc`または`P` | 右上の「ポーズ」 |
+| World Settings | WORLDタブまたはポーズハブの「ワールド設定」 | 同左。全画面で天候・描画・交通・BGMを操作。 |
+| BGM | World Settings内の`探索BGMを再生する`と音量スライダー | 同左。タイトルでは再生されず、ゲーム開始後に再生。 |
 | 乗車／降車 | 近くの車両で`E` | メニューまたは「使う」 |
 | City Hub入退室 | 入口／退出ゲートの近くで`E` | 「使う」 |
 | 車両生成 | メニューから車種を選択 | Context Actionsの「乗り物」またはメニュー |
@@ -50,6 +54,12 @@
 WebLLMはWebGPUを利用してブラウザ内で推論を行い、OpenAI互換のストリーミングチャットAPIを提供します。[1] 本ゲームでは`Qwen2.5-0.5B-Instruct-q4f16_1-MLC`を、利用者がConversation Dockで明示操作した時だけ読み込みます。公式設定上の必要VRAM目安は約944.62MBです。[2]
 
 LOCAL AIが起動すると、NPCごとの人格・履歴を分けながら一つの推論エンジンを共有します。ゲーム開始時にはモデルを自動ロードしません。WebGPU非対応、モデル取得失敗、端末メモリ不足の場合も、テンプレート会話によるNPC間の発言とプレイヤー応答へフォールバックし、建築・探索・NPC行動を含むゲーム本体は通常どおり利用できます。
+
+## BGMの権利と利用上の注意
+
+`assets/audio/neon-city-drift.mp3`は、Ultimate 3D Sandbox向けに生成したオリジナルのインストゥルメンタル音源です。生成時に既存曲、既存のアーティスト名、歌詞、NCSを含む第三者配布曲を参照・模倣する指定は使用していません。音源の来歴と利用上の注意は[`assets/audio/LICENSE-ORIGINAL-BGM.md`](assets/audio/LICENSE-ORIGINAL-BGM.md)に記録しています。
+
+NCSは動画・配信に関する利用方針を公開していますが、公式FAQではゲームでの利用について商用ライセンス窓口への連絡を求めています。[7] そのため本ゲームにはNCS曲を同梱せず、独自BGMを採用しています。
 
 ## パフォーマンス設定
 
@@ -99,3 +109,5 @@ python3 validate_refresh.py
 [5] [Three.js — InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html)
 
 [6] [Cloudflare Pages — Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/)
+
+[7] [NCS — FAQs / Usage Policy](https://ncs.io/usage-policy)
