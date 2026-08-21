@@ -5,341 +5,252 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Ultimate 3D Sandbox — Free City Play</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Noto+Sans+JP:wght@500;600;700&display=swap');
 
+        :root {
+            --ink: #eaf4ff;
+            --muted: #91a4b8;
+            --panel: rgba(10, 20, 34, .86);
+            --panel-solid: #101d30;
+            --stroke: rgba(168, 210, 245, .17);
+            --cyan: #73ddff;
+            --cyan-deep: #187ca9;
+            --lime: #91edbc;
+            --amber: #ffc66d;
+            --danger: #ff8a94;
+            --shadow: 0 18px 50px rgba(0, 0, 0, .34);
+        }
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             overflow: hidden;
-            font-family: 'Roboto', sans-serif;
-            background-color: #000;
+            color: var(--ink);
+            font-family: Inter, "Noto Sans JP", system-ui, sans-serif;
+            background: #050a12;
         }
-        canvas {
-            display: block;
-        }
+        canvas { display: block; }
+        button, select, input { font: inherit; }
+        button { cursor: pointer; }
+        button:disabled { cursor: not-allowed; opacity: .42; }
+        .bi-icon { width: 16px; height: 16px; flex: 0 0 16px; fill: currentColor; }
+
         .ui-container {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            background-color: rgba(0,0,0,0.6);
-            padding: 15px;
-            border-radius: 8px;
-            max-width: 300px;
-            max-height: 95vh;
-            overflow-y: auto;
+            z-index: 10;
+            top: 16px;
+            left: 16px;
+            width: min(344px, calc(100vw - 32px));
+            max-height: calc(100vh - 32px);
+            overflow: auto;
+            padding: 14px;
+            border: 1px solid var(--stroke);
+            border-radius: 18px;
+            background: linear-gradient(155deg, rgba(16, 31, 51, .93), rgba(7, 15, 27, .88));
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+            scrollbar-width: thin;
         }
-        .ui-container button, .ui-container select, .ui-container input[type="text"] {
-            display: block;
+        .console-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 2px 2px 13px; }
+        .eyebrow { display: block; color: var(--cyan); font-size: 9px; font-weight: 700; letter-spacing: .17em; }
+        .console-header h1 { margin: 3px 0 0; color: #f6fbff; font-size: 16px; letter-spacing: .035em; }
+        .live-badge { display: inline-flex; align-items: center; gap: 6px; color: var(--lime); font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+        .live-badge::before { width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 12px currentColor; content: ""; }
+        .hud-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 7px; }
+        .hud-cell, #destination-info {
+            min-width: 0;
+            padding: 9px 10px;
+            border: 1px solid rgba(179, 218, 246, .10);
+            border-radius: 11px;
+            background: rgba(2, 10, 20, .32);
+        }
+        .hud-cell small, .section-label { display: block; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .11em; }
+        .hud-cell strong { display: block; overflow: hidden; margin-top: 3px; color: #f4fbff; font-size: 12px; font-variant-numeric: tabular-nums; text-overflow: ellipsis; white-space: nowrap; }
+        #destination-info { min-height: 0; margin-top: 7px; color: #cfe5f5; font-size: 11px; line-height: 1.45; }
+        .tab-nav { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 12px 0 10px; padding: 4px; border: 1px solid rgba(179, 218, 246, .1); border-radius: 11px; background: rgba(1, 9, 17, .45); }
+        .tab-button { padding: 8px 6px; border: 0; border-radius: 8px; color: var(--muted); background: transparent; font-size: 10px; font-weight: 700; letter-spacing: .09em; transition: .18s ease; }
+        .tab-button.active { color: #06111c; background: var(--cyan); box-shadow: 0 5px 16px rgba(109, 218, 255, .2); }
+        .control-panel[hidden] { display: none; }
+        .panel-stack { display: grid; gap: 10px; }
+        .control-card { padding: 11px; border: 1px solid rgba(179, 218, 246, .11); border-radius: 13px; background: rgba(3, 13, 24, .33); }
+        .control-card h2 { display: flex; align-items: center; gap: 7px; margin: 0 0 9px; color: #d9edfb; font-size: 10px; letter-spacing: .13em; }
+        .control-card h2 .bi-icon { color: var(--cyan); }
+        .button-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+        .button-grid + .button-grid { margin-top: 7px; }
+        .action-button, .compact-button, .ui-container select, .ui-container input[type="text"] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
             width: 100%;
-            margin-top: 8px;
-            padding: 8px 12px;
-            font-family: 'Roboto', sans-serif;
-            cursor: pointer;
-            border: 1px solid #555;
-            background-color: #333;
-            color: white;
-            border-radius: 4px;
-            box-sizing: border-box;
+            min-height: 37px;
+            padding: 8px 9px;
+            border: 1px solid rgba(150, 211, 250, .18);
+            border-radius: 9px;
+            color: #e9f7ff;
+            background: rgba(20, 47, 73, .68);
+            font-size: 11px;
+            font-weight: 600;
+            transition: transform .16s ease, border-color .16s ease, background .16s ease;
         }
-        .ui-container label {
-            display: inline-block;
-            margin-top: 10px;
-            font-size: 0.9em;
+        .action-button:hover, .compact-button:hover, .ui-container select:hover, .ui-container input[type="text"]:focus {
+            border-color: rgba(115, 221, 255, .72);
+            background: rgba(27, 85, 123, .82);
+            outline: 0;
+            transform: translateY(-1px);
         }
-        .ui-container input[type="range"] {
-            width: 100%;
-        }
-        #coords, #speed-display, #destination-info {
-            margin-bottom: 10px;
-            font-size: 1.0em;
-            background-color: rgba(0,0,0,0.3);
-            padding: 5px;
-            border-radius: 3px;
-            white-space: pre;
-            min-height: 1.2em;
-        }
-        #auto-drive-btn { display: none; background-color: #2a75d1; }
+        .action-button.primary { border-color: rgba(115, 221, 255, .60); color: #05111d; background: linear-gradient(135deg, #74ddff, #59bfe5); }
+        .action-button.warm { border-color: rgba(255, 198, 109, .52); color: #fff0cc; background: rgba(112, 67, 5, .50); }
+        .action-button.danger { border-color: rgba(255, 138, 148, .34); color: #ffd8dc; background: rgba(108, 28, 40, .36); }
+        .status-line { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(179, 218, 246, .09); color: #dceefa; font-size: 11px; }
+        .status-line strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .status-line span { flex: 0 0 auto; color: var(--muted); font-size: 10px; }
+        .field { display: grid; gap: 6px; }
+        .field + .field { margin-top: 10px; }
+        .field label, .inline-toggle { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #c6d8e7; font-size: 11px; }
+        .field label span { color: var(--cyan); font-variant-numeric: tabular-nums; }
+        .ui-container input[type="range"] { width: 100%; accent-color: var(--cyan); }
+        .inline-toggle { justify-content: flex-start; }
+        .inline-toggle input { accent-color: var(--cyan); }
+        #vehicle-type, #weather-select, #quality-select { appearance: none; text-align: left; }
+        #auto-drive-btn { display: none; }
 
         #map-container {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 250px;
-            height: 250px;
-            border: 2px solid rgba(255, 255, 255, 0.7);
-            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9;
+            top: 16px;
+            right: 16px;
+            width: 194px;
+            height: 194px;
+            overflow: hidden;
+            border: 1px solid var(--stroke);
+            border-radius: 16px;
+            background: rgba(4, 13, 23, .84);
+            box-shadow: var(--shadow);
         }
-        #map-canvas { width: 100%; height: 100%; }
-
-        .mobile-ui { display: none; }
-        @media (pointer: coarse) {
-            .mobile-ui { display: block; }
-            #map-container { width: 150px; height: 150px; }
-            .ui-container { max-width: 200px; }
-        }
-
-        #joystick-container {
-            position: absolute;
-            bottom: 80px; left: 20px;
-            width: 120px; height: 120px;
-        }
-        #joystick-base {
-            position: absolute;
-            width: 120px; height: 120px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-        }
-        #joystick-handle {
-            position: absolute;
-            top: 40px; left: 40px;
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-        }
-        #run-button {
-            position: absolute;
-            bottom: 90px; right: 30px;
-            width: 80px; height: 80px;
-            background: rgba(255,255,255,0.3);
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2em;
-            color: white;
-            user-select: none;
-        }
-        #help-modal {
-            display: none;
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0,0,0,0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 80%;
-            text-align: left;
-            z-index: 100;
-        }
+        #map-container::before { position: absolute; z-index: 1; top: 10px; left: 11px; color: #bfe8fb; font-size: 9px; font-weight: 700; letter-spacing: .13em; content: "CITY MAP"; pointer-events: none; }
+        #map-canvas { width: 100%; height: 100%; cursor: crosshair; }
 
         #chat-ui {
             position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            max-width: 800px;
-            box-sizing: border-box;
-            background: rgba(0,0,0,0.5);
-            border-radius: 5px;
             z-index: 10;
-        }
-        #chat-log {
-            height: 6em;
-            padding: 5px;
-            overflow-y: scroll;
-            color: white;
-            font-size: 0.9em;
-        }
-        #chat-log p { margin: 0 0 2px 0; }
-        #chat-form {
-            display: flex;
-            padding: 5px;
-        }
-        #chat-input {
-            flex-grow: 1;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: 1px solid #555;
-            border-radius: 3px;
-            padding: 5px;
-        }
-        #chat-send {
-            margin-left: 5px;
-            background: #2a75d1;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-        }
-        .chat-bubble {
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            text-align: center;
-            pointer-events: none;
-            /* --- ▼ 修正点: ポップアップアニメーションのためのスタイルを追加 ▼ --- */
-            transform: scale(0);
-            opacity: 0;
-            transform-origin: 50% 100%; /* 下中央を基点にアニメーション */
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
-        }
-        .chat-bubble.visible { /* 表示状態を制御するクラス */
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        :root {
-            --panel: rgba(6, 14, 27, 0.88);
-            --panel-border: rgba(116, 222, 255, 0.28);
-            --accent: #68ddff;
-            --accent-strong: #168cc3;
-            --text-muted: #9eb1c4;
-            --warm: #ffcb69;
-        }
-        body { background: #050a12; color: #f3fbff; }
-        .ui-container {
-            top: 14px;
-            left: 14px;
-            width: min(324px, calc(100vw - 28px));
-            max-width: none;
-            max-height: calc(100vh - 28px);
-            padding: 14px;
-            border: 1px solid var(--panel-border);
-            border-radius: 14px;
-            background: linear-gradient(145deg, rgba(11, 28, 48, 0.94), rgba(4, 11, 22, 0.88));
-            box-shadow: 0 18px 42px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(14px);
-        }
-        .ui-container button, .ui-container select, .ui-container input[type="text"] {
-            min-height: 36px;
-            margin-top: 7px;
-            border-color: rgba(135, 221, 255, 0.24);
-            border-radius: 8px;
-            background: rgba(16, 43, 68, 0.88);
-            transition: transform .16s ease, background .16s ease, border-color .16s ease;
-        }
-        .ui-container button:hover, .ui-container button:focus-visible {
-            border-color: var(--accent);
-            background: rgba(20, 88, 125, 0.95);
-            transform: translateY(-1px);
-            outline: none;
-        }
-        .sandbox-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(165, 226, 255, 0.13);
-        }
-        .sandbox-title small { display: block; color: var(--accent); font-size: 9px; font-weight: 700; letter-spacing: .15em; }
-        .sandbox-title strong { display: block; margin-top: 2px; color: #f5fcff; font-size: 15px; letter-spacing: .07em; }
-        .sandbox-badge { display: inline-flex; align-items: center; gap: 5px; color: #8bf7b0; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
-        .sandbox-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
-        .bi-icon { width: 17px; height: 17px; flex: 0 0 17px; fill: currentColor; vertical-align: -0.18em; }
-        .button-with-icon { display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; }
-        .sandbox-section { margin-top: 12px; padding-top: 11px; border-top: 1px solid rgba(165, 226, 255, 0.12); }
-        .sandbox-section h2 { margin: 0 0 7px; color: #c9e4f5; font-size: 10px; letter-spacing: .13em; }
-        .sandbox-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 8px 9px;
-            border: 1px solid rgba(255, 203, 105, 0.23);
-            border-radius: 8px;
-            background: rgba(106, 70, 6, 0.18);
-            color: #fff1bd;
-            font-size: 11px;
-        }
-        .sandbox-status span { color: var(--text-muted); font-size: 10px; }
-        .sandbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-        .sandbox-grid button { width: 100%; }
-        #vehicle-type { width: 100%; min-height: 36px; margin-top: 6px; padding: 7px 8px; color: #effbff; border: 1px solid rgba(135, 221, 255, 0.24); border-radius: 8px; background: rgba(16, 43, 68, 0.88); }
-        .inline-toggle { display: flex; align-items: center; gap: 7px; margin-top: 8px; color: #c9dce8; font-size: 12px; }
-        .inline-toggle label { margin-top: 0; }
-        #map-container {
-            top: 14px;
-            right: 14px;
+            bottom: 16px;
+            left: 50%;
+            width: min(470px, calc(100vw - 32px));
             overflow: hidden;
-            border: 1px solid var(--panel-border);
+            transform: translateX(-50%);
+            border: 1px solid rgba(179, 218, 246, .15);
             border-radius: 13px;
-            background: rgba(5, 15, 26, 0.82);
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+            background: rgba(6, 16, 28, .78);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, .26);
+            backdrop-filter: blur(12px);
         }
-        #map-container::before { content: "SANDBOX MAP"; position: absolute; top: 7px; left: 9px; z-index: 1; color: rgba(219, 247, 255, .75); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-shadow: 0 1px 2px #000; }
-        #chat-ui { border: 1px solid rgba(135, 221, 255, .16); border-radius: 10px; background: rgba(4, 14, 25, 0.78); backdrop-filter: blur(12px); }
-        #chat-send { background: var(--accent-strong); }
-        #help-modal { border: 1px solid var(--panel-border); background: rgba(4, 14, 25, 0.94); box-shadow: 0 22px 70px rgba(0,0,0,.48); }
-        #help-modal h3 { margin-top: 0; color: var(--accent); }
-        #help-modal kbd { padding: 2px 5px; border: 1px solid rgba(255,255,255,.24); border-radius: 4px; background: rgba(255,255,255,.08); }
-        @media (max-width: 680px) {
-            .ui-container { width: min(260px, calc(100vw - 28px)); padding: 11px; }
-            #map-container { width: 132px; height: 132px; }
-            #chat-ui { width: calc(100% - 24px); }
-            .sandbox-grid { grid-template-columns: 1fr; }
+        #chat-log { height: 57px; padding: 8px 10px 4px; overflow-y: auto; color: #d7eaf7; font-size: 10px; line-height: 1.45; }
+        #chat-log p { margin: 0 0 2px; }
+        #chat-form { display: flex; gap: 6px; padding: 7px; border-top: 1px solid rgba(179, 218, 246, .1); }
+        #chat-input { flex: 1; min-width: 0; padding: 7px 9px; border: 1px solid rgba(150, 211, 250, .18); border-radius: 8px; color: #effaff; background: rgba(1, 8, 16, .42); outline: none; }
+        #chat-input:focus { border-color: var(--cyan); }
+        #chat-send { min-width: 56px; border: 0; border-radius: 8px; color: #03131f; background: var(--cyan); font-size: 11px; font-weight: 700; }
+
+        #help-modal { position: absolute; z-index: 100; top: 50%; left: 50%; display: none; width: min(480px, calc(100vw - 32px)); max-height: min(620px, calc(100vh - 32px)); overflow: auto; transform: translate(-50%, -50%); padding: 22px; border: 1px solid var(--stroke); border-radius: 18px; color: #e7f4ff; background: rgba(7, 17, 29, .95); box-shadow: 0 28px 80px rgba(0, 0, 0, .54); }
+        #help-modal h3 { margin: 0 0 12px; color: var(--cyan); }
+        #help-modal p { color: #c6d6e4; font-size: 13px; line-height: 1.6; }
+        #help-modal kbd { padding: 2px 5px; border: 1px solid rgba(255,255,255,.2); border-radius: 4px; background: rgba(255,255,255,.08); }
+        .chat-bubble { padding: 5px 10px; border: 1px solid rgba(162, 223, 255, .22); border-radius: 10px; color: white; background: rgba(4, 14, 25, .84); font-size: 12px; text-align: center; pointer-events: none; transform: scale(0); opacity: 0; transform-origin: 50% 100%; transition: transform .22s cubic-bezier(.34,1.56,.64,1), opacity .18s; }
+        .chat-bubble.visible { transform: scale(1); opacity: 1; }
+
+        .mobile-ui { display: none; }
+        #joystick-container { position: absolute; z-index: 15; bottom: 88px; left: 20px; width: 112px; height: 112px; }
+        #joystick-base { position: absolute; width: 112px; height: 112px; border: 1px solid rgba(255,255,255,.28); border-radius: 50%; background: rgba(3, 13, 23, .35); backdrop-filter: blur(8px); }
+        #joystick-handle { position: absolute; top: 36px; left: 36px; width: 40px; height: 40px; border-radius: 50%; background: rgba(115,221,255,.7); box-shadow: 0 0 20px rgba(115,221,255,.35); }
+        #run-button { position: absolute; z-index: 15; right: 24px; bottom: 98px; display: flex; width: 72px; height: 72px; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,.36); border-radius: 50%; color: white; background: rgba(3, 13, 23, .48); font-size: 12px; font-weight: 700; backdrop-filter: blur(8px); user-select: none; }
+
+        @media (pointer: coarse) { .mobile-ui { display: block; } }
+        @media (max-width: 720px) {
+            .ui-container { top: 10px; left: 10px; width: min(288px, calc(100vw - 20px)); max-height: calc(100vh - 20px); padding: 11px; border-radius: 14px; }
+            #map-container { top: 10px; right: 10px; width: 116px; height: 116px; }
+            #chat-ui { bottom: 10px; width: calc(100vw - 20px); }
+            .button-grid { grid-template-columns: 1fr; }
         }
         </style>
 </head>
 <body>
-    <div class="ui-container">
-        <div class="sandbox-title">
-            <div><small>FREE CITY PLAY</small><strong>ULTIMATE 3D SANDBOX</strong></div>
-            <span class="sandbox-badge">LIVE</span>
+    <div class="ui-container" aria-label="ゲームコントロール">
+        <header class="console-header">
+            <div><span class="eyebrow">FREE CITY PLAY</span><h1>ULTIMATE 3D SANDBOX</h1></div>
+            <span class="live-badge">ONLINE</span>
+        </header>
+        <div class="hud-grid">
+            <div class="hud-cell"><small>POSITION</small><strong id="coords">X: 0.00, Y: 0.00, Z: 0.00</strong></div>
+            <div class="hud-cell"><small>VELOCITY</small><strong id="speed-display">0 km/h | 0.0 m/s</strong></div>
         </div>
-        <div id="coords">X: 0.00, Y: 0.00, Z: 0.00</div>
-        <div id="speed-display">0 km/h | 0.0 m/s</div>
-        <div id="destination-info"></div>
-        <button class="button-with-icon" id="change-camera-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点切り替え (現在: 三人称)</button>
-        <button class="button-with-icon" id="change-character-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#person-badge-fill"></use></svg>キャラクター変更</button>
-        <button class="button-with-icon" id="auto-drive-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#sign-turn-right-fill"></use></svg>自動運転開始</button>
+        <div id="destination-info" role="status">自由に街を探索できます。</div>
+        <nav class="tab-nav" aria-label="コントロール分類">
+            <button class="tab-button active" type="button" data-panel-target="play">PLAY</button>
+            <button class="tab-button" type="button" data-panel-target="world">WORLD</button>
+            <button class="tab-button" type="button" data-panel-target="social">SOCIAL</button>
+        </nav>
 
-        <section class="sandbox-section" aria-labelledby="vehicle-title">
-            <h2 id="vehicle-title">VEHICLE GARAGE</h2>
-            <select id="vehicle-type" aria-label="乗り物タイプ">
-                <option value="car">クルーザー</option>
-                <option value="sports">スポーツカー</option>
-                <option value="bike">ホバーバイク</option>
-            </select>
-            <div class="sandbox-grid">
-                <button class="button-with-icon" id="spawn-vehicle-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg>乗り物を出す</button>
-                <button class="button-with-icon" id="vehicle-action-btn" disabled><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車</button>
+        <section class="control-panel" data-panel="play">
+            <div class="panel-stack">
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#joystick"></use></svg>QUICK ACTIONS</h2>
+                    <div class="button-grid">
+                        <button class="action-button" id="change-camera-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点: 三人称</button>
+                        <button class="action-button" id="change-character-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#person-badge-fill"></use></svg>キャラ変更</button>
+                    </div>
+                    <div class="button-grid">
+                        <button class="action-button primary" id="auto-drive-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#sign-turn-right-fill"></use></svg>自動運転開始</button>
+                        <button class="action-button" id="help-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#question-circle-fill"></use></svg>操作ガイド</button>
+                    </div>
+                    <label class="inline-toggle"><input type="checkbox" id="teleport-mode">マップクリックでテレポート</label>
+                    <label class="inline-toggle"><input type="checkbox" id="auto-drive-run">自動運転で走る</label>
+                </div>
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg>VEHICLE GARAGE</h2>
+                    <select id="vehicle-type" aria-label="乗り物タイプ"><option value="car">クルーザー</option><option value="sports">スポーツカー</option><option value="bike">ホバーバイク</option></select>
+                    <div class="button-grid">
+                        <button class="action-button primary" id="spawn-vehicle-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#plus-circle-fill"></use></svg>乗り物を出す</button>
+                        <button class="action-button" id="vehicle-action-btn" disabled><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>乗車</button>
+                    </div>
+                    <div class="status-line"><strong id="vehicle-status">徒歩で探索中</strong><span id="vehicle-hint">近くの乗り物に E</span></div>
+                </div>
             </div>
-            <div class="sandbox-status"><strong id="vehicle-status">徒歩で探索中</strong><span id="vehicle-hint">近くの乗り物に E</span></div>
         </section>
 
-        <section class="sandbox-section" aria-labelledby="world-title">
-            <h2 id="world-title">WORLD TOOLS</h2>
-            <div class="sandbox-grid">
-                <button class="button-with-icon" id="place-prop-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>ブロック配置</button>
-                <button class="button-with-icon" id="clear-props-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#trash3-fill"></use></svg>配置を消す</button>
+        <section class="control-panel" data-panel="world" hidden>
+            <div class="panel-stack">
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#speedometer2"></use></svg>PERFORMANCE</h2>
+                    <div class="field"><label for="quality-select">品質プリセット <span id="perf-readout">最適化モード</span></label><select id="quality-select"><option value="performance" selected>パフォーマンス優先</option><option value="balanced">バランス</option><option value="visual">高画質</option></select></div>
+                    <div class="field"><label for="draw-distance-slider">描画距離 <span id="draw-distance-label">360</span></label><input type="range" id="draw-distance-slider" min="120" max="512" value="360"></div>
+                </div>
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cloud-sun-fill"></use></svg>ENVIRONMENT</h2>
+                    <div class="field"><label for="weather-select">天気</label><select id="weather-select"><option value="sunny">晴れ</option><option value="cloudy">くもり</option><option value="rainy">雨</option><option value="snowy">雪</option></select></div>
+                    <div class="field"><label for="time-slider">時間 <span id="time-label">12:00</span></label><input type="range" id="time-slider" min="0" max="23.99" value="12" step="0.01"></div>
+                </div>
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>WORLD TOOLS</h2>
+                    <div class="button-grid"><button class="action-button warm" id="place-prop-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>ブロック配置</button><button class="action-button danger" id="clear-props-btn"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#trash3-fill"></use></svg>配置を消す</button></div>
+                    <label class="inline-toggle"><input type="checkbox" id="traffic-toggle" checked>交通車両を動かす</label>
+                </div>
             </div>
-            <div class="inline-toggle"><input type="checkbox" id="traffic-toggle" checked><label for="traffic-toggle">交通車両を動かす</label></div>
         </section>
 
-        <button class="button-with-icon" id="help-button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#question-circle-fill"></use></svg>操作方法</button>
-        <div><input type="checkbox" id="teleport-mode"><label for="teleport-mode">テレポートモード</label></div>
-        <div><input type="checkbox" id="auto-drive-run"><label for="auto-drive-run">自動運転で走る</label></div>
-
-        <label for="username-input">ユーザー名</label>
-        <input type="text" id="username-input" value="Player">
-        <label for="userid-input">ユーザーID</label>
-        <input type="text" id="userid-input" value="001">
-
-        <label for="npc-slider">NPCの数: <span id="npc-count">10</span></label>
-        <input type="range" id="npc-slider" min="0" max="10000" value="10">
-
-        <label for="chat-speed-slider">NPCチャット頻度: <span id="chat-speed-label">1</span> msg/s</label>
-        <input type="range" id="chat-speed-slider" min="0" max="200" value="1">
-
-        <label for="draw-distance-slider">描画距離(m): <span id="draw-distance-label">512</span></label>
-        <input type="range" id="draw-distance-slider" min="1" max="1000" value="512">
-
-        <label for="weather-select">天気</label>
-        <select id="weather-select">
-            <option value="sunny">晴れ</option>
-            <option value="cloudy">くもり</option>
-            <option value="rainy">雨</option>
-            <option value="snowy">雪</option>
-        </select>
-
-        <label for="time-slider">時間: <span id="time-label">12:00</span></label>
-        <input type="range" id="time-slider" min="0" max="23.99" value="12" step="0.01">
+        <section class="control-panel" data-panel="social" hidden>
+            <div class="panel-stack">
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#person-vcard-fill"></use></svg>PROFILE</h2>
+                    <div class="field"><label for="username-input">ユーザー名</label><input type="text" id="username-input" value="Player"></div>
+                    <div class="field"><label for="userid-input">ユーザーID</label><input type="text" id="userid-input" value="001"></div>
+                </div>
+                <div class="control-card">
+                    <h2><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#people-fill"></use></svg>NPC ACTIVITY</h2>
+                    <div class="field"><label for="npc-slider">NPCの数 <span id="npc-count">12</span></label><input type="range" id="npc-slider" min="0" max="80" value="12"></div>
+                    <div class="field"><label for="chat-speed-slider">NPCチャット頻度 <span id="chat-speed-label">1</span> msg/s</label><input type="range" id="chat-speed-slider" min="0" max="10" value="1"></div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <div id="map-container">
@@ -384,14 +295,10 @@
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import Stats from 'three/addons/libs/stats.module.js';
         import { Sky } from 'three/addons/objects/Sky.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-        let scene, renderer, character, orbitControls, playerGroup, stats, composer, sky, sun, pmremGenerator, labelRenderer;
+        let scene, renderer, character, orbitControls, playerGroup, sky, sun, labelRenderer, buildingMaterial;
         let cameras = {}, currentCamera, currentCameraIndex = 0;
         const cameraTypes = ['Third Person', 'First Person', 'Free Look'];
         let keys = { w:false, a:false, s:false, d:false, Shift:false, ArrowUp:false, ArrowLeft:false, ArrowDown:false, ArrowRight:false };
@@ -409,6 +316,14 @@
         let vehicles = [], trafficVehicles = [], placedProps = [];
         let selectedVehicle = null, controlledVehicle = null, nearestVehicle = null;
         let vehicleSpeed = 0, vehicleSteer = 0, placeMode = false, trafficEnabled = true, lastAnimationTime = 0, vehicleUiKey = '';
+        let frameCounter = 0, lastHudUpdate = 0, lastMapDraw = 0, lastFpsSample = 0, sampledFrames = 0, currentFps = 0, labelRenderUntil = 0, npcUpdateCursor = 0;
+        let qualityMode = 'performance';
+        const QUALITY_PRESETS = {
+            performance: { pixelRatio: 1, shadows: false, shadowSize: 512, buildingCount: 78, weatherCount: 700, npcCap: 80, npcStride: 4, mapMs: 125, hudMs: 180, weatherStride: 2 },
+            balanced: { pixelRatio: 1.2, shadows: false, shadowSize: 512, buildingCount: 78, weatherCount: 1100, npcCap: 160, npcStride: 2, mapMs: 95, hudMs: 130, weatherStride: 1 },
+            visual: { pixelRatio: 1.4, shadows: true, shadowSize: 1024, buildingCount: 78, weatherCount: 1600, npcCap: 240, npcStride: 1, mapMs: 80, hudMs: 100, weatherStride: 1 }
+        };
+        const qualityConfig = () => QUALITY_PRESETS[qualityMode];
         const vehicleRaycaster = new THREE.Raycaster();
         const vehiclePointer = new THREE.Vector2();
         let autoDriveTargetIndex = 0;
@@ -433,12 +348,13 @@
         function init() {
             scene = new THREE.Scene();
 
-            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setPixelRatio(1);
+            renderer.shadowMap.enabled = false;
+            renderer.shadowMap.type = THREE.BasicShadowMap;
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
             document.body.appendChild(renderer.domElement);
 
             labelRenderer = new CSS2DRenderer();
@@ -448,10 +364,6 @@
             labelRenderer.domElement.style.pointerEvents = 'none';
             document.body.appendChild(labelRenderer.domElement);
 
-            pmremGenerator = new THREE.PMREMGenerator(renderer);
-
-            stats = new Stats();
-            document.body.appendChild(stats.dom);
 
             const initialFar = parseFloat(document.getElementById('draw-distance-slider').value);
             cameras.thirdPerson = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, initialFar);
@@ -470,9 +382,9 @@
             scene.add(hemisphereLight);
             directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
             directionalLight.position.set(32, 64, 32);
-            directionalLight.castShadow = true;
-            directionalLight.shadow.mapSize.width = 2048;
-            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.castShadow = false;
+            directionalLight.shadow.mapSize.width = 512;
+            directionalLight.shadow.mapSize.height = 512;
             directionalLight.shadow.camera.left = -MAP_WORLD_SIZE/2;
             directionalLight.shadow.camera.right = MAP_WORLD_SIZE/2;
             directionalLight.shadow.camera.top = MAP_WORLD_SIZE/2;
@@ -480,7 +392,6 @@
             scene.add(directionalLight);
 
             initSky();
-            initPostProcessing();
 
             scene.add(mapObjects);
 
@@ -505,8 +416,9 @@
             updateTime(parseFloat(document.getElementById('time-slider').value));
 
             updateNpcCount();
+            setQuality(document.getElementById('quality-select').value, true);
 
-            animate();
+            renderer.setAnimationLoop(animate);
         }
 
         function initSky() {
@@ -514,16 +426,6 @@
             sky.scale.setScalar(MAP_WORLD_SIZE * 2);
             scene.add(sky);
             sun = new THREE.Vector3();
-        }
-
-        function initPostProcessing() {
-            composer = new EffectComposer(renderer);
-            const renderPass = new RenderPass(scene, currentCamera);
-            composer.addPass(renderPass);
-
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.5, 0.5, 0.85);
-            bloomPass.threshold = 0.8;
-            composer.addPass(bloomPass);
         }
 
         function setupEventListeners() {
@@ -543,6 +445,8 @@
             document.getElementById('place-prop-btn').addEventListener('click', togglePlaceMode);
             document.getElementById('clear-props-btn').addEventListener('click', clearPlacedProps);
             document.getElementById('traffic-toggle').addEventListener('change', (e) => { trafficEnabled = e.target.checked; });
+            document.getElementById('quality-select').addEventListener('change', (e) => setQuality(e.target.value));
+            setupPanelTabs();
             document.getElementById('help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'block'; });
             document.getElementById('close-help-button').addEventListener('click', () => { document.getElementById('help-modal').style.display = 'none'; });
 
@@ -596,50 +500,55 @@
             buildings = [];
             streetLights = [];
 
-            const ground = new THREE.Mesh(new THREE.PlaneGeometry(MAP_WORLD_SIZE, MAP_WORLD_SIZE), new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.8 }));
-            ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; mapObjects.add(ground);
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(MAP_WORLD_SIZE, MAP_WORLD_SIZE), new THREE.MeshLambertMaterial({ color: 0x303947 }));
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = false;
+            mapObjects.add(ground);
             sandboxGround = ground;
 
             const roadW = 8;
-            const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+            const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x151d29 });
             const roadInterval = 40;
-
             for (let i = -1; i <= 1; i++) {
                 const roadX = new THREE.Mesh(new THREE.PlaneGeometry(roadW, MAP_WORLD_SIZE), roadMaterial);
-                roadX.rotation.x = -Math.PI / 2; roadX.position.set(i * roadInterval, 0.01, 0); roadX.receiveShadow = true; mapObjects.add(roadX);
-                markPathfindingGrid(roadX.position, roadW/2, MAP_WORLD_SIZE/2, 2);
+                roadX.rotation.x = -Math.PI / 2;
+                roadX.position.set(i * roadInterval, 0.01, 0);
+                mapObjects.add(roadX);
+                markPathfindingGrid(roadX.position, roadW / 2, MAP_WORLD_SIZE / 2, 2);
                 if (i !== 0) {
-                    for (let z = -MAP_WORLD_SIZE/2 + 10; z < MAP_WORLD_SIZE/2; z += 20) {
-                        const light1 = createStreetLight();
-                        light1.position.set(i * roadInterval + roadW/2 + 1, 0, z);
-                        mapObjects.add(light1);
-                        streetLights.push(light1.children[2]);
+                    for (let z = -MAP_WORLD_SIZE / 2 + 12; z < MAP_WORLD_SIZE / 2; z += 28) {
+                        const light = createStreetLight();
+                        light.position.set(i * roadInterval + roadW / 2 + 1, 0, z);
+                        mapObjects.add(light);
+                        streetLights.push(light.children[2]);
                     }
                 }
             }
 
-            for (let i = 0; i < 150; i++) {
+            const specs = [];
+            const count = qualityConfig().buildingCount;
+            for (let i = 0; i < count; i++) {
                 const x = (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.98;
                 const z = (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.98;
-                if (Math.abs(x % roadInterval) < roadW/2+4 || Math.abs(z % roadInterval) < roadW/2+4) continue;
-
-                const height = Math.random() * 20 + 8;
-                const bSize = Math.random()*5+4;
-                const building = new THREE.Mesh(
-                    new THREE.BoxGeometry(bSize, height, bSize),
-                    new THREE.MeshStandardMaterial({
-                        color: new THREE.Color(Math.random()*0.2+0.2,Math.random()*0.2+0.2,Math.random()*0.2+0.2),
-                        roughness: 0.5 + Math.random() * 0.4,
-                        metalness: Math.random() * 0.5
-                    })
-                );
-                building.position.set(x, height/2, z);
-                building.castShadow = true;
-                building.receiveShadow = true;
-                mapObjects.add(building);
-                buildings.push(building);
-                markPathfindingGrid(building.position, bSize/2, bSize/2, 1);
+                if (Math.abs(x % roadInterval) < roadW / 2 + 4 || Math.abs(z % roadInterval) < roadW / 2 + 4) continue;
+                specs.push({ x, z, height: Math.random() * 20 + 8, size: Math.random() * 5 + 4, color: new THREE.Color(Math.random() * 0.14 + 0.19, Math.random() * 0.17 + 0.22, Math.random() * 0.22 + 0.28) });
             }
+            buildingMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true, emissive: 0x000000 });
+            const buildingMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), buildingMaterial, specs.length);
+            const helper = new THREE.Object3D();
+            specs.forEach((spec, index) => {
+                helper.position.set(spec.x, spec.height / 2, spec.z);
+                helper.scale.set(spec.size, spec.height, spec.size);
+                helper.updateMatrix();
+                buildingMesh.setMatrixAt(index, helper.matrix);
+                buildingMesh.setColorAt(index, spec.color);
+                markPathfindingGrid(helper.position, spec.size / 2, spec.size / 2, 1);
+            });
+            buildingMesh.instanceMatrix.needsUpdate = true;
+            if (buildingMesh.instanceColor) buildingMesh.instanceColor.needsUpdate = true;
+            buildingMesh.castShadow = false;
+            buildingMesh.receiveShadow = false;
+            mapObjects.add(buildingMesh);
         }
 
         function createSandboxWorld() {
@@ -903,13 +812,13 @@
             const postMat = new THREE.MeshStandardMaterial({color: 0x555555, roughness: 0.8, metalness: 0.2});
             const post = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 8), postMat);
             post.position.y = 2;
-            post.castShadow = true;
+            post.castShadow = false;
             const arm = new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 0.1), postMat);
             arm.position.set(0.5, 4, 0);
-            arm.castShadow = true;
+            arm.castShadow = false;
             const light = new THREE.PointLight(0xffddaa, 0, 15, 2);
             light.position.set(1, 3.8, 0);
-            light.castShadow = true;
+            light.castShadow = false;
             group.add(post, arm, light);
             return group;
         }
@@ -1064,7 +973,7 @@
         }
 
         function updateNpcCount() {
-            const newCount = parseInt(document.getElementById('npc-slider').value);
+            const newCount = Math.min(parseInt(document.getElementById('npc-slider').value), qualityConfig().npcCap);
             while (npcs.length < newCount) {
                 const npc = changeCharacter(false);
                 npc.userData = { name: "NPC " + (npcs.length + 1), id: 1000 + npcs.length + 1 };
@@ -1085,17 +994,20 @@
         function resetNpcTarget(npc) {
             npc.targetPosition.set((Math.random() - 0.5) * MAP_WORLD_SIZE * 0.95, 0, (Math.random() - 0.5) * MAP_WORLD_SIZE * 0.95);
         }
-        function moveNpcs() {
+        function moveNpcs(delta) {
             const playerPos = playerGroup.position;
-            const updateDistanceSq = 50 * 50;
-            npcs.forEach(npc => {
-                if (npc.position.distanceToSquared(playerPos) > updateDistanceSq) return;
+            const stride = qualityConfig().npcStride;
+            const updateDistanceSq = 48 * 48;
+            for (let index = npcUpdateCursor; index < npcs.length; index += stride) {
+                const npc = npcs[index];
+                if (npc.position.distanceToSquared(playerPos) > updateDistanceSq) continue;
                 const distanceToTarget = npc.position.distanceTo(npc.targetPosition);
                 if (distanceToTarget < 2) resetNpcTarget(npc);
                 const direction = npc.targetPosition.clone().sub(npc.position).normalize();
-                npc.position.add(direction.multiplyScalar(0.02));
+                npc.position.addScaledVector(direction, 1.2 * delta * stride);
                 npc.rotation.y = Math.atan2(direction.x, direction.z);
-            });
+            }
+            npcUpdateCursor = (npcUpdateCursor + 1) % Math.max(stride, 1);
         }
 
         function addChatMessage(characterObject, message) {
@@ -1103,7 +1015,9 @@
             const p = document.createElement('p');
             p.textContent = `[${characterObject.userData.name}]: ${message}`;
             log.appendChild(p);
+            while (log.children.length > 24) log.removeChild(log.firstChild);
             log.scrollTop = log.scrollHeight;
+            labelRenderUntil = Math.max(labelRenderUntil, performance.now() + 5300);
 
             // --- ▼ 修正点: traverseを使い、子孫要素からチャットラベルを正しく検索する ▼ ---
             let label = null;
@@ -1142,8 +1056,7 @@
             const cameraName = cameraTypes[currentCameraIndex];
             orbitControls.enabled = (cameraName === 'Free Look');
             currentCamera = (cameraName === 'Third Person') ? cameras.thirdPerson : (cameraName === 'First Person') ? cameras.firstPerson : cameras.freeLook;
-            composer.passes[0].camera = currentCamera;
-            document.getElementById('change-camera-btn').textContent = `視点切り替え (現在: ${cameraName})`;
+            document.getElementById('change-camera-btn').innerHTML = '<svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点: ' + cameraName;
             onWindowResize();
         }
         function handleMapClick(event) {
@@ -1226,11 +1139,8 @@
                 hemisphereLight.intensity = 0.2 + noon_factor * 0.3;
             }
             directionalLight.position.copy(sun).multiplyScalar(50);
-            scene.environment = pmremGenerator.fromScene(sky).texture;
-            streetLights.forEach(light => { light.intensity = isNight ? 2 : 0; });
-            buildings.forEach(building => {
-                building.material.emissive.setHex(isNight ? 0x996600 : 0x000000);
-            });
+            streetLights.forEach(light => { light.intensity = isNight ? 0.75 : 0; });
+            if (buildingMaterial) buildingMaterial.emissive.setHex(isNight ? 0x233244 : 0x000000);
         }
         function changeWeather(weather) {
             if (weatherParticles) {
@@ -1245,7 +1155,7 @@
                 uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 1.5;
             } else if (weather === 'rainy' || weather === 'snowy') {
                 uniforms['turbidity'].value = 20; uniforms['rayleigh'].value = 0.5;
-                const count = weather === 'rainy' ? 3000 : 1500;
+                const count = weather === 'rainy' ? qualityConfig().weatherCount : Math.floor(qualityConfig().weatherCount * 0.65);
                 const positions = new Float32Array(count * 3);
                 const velocities = new Float32Array(count * 3);
                 const geometry = new THREE.BufferGeometry();
@@ -1323,10 +1233,11 @@
         function onWindowResize() {
             const width = window.innerWidth;
             const height = window.innerHeight;
-            currentCamera.aspect = width / height;
-            currentCamera.updateProjectionMatrix();
+            Object.values(cameras).forEach(camera => {
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+            });
             renderer.setSize(width, height);
-            composer.setSize(width, height);
             labelRenderer.setSize(width, height);
         }
         function setupMobileControls() {
@@ -1390,31 +1301,76 @@
         }
         function onPointerUp() { isPointerDown = false; }
 
+        function setupPanelTabs() {
+            document.querySelectorAll('[data-panel-target]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const target = button.dataset.panelTarget;
+                    document.querySelectorAll('[data-panel-target]').forEach(item => item.classList.toggle('active', item === button));
+                    document.querySelectorAll('[data-panel]').forEach(panel => { panel.hidden = panel.dataset.panel !== target; });
+                });
+            });
+        }
+
+        function setQuality(mode, silent = false) {
+            qualityMode = QUALITY_PRESETS[mode] ? mode : 'performance';
+            const config = qualityConfig();
+            if (!renderer) return;
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, config.pixelRatio));
+            renderer.shadowMap.enabled = config.shadows;
+            directionalLight.castShadow = config.shadows;
+            directionalLight.shadow.mapSize.set(config.shadowSize, config.shadowSize);
+            const npcSlider = document.getElementById('npc-slider');
+            npcSlider.max = config.npcCap;
+            if (parseInt(npcSlider.value) > config.npcCap) npcSlider.value = config.npcCap;
+            document.getElementById('npc-count').textContent = npcSlider.value;
+            if (playerGroup) updateNpcCount();
+            if (weatherParticles) changeWeather(document.getElementById('weather-select').value);
+            onWindowResize();
+            if (!silent) setSandboxMessage('品質プリセットを ' + document.getElementById('quality-select').selectedOptions[0].text + ' に変更しました。');
+        }
+
+        function updatePerformanceHud(time, controlledObject) {
+            const config = qualityConfig();
+            if (time - lastHudUpdate < config.hudMs) return;
+            lastHudUpdate = time;
+            const pos = controlledObject.position;
+            document.getElementById('coords').textContent = `X: ${pos.x.toFixed(1)}, Y: ${pos.y.toFixed(1)}, Z: ${pos.z.toFixed(1)}`;
+            const speedKmh = currentSpeedMs * 3.6;
+            document.getElementById('speed-display').textContent = `${speedKmh.toFixed(0)} km/h | ${currentSpeedMs.toFixed(1)} m/s`;
+            if (!lastFpsSample) lastFpsSample = time;
+            sampledFrames++;
+            if (time - lastFpsSample >= 700) {
+                currentFps = Math.round(sampledFrames * 1000 / (time - lastFpsSample));
+                sampledFrames = 0;
+                lastFpsSample = time;
+            }
+            document.getElementById('perf-readout').textContent = currentFps ? `${currentFps} FPS · ${renderer.info.render.calls} calls` : '計測中';
+        }
+
         function animate(time) {
-            requestAnimationFrame(animate);
-            stats.begin();
+            frameCounter++;
             const delta = lastAnimationTime ? Math.min((time - lastAnimationTime) / 1000, 0.05) : 1 / 60;
             lastAnimationTime = time;
 
             const driving = updateControlledVehicle(delta);
             if (!driving) {
                 isRunning = keys['Shift'] || isRunning;
-                const isMoving = (keys.w||keys.s||keys.a||keys.d||keys.ArrowUp||keys.ArrowDown||keys.ArrowLeft||keys.ArrowRight) || isAutoDriving;
+                const isMoving = (keys.w || keys.s || keys.a || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight) || isAutoDriving;
                 const autoRun = document.getElementById('auto-drive-run').checked;
                 let targetSpeedKmh = 0;
-                if(isAutoDriving) targetSpeedKmh = autoRun ? RUN_SPEED_KMH : WALK_SPEED_KMH;
-                else if(isMoving) targetSpeedKmh = isRunning ? RUN_SPEED_KMH : WALK_SPEED_KMH;
+                if (isAutoDriving) targetSpeedKmh = autoRun ? RUN_SPEED_KMH : WALK_SPEED_KMH;
+                else if (isMoving) targetSpeedKmh = isRunning ? RUN_SPEED_KMH : WALK_SPEED_KMH;
 
                 currentSpeedMs = (targetSpeedKmh * 1000) / 3600;
                 const moveDistance = currentSpeedMs / FRAME_RATE;
-                characterDirection.set(0,0,0);
+                characterDirection.set(0, 0, 0);
                 if (isAutoDriving) {
-                    if(autoDriveTargetIndex >= path.length) {
+                    if (autoDriveTargetIndex >= path.length) {
                         stopAutoDrive();
                     } else {
                         const targetPoint = path[autoDriveTargetIndex];
-                        if(playerGroup.position.distanceTo(targetPoint) < 1) autoDriveTargetIndex++;
-                        if(autoDriveTargetIndex < path.length) characterDirection.subVectors(path[autoDriveTargetIndex], playerGroup.position).normalize();
+                        if (playerGroup.position.distanceTo(targetPoint) < 1) autoDriveTargetIndex++;
+                        if (autoDriveTargetIndex < path.length) characterDirection.subVectors(path[autoDriveTargetIndex], playerGroup.position).normalize();
                     }
                 } else {
                     if (keys.w || keys.ArrowUp) characterDirection.z = -1;
@@ -1423,9 +1379,9 @@
                     if (keys.d || keys.ArrowRight) characterDirection.x = 1;
                 }
 
-                if(characterDirection.lengthSq() > 0) {
+                if (characterDirection.lengthSq() > 0) {
                     const moveVector = characterDirection.normalize();
-                    if(!isAutoDriving) {
+                    if (!isAutoDriving) {
                         const targetAngle = playerGroup.rotation.y + Math.atan2(characterDirection.x, characterDirection.z);
                         moveVector.set(Math.sin(targetAngle), 0, Math.cos(targetAngle));
                     } else {
@@ -1442,7 +1398,7 @@
             }
 
             const controlledObject = getControlledObject();
-            if(currentCamera === cameras.thirdPerson) {
+            if (currentCamera === cameras.thirdPerson) {
                 const offset = new THREE.Vector3().setFromSpherical(cameraOffsetSpherical);
                 currentCamera.position.copy(controlledObject.position).add(offset);
                 currentCamera.lookAt(controlledObject.position);
@@ -1450,39 +1406,38 @@
                 currentCamera.position.copy(controlledObject.position).add(new THREE.Vector3(0, controlledVehicle ? 1.2 : 1.5, 0));
                 currentCamera.quaternion.copy(controlledObject.quaternion);
             } else {
-                 orbitControls.update();
+                orbitControls.update();
             }
 
-            moveNpcs();
+            moveNpcs(delta);
             updateTraffic(delta);
             updateVehicleUi();
             handleNpcChat(time);
-            if(weatherParticles) {
+            if (weatherParticles && frameCounter % qualityConfig().weatherStride === 0) {
                 weatherParticles.position.copy(controlledObject.position);
                 const positions = weatherParticles.geometry.attributes.position.array;
                 const velocities = weatherParticles.geometry.attributes.velocity.array;
-                for(let i=0; i<positions.length; i+=3) {
-                    positions[i] += velocities[i];
-                    positions[i+1] += velocities[i+1];
-                    if(positions[i+1] < -25) {
+                const step = qualityConfig().weatherStride;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] += velocities[i] * step;
+                    positions[i + 1] += velocities[i + 1] * step;
+                    if (positions[i + 1] < -25) {
                         positions[i] = (Math.random() - 0.5) * 100;
-                        positions[i+1] = 25;
-                        positions[i+2] = (Math.random() - 0.5) * 100;
+                        positions[i + 1] = 25;
+                        positions[i + 2] = (Math.random() - 0.5) * 100;
                     }
                 }
                 weatherParticles.geometry.attributes.position.needsUpdate = true;
             }
 
-            const pos = controlledObject.position;
-            document.getElementById('coords').textContent = `X: ${pos.x.toFixed(2)}, Y: ${pos.y.toFixed(2)}, Z: ${pos.z.toFixed(2)}`;
-            const speedKmh = currentSpeedMs * 3.6;
-            document.getElementById('speed-display').textContent = `${speedKmh.toFixed(0)} km/h | ${currentSpeedMs.toFixed(1)} m/s`;
+            updatePerformanceHud(time, controlledObject);
             if (isAutoDriving && !controlledVehicle) updateDestinationInfo();
-            drawMap();
-
-            composer.render();
-            labelRenderer.render(scene, currentCamera);
-            stats.end();
+            if (time - lastMapDraw >= qualityConfig().mapMs) {
+                drawMap();
+                lastMapDraw = time;
+            }
+            renderer.render(scene, currentCamera);
+            if (time < labelRenderUntil && frameCounter % 2 === 0) labelRenderer.render(scene, currentCamera);
         }
 
         init();

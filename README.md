@@ -14,6 +14,8 @@
 | 環境 | 天候（晴れ・くもり・雨・雪）、時刻、描画距離をリアルタイムに変更できます。夜間には街灯とビルの発光表現が切り替わります。 |
 | 車両 | クルーザー、スポーツカー、ホバーバイクを生成して乗車できます。運転中はWASD／矢印キーで加減速・操舵し、`E` で降車します。交通車両は表示・停止を切り替えられます。 |
 | ワールド編集 | 配置モードで地面をクリックし、色と高さがランダムなブロックを追加できます。配置済みブロックは一括削除できます。 |
+| 軽量化 | 建物のインスタンシング、影・後処理の既定無効化、低い描画ピクセル比、NPC・粒子・ミニマップ・HUD更新の間引きにより、プレイ中の描画・更新負荷を抑えます。[3] [4] |
+| UI | PLAY／WORLD／SOCIALのタブ式コントロールに整理し、プレイ中に必要な操作だけをコンパクトに表示します。 |
 | UIアイコン | [Bootstrap Icons v1.13.1](https://icons.getbootstrap.com/) の公式SVGスプライトを同梱し、車両・カメラ・配置・ヘルプなどの操作ボタンに使用しています。[1] [2] |
 
 ## 操作方法
@@ -30,6 +32,17 @@
 | 車両運転 | 乗車中に `W` `A` `S` `D` または矢印キー |
 | 配置モード | 「ブロック配置」または `B`。有効時、ゲーム画面の地面をクリック |
 | 配置を削除 | 「配置を消す」 |
+| パフォーマンス設定 | WORLDタブの「品質プリセット」。通常は「パフォーマンス優先」を推奨します。 |
+
+## パフォーマンス設定
+
+初期設定の **パフォーマンス優先** は、影と後処理を無効化し、描画解像度を抑え、NPC・天候粒子・ミニマップ・HUDの更新頻度を制御します。これにより、自由探索、車両、天候、チャットといったゲーム性は保ったまま、低〜中性能環境でも滑らかに動かすことを優先します。
+
+| プリセット | 主な設定 | 推奨用途 |
+|---|---|---|
+| パフォーマンス優先 | 1倍ピクセル比、影なし、NPC上限80、雨粒子700、低頻度UI更新 | ラグを抑えたい場合の既定値 |
+| バランス | 1.2倍ピクセル比、NPC上限160、雨粒子1,100 | 通常のPC環境 |
+| 高画質 | 1.4倍ピクセル比、影有効、NPC上限240、雨粒子1,600 | GPU性能に余裕がある場合 |
 
 ## ローカル確認
 
@@ -43,7 +56,7 @@ python3 -m http.server 4173
 
 ## Cloudflare Pages
 
-本リポジトリは静的HTMLサイトです。既存のCloudflare Pagesプロジェクト `ultimate-3d-game` は `main` ブランチを本番として監視しており、GitHubへのプッシュごとに自動デプロイされます。[3] 公開先は [ultimate-3d-game.pages.dev](https://ultimate-3d-game.pages.dev/) です。
+本リポジトリは静的HTMLサイトです。既存のCloudflare Pagesプロジェクト `ultimate-3d-game` は `main` ブランチを本番として監視しており、GitHubへのプッシュごとに自動デプロイされます。[5] 公開先は [ultimate-3d-game.pages.dev](https://ultimate-3d-game.pages.dev/) です。
 
 | 項目 | 設定 |
 |---|---|
@@ -68,4 +81,8 @@ python3 -m http.server 4173
 
 [2] [Bootstrap Icons v1.13.1 release](https://github.com/twbs/icons/releases/tag/v1.13.1)
 
-[3] [Cloudflare Pages — Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/)
+[3] [Three.js — InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html)
+
+[4] [Three.js — Post Processing](https://threejs.org/manual/en/post-processing.html)
+
+[5] [Cloudflare Pages — Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/)
