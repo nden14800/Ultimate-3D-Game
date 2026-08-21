@@ -404,6 +404,65 @@
             #chat-mode-status { max-width: 108px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         }
 
+
+        /* Mobile containment: keep the game surface fixed and reserve safe, touchable regions. */
+        html, body { width: 100%; min-width: 0; height: 100%; min-height: 100%; overflow: hidden; overscroll-behavior: none; }
+        body { position: fixed; inset: 0; height: 100dvh; min-height: 100dvh; }
+        canvas.game-canvas { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; -webkit-user-select: none; user-select: none; }
+        button, #map-canvas, #joystick-base, #run-button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        #build-belt { overscroll-behavior-x: contain; touch-action: pan-x; }
+        #chat-log, .ui-container, #field-pack { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+
+        @media (pointer: coarse), (max-width: 760px) {
+            #game-topbar { top: calc(8px + env(safe-area-inset-top)); right: calc(8px + env(safe-area-inset-right)); left: calc(8px + env(safe-area-inset-left)); }
+            #world-readout { top: calc(53px + env(safe-area-inset-top)); left: calc(8px + env(safe-area-inset-left)); width: min(158px, calc(100vw - 18px)); padding: 7px; gap: 5px; }
+            #world-readout .readout-chip { padding: 5px; }
+            #world-readout .readout-chip strong { font-size: 8px; }
+            #build-status { display: none; }
+            #build-belt { bottom: calc(6px + env(safe-area-inset-bottom)); width: calc(100vw - 12px - env(safe-area-inset-left) - env(safe-area-inset-right)); max-width: none; min-height: 56px; padding: 4px; scroll-padding-inline: 3px; }
+            .belt-slot { flex: 1 1 41px; min-width: 41px; min-height: 48px; padding: 3px 2px; font-size: 7px; }
+            .belt-slot.utility { flex-basis: 41px; min-width: 41px; }
+            .belt-slot .bi-icon { width: 16px; height: 16px; }
+            .belt-slot .slot-key { top: 3px; right: 4px; font-size: 7px; }
+            #chat-ui.conversation-dock { right: calc(8px + env(safe-area-inset-right)); bottom: calc(76px + env(safe-area-inset-bottom)); left: calc(8px + env(safe-area-inset-left)); width: auto; max-width: none; min-width: 0; max-height: min(285px, calc(100dvh - 160px)); }
+            #chat-ui.conversation-dock.collapsed { right: auto; bottom: calc(74px + env(safe-area-inset-bottom)); left: calc(108px + env(safe-area-inset-left)); width: 44px; min-width: 44px; max-width: 44px; height: 44px; min-height: 44px; max-height: 44px; transform: none; border-radius: 13px; }
+            #chat-ui.conversation-dock.collapsed .conversation-head { min-height: 44px; padding: 5px; border: 0; }
+            #chat-ui.conversation-dock.collapsed .conversation-title, #chat-ui.conversation-dock.collapsed #chat-mode-status, #chat-ui.conversation-dock.collapsed #local-ai-button, #chat-ui.conversation-dock.collapsed .conversation-status-row, #chat-ui.conversation-dock.collapsed #chat-log, #chat-ui.conversation-dock.collapsed #chat-form { display: none; }
+            #chat-ui.conversation-dock.collapsed .conversation-controls { display: grid; margin: 0; }
+            #chat-ui.conversation-dock.collapsed .conversation-toggle { width: 32px; height: 32px; border-radius: 10px; }
+            #chat-log { height: min(108px, 18dvh); }
+            #context-actions { right: calc(9px + env(safe-area-inset-right)); bottom: calc(184px + env(safe-area-inset-bottom)); gap: 5px; }
+            .context-action { min-width: 36px; min-height: 34px; padding: 5px 7px; }
+            #map-container { right: calc(9px + env(safe-area-inset-right)); bottom: calc(86px + env(safe-area-inset-bottom)); width: 92px; height: 92px; }
+            #map-container::before { top: 7px; left: 8px; font-size: 7px; }
+            #joystick-container { bottom: calc(88px + env(safe-area-inset-bottom)); left: calc(12px + env(safe-area-inset-left)); width: 92px; height: 92px; }
+            #joystick-base { width: 92px; height: 92px; border-width: 2px; }
+            #joystick-handle { top: 26px; left: 26px; width: 38px; height: 38px; }
+            #run-button { right: calc(14px + env(safe-area-inset-right)); bottom: calc(93px + env(safe-area-inset-bottom)); width: 66px; height: 66px; border-width: 2px; font-size: 10px; }
+            .ui-container { top: calc(54px + env(safe-area-inset-top)); right: calc(8px + env(safe-area-inset-right)); width: min(320px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right))); max-height: calc(100dvh - 68px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); }
+            #field-pack { top: calc(8px + env(safe-area-inset-top)); right: calc(8px + env(safe-area-inset-right)); bottom: calc(8px + env(safe-area-inset-bottom)); left: calc(8px + env(safe-area-inset-left)); width: auto; max-height: none; transform: none; padding: 13px; }
+        }
+
+        @media (max-width: 430px) {
+            .brand-lockup > div:last-child { display: none; }
+            .brand-mark { width: 32px; height: 32px; border-radius: 10px; }
+            .top-actions { gap: 5px; }
+            .round-button { min-width: 36px; padding: 0 7px; }
+            #world-readout { width: 130px; }
+            #world-readout .readout-row:last-child { display: none; }
+            #map-container { width: 76px; height: 76px; bottom: calc(82px + env(safe-area-inset-bottom)); }
+            #context-actions { bottom: calc(166px + env(safe-area-inset-bottom)); }
+            .context-action .context-label { display: none; }
+            #joystick-container { bottom: calc(84px + env(safe-area-inset-bottom)); left: calc(10px + env(safe-area-inset-left)); width: 82px; height: 82px; }
+            #joystick-base { width: 82px; height: 82px; }
+            #joystick-handle { top: 22px; left: 22px; width: 36px; height: 36px; }
+            #run-button { right: calc(10px + env(safe-area-inset-right)); bottom: calc(87px + env(safe-area-inset-bottom)); width: 58px; height: 58px; font-size: 9px; }
+            #chat-ui.conversation-dock { bottom: calc(71px + env(safe-area-inset-bottom)); max-height: min(260px, calc(100dvh - 138px)); }
+            #chat-ui.conversation-dock.collapsed { bottom: calc(67px + env(safe-area-inset-bottom)); left: calc(96px + env(safe-area-inset-left)); }
+            .conversation-title { font-size: 9px; letter-spacing: .06em; }
+            .conversation-status-row { font-size: 8px; padding-inline: 10px; }
+        }
+
         </style>
 </head>
 <body>
@@ -666,6 +725,8 @@
             renderer.toneMappingExposure = 1.36;
             renderer.outputColorSpace = THREE.SRGBColorSpace;
             renderer.debug.checkShaderErrors = false;
+            renderer.domElement.classList.add('game-canvas');
+            renderer.domElement.style.touchAction = 'none';
             document.body.appendChild(renderer.domElement);
 
             labelRenderer = new CSS2DRenderer();
@@ -842,10 +903,12 @@
 
             mapCanvas.addEventListener('click', handleMapClick);
             setupMobileControls();
+            setupMobileTouchSafety();
 
-            renderer.domElement.addEventListener('pointerdown', onPointerDown);
-            renderer.domElement.addEventListener('pointermove', onPointerMove);
-            renderer.domElement.addEventListener('pointerup', onPointerUp);
+            renderer.domElement.addEventListener('pointerdown', onPointerDown, { passive: false });
+            renderer.domElement.addEventListener('pointermove', onPointerMove, { passive: false });
+            renderer.domElement.addEventListener('pointerup', onPointerUp, { passive: false });
+            renderer.domElement.addEventListener('pointercancel', onPointerUp, { passive: false });
             renderer.domElement.addEventListener('contextmenu', (e) => { if (placeMode || removeMode) e.preventDefault(); });
         }
 
@@ -2138,7 +2201,11 @@
 
         function onPointerDown(event) {
             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
-            if (event.target.tagName !== 'CANVAS') return;
+            if (event.target !== renderer.domElement) return;
+            if (event.pointerType === 'touch') {
+                event.preventDefault();
+                renderer.domElement.setPointerCapture?.(event.pointerId);
+            }
             if (event.button === 2) { if (placeMode || removeMode) removePropAtPointer(event); return; }
             if (event.button !== 0) return;
             if (removeMode) { removePropAtPointer(event); return; }
@@ -2148,6 +2215,7 @@
             pointerPosition.y = event.clientY;
         }
         function onPointerMove(event) {
+            if (event.pointerType === 'touch') event.preventDefault();
             if (placeMode || removeMode) updateBuildGhost(event);
             if (!isPointerDown || currentCameraIndex === 2) return;
             const deltaX = event.clientX - pointerPosition.x;
@@ -2163,7 +2231,40 @@
             pointerPosition.x = event.clientX;
             pointerPosition.y = event.clientY;
         }
-        function onPointerUp() { isPointerDown = false; }
+        function onPointerUp(event) {
+            if (event?.pointerType === 'touch') {
+                event.preventDefault();
+                if (renderer.domElement.hasPointerCapture?.(event.pointerId)) renderer.domElement.releasePointerCapture?.(event.pointerId);
+            }
+            isPointerDown = false;
+        }
+
+        function setupMobileTouchSafety() {
+            const isScrollableUi = (target) => target instanceof Element && target.closest('#chat-log, .ui-container, #field-pack, input, select, textarea');
+            const blockPageGesture = (event) => {
+                if (!isScrollableUi(event.target) && event.cancelable) event.preventDefault();
+            };
+            document.addEventListener('touchmove', blockPageGesture, { passive: false });
+            document.addEventListener('gesturestart', blockPageGesture, { passive: false });
+            document.addEventListener('gesturechange', blockPageGesture, { passive: false });
+
+            const syncMobileHudLayout = () => {
+                const dock = document.getElementById('chat-ui');
+                const isMobile = window.matchMedia('(max-width: 760px), (pointer: coarse)').matches;
+                if (isMobile && !dock.dataset.mobileLayoutReady) {
+                    dock.classList.add('collapsed');
+                    dock.dataset.mobileLayoutReady = 'true';
+                    document.getElementById('chat-drawer-toggle').setAttribute('aria-label', '会話欄を開く');
+                } else if (!isMobile && dock.dataset.mobileLayoutReady) {
+                    dock.classList.remove('collapsed');
+                    delete dock.dataset.mobileLayoutReady;
+                    document.getElementById('chat-drawer-toggle').setAttribute('aria-label', '会話欄を折り畳む');
+                }
+            };
+            syncMobileHudLayout();
+            window.addEventListener('resize', syncMobileHudLayout, { passive: true });
+            window.addEventListener('orientationchange', () => setTimeout(syncMobileHudLayout, 80), { passive: true });
+        }
 
         function toggleDrawer(force) {
             const open = typeof force === 'boolean' ? force : !document.body.classList.contains('drawer-open');
@@ -2180,6 +2281,7 @@
         function toggleChatDock() {
             const dock = document.getElementById('chat-ui');
             dock.classList.toggle('collapsed');
+            dock.dataset.mobileLayoutReady = 'true';
             const collapsed = dock.classList.contains('collapsed');
             document.getElementById('chat-drawer-toggle').setAttribute('aria-label', collapsed ? '会話欄を開く' : '会話欄を折り畳む');
         }
