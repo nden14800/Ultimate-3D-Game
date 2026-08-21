@@ -9,7 +9,8 @@
 | 区分 | 内容 |
 |---|---|
 | 自由探索 | 徒歩でのWASD／矢印キー移動、走行、三人称・一人称・フリールック視点、マウス／タッチでのカメラ操作を提供します。 |
-| ナビゲーション | ミニマップクリックで目的地を指定できます。テレポート、経路探索、自動運転、自動運転中の走行設定を利用できます。 |
+| 無限都市 | 64×64ワールド単位の決定論的な都市チャンクを、プレイヤー／操作中の車両の周辺に生成・保持・解放します。同じ座標は同じ都市区画として再生成され、固定マップの端はありません。[3] [4] |
+| ナビゲーション | プレイヤー中心のローカルレーダーをクリックして目的地を指定できます。テレポート、グローバル道路格子を経由する自動運転、自動運転中の走行設定を利用できます。 |
 | NPCとチャット | NPC数と会話頻度を調整でき、プレイヤーとNPCの発言は画面内ログと吹き出しで表示されます。 |
 | 環境 | 天候（晴れ・くもり・雨・雪）、時刻、描画距離をリアルタイムに変更できます。夜間には街灯とビルの発光表現が切り替わります。 |
 | 車両 | クルーザー、スポーツカー、ホバーバイクを生成して乗車できます。運転中はWASD／矢印キーで加減速・操舵し、`E` で降車します。交通車両は表示・停止を切り替えられます。 |
@@ -35,6 +36,7 @@
 | 車両運転 | 乗車中に `W` `A` `S` `D` または矢印キー |
 | 配置モード | 「ブロック配置」または `B`。有効時、ゲーム画面の地面をクリック |
 | 配置を削除 | 「配置を消す」 |
+| 描画チャンク | メニューのWORLDタブで半径1〜3チャンクを選択します。1は3×3、2は5×5、3は7×7の周辺区画を描画します。 |
 | パフォーマンス設定 | メニューのWORLDタブにある「品質プリセット」。通常は「プレミアム（推奨）」を選択します。 |
 
 ## パフォーマンス設定
@@ -43,9 +45,15 @@
 
 | プリセット | 主な設定 | 推奨用途 |
 |---|---|---|
-| 軽量 | 最大1.18倍ピクセル比、影なし、NPC上限80、雨粒子600、低頻度UI更新 | 動作の軽さを最優先する場合 |
-| プレミアム（推奨） | 最大1.5倍ピクセル比、影有効、NPC上限120、雨粒子1,000、明るいファサード | 画質と軽さのバランスを取る既定値 |
-| ウルトラ画質 | 最大1.8倍ピクセル比、1536px影、NPC上限180、雨粒子1,450 | GPU性能に余裕がある場合 |
+| 軽量 | 最大1.18倍ピクセル比、影なし、NPC上限80、雨粒子600、既定半径1チャンク | 動作の軽さを最優先する場合 |
+| プレミアム（推奨） | 最大1.5倍ピクセル比、影有効、NPC上限120、雨粒子1,000、既定半径2チャンク | 画質と軽さのバランスを取る既定値 |
+| ウルトラ画質 | 最大1.8倍ピクセル比、1536px影、NPC上限180、雨粒子1,450、既定半径3チャンク | GPU性能に余裕がある場合 |
+
+## 無限ワールドの動作
+
+チャンクは描画半径の外側に1チャンク分だけキャッシュされますが、キャッシュ区画は非表示です。これにより、チャンク境界をまたいだ移動で都市を即時に再利用しながら、実際の描画数は設定値に保たれます。チャンク固有の道路・建物・ファサード・樹木はインスタンシングでまとめ、不要な遠方区画はシーングラフから解放します。[3] [4]
+
+HUDの `WORLD` 表示は、現在描画中のチャンク数と半径を `25 chunks · 2R` のように示します。移動、車両、NPC、交通、配置、天候、ローカルレーダーはすべて無限座標で動作します。
 
 ## ローカル確認
 
@@ -59,7 +67,7 @@ python3 -m http.server 4173
 
 ## Cloudflare Pages
 
-本リポジトリは静的HTMLサイトです。既存のCloudflare Pagesプロジェクト `ultimate-3d-game` は `main` ブランチを本番として監視しており、GitHubへのプッシュごとに自動デプロイされます。[6] 公開先は [ultimate-3d-game.pages.dev](https://ultimate-3d-game.pages.dev/) です。
+本リポジトリは静的HTMLサイトです。既存のCloudflare Pagesプロジェクト `ultimate-3d-game` は `main` ブランチを本番として監視しており、GitHubへのプッシュごとに自動デプロイされます。[7] 公開先は [ultimate-3d-game.pages.dev](https://ultimate-3d-game.pages.dev/) です。
 
 | 項目 | 設定 |
 |---|---|
@@ -86,8 +94,10 @@ python3 -m http.server 4173
 
 [3] [Three.js — InstancedMesh](https://threejs.org/docs/pages/InstancedMesh.html)
 
-[4] [Three.js — Post Processing](https://threejs.org/manual/en/post-processing.html)
+[4] [Three.js — Cleanup](https://threejs.org/manual/en/cleanup.html)
 
-[5] [Roblox Creator Hub — UI and UX design](https://create.roblox.com/docs/production/game-design/ui-ux-design)
+[5] [Three.js — WebGLRenderer](https://threejs.org/docs/pages/WebGLRenderer.html)
 
-[6] [Cloudflare Pages — Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/)
+[6] [Roblox Creator Hub — UI and UX design](https://create.roblox.com/docs/production/game-design/ui-ux-design)
+
+[7] [Cloudflare Pages — Git integration](https://developers.cloudflare.com/pages/configuration/git-integration/)
