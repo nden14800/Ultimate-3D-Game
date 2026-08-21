@@ -17,3 +17,9 @@ City Atlasはコンテキストの「マップ」ボタンから全画面表示�
 ## Phase 6 検証
 
 独自生成したガラス・金属ファサード素材を、近傍の建物ストリップへ適用した。建物本体、屋上縁、屋上設備、ガラスのファサード、発光する入口を階層化し、従来の単純な立方体だけの外観を置き換えた。植生は幹と複数の葉冠を持つ立体構成に更新し、雲は品質と天候に応じて透明度を変える層として追加した。通常品質でローカル起動後の建物、屋上、植生の描画と、ブラウザコンソールに実行時エラーがないことを確認した。すべての手続き生成建物には入口座標と汎用屋内テンプレートを関連付け、近接時の`E`プロンプトから入室できる構成にした。
+
+## Phase 7・8 検証と本番反映
+
+NPC個別会話モーダルの閉じる操作、会話入力欄、送信操作、LOCAL AI状態表示がDOM上で検出されることを確認した。World SettingsにはQwen 0.5B、Hermes 3B、Llama 8Bの三段階モデル選択と、端末内キャッシュ状態を説明する領域を追加した。静的統合検証ではJavaScript構文、131件のDOM要素と116件のJavaScript参照の整合、43件のBootstrap Icons参照、WebLLMモジュール取得、生成ファサード素材、公共交通、全建物入室、クラウド層、NPC会話モーダルを確認し、すべて成功した。
+
+GitHub `main`へコミット`8f86fa1`（`feat: expand city realism transit and local AI`）を反映した。Cloudflare Pagesの本番デプロイ`fd2bed0e`はGitHub pushを契機に作成され、clone、build、deployのすべてが成功している。公開URLは`https://ultimate-3d-game.pages.dev/`、同デプロイの固有URLは`https://fd2bed0e.ultimate-3d-game.pages.dev`である。
