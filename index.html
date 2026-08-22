@@ -2168,8 +2168,19 @@
             npcs.slice().forEach((npc, index) => {
                 const modern = createCharacter(index % 6, true);
                 if (!modern) return;
+                const previousData = npc.userData || {};
+                const previousBrain = previousData.brain;
+                const preservedData = { ...previousData };
+                delete preservedData.animationController;
+                delete preservedData.brain;
                 modern.position.copy(npc.position); modern.quaternion.copy(npc.quaternion);
-                modern.userData = { ...modern.userData, ...npc.userData };
+                modern.userData = {
+                    ...modern.userData,
+                    ...preservedData,
+                    brain: previousBrain ? { ...previousBrain, home: previousBrain.home?.clone?.() || npc.position.clone() } : undefined
+                };
+                modern.targetPosition = npc.targetPosition?.clone?.() || npc.position.clone();
+                if (!modern.userData.brain) createNpcBrain(modern);
                 npcMixers.delete(npc);
                 scene.remove(npc); scene.add(modern); npcs[index] = modern;
             });
@@ -2376,6 +2387,7 @@
                 }
                 if ((brain.state === 'wait' || brain.state === 'talk') && time < brain.stateUntil) { setCharacterAnimation(npc, 'Idle'); continue; }
                 if (brain.state === 'wait' || brain.state === 'talk') chooseNpcDestination(npc, time);
+                if (!npc.targetPosition) { createNpcBrain(npc); setCharacterAnimation(npc, 'Idle'); continue; }
                 const toTarget = npc.targetPosition.clone().sub(npc.position);
                 toTarget.y = 0;
                 if (toTarget.lengthSq() < 2.25) { enterNpcWait(npc, time); setCharacterAnimation(npc, 'Idle'); continue; }

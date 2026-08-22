@@ -42,6 +42,7 @@ checks = {
     'non_affiliation_copy': 'ブランド非提携・独自設計のゲーム内端末' in html,
     'wind_credit': 'Strong Wind Blowing — Flixberry Entertainment (CC BY 3.0/4.0)' in html,
     'weather_profiles': all(token in html for token in ('function applyWeatherSurfaceProfile', 'let activeWeather', 'function changeWeather(weather)')),
+    'npc_state_preserved_on_model_swap': all(token in html for token in ('modern.targetPosition = npc.targetPosition?.clone?.() || npc.position.clone()', 'if (!npc.targetPosition) { createNpcBrain(npc); setCharacterAnimation(npc, \'Idle\'); continue; }')),
 }
 
 module_match = re.search(r'<script type="module">\s*(.*?)\s*</script>', html, re.S)
