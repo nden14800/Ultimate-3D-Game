@@ -85,3 +85,19 @@ W3C Pointer Events仕様は、`pointerdown`、`pointermove`、`pointerup`をマ�
 [17] [Three.js — OrbitControls](https://threejs.org/docs/pages/OrbitControls.html)
 
 [18] [W3C — Pointer Events](https://www.w3.org/TR/pointerevents/)
+
+## 2026-08-22 — 外部フリー3Dモデルの採用
+
+現行の手続き生成メッシュだけでは、車両と近傍建物のシルエットが単純になりやすいため、ブラウザ配信に適したGLB形式の外部モデルを採用する。候補は、明示的にCC0を表示する公式配布ページからのみ選定した。
+
+| 採用パック | 採用ファイル | 用途 | 配布形式 | ライセンス | 配信サイズ |
+|---|---|---|---|---|---:|
+| Kenney Car Kit | `hatchback-sports.glb` | スポーツカー、交通車両 | GLB 2.0 | CC0 1.0 | 197,804 bytes |
+| Kenney Car Kit | `delivery.glb` | 配達バン | GLB 2.0 | CC0 1.0 | 240,264 bytes |
+| Kenney Car Kit | `taxi.glb` | タクシー | GLB 2.0 | CC0 1.0 | 175,608 bytes |
+| Kenney City Kit (Suburban) | `building-type-a.glb` | 近傍住宅のアクセント | GLB 2.0 | CC0 1.0 | 98,604 bytes |
+| Kenney City Kit (Suburban) | `building-type-f.glb` | 近傍商業建物のアクセント | GLB 2.0 | CC0 1.0 | 138,536 bytes |
+
+合計配信サイズは約840 KiBである。各ファイルは`file`コマンドでglTF binary model version 2として確認した。採用ファイルと出典は`assets/models/kenney/LICENSE-AND-SOURCES.md`に記録する。全車両・建物を無条件に外部モデルへ置換せず、GLTFLoaderによる非同期読込後、プレイヤー近傍とガレージ出現車両へ優先適用する。これにより無限チャンクのインスタンシングを維持し、初期描画とモバイル性能への影響を限定する。
+
+参照: [Kenney Car Kit](https://kenney.nl/assets/car-kit)、[Kenney City Kit (Suburban)](https://kenney.nl/assets/city-kit-suburban)、[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)。

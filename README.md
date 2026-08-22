@@ -13,7 +13,8 @@
 | 衝突 | 建物、City Hubの外壁、配置済みモジュール、車両、屋内壁を軽量な境界判定の対象にします。壁をすり抜けず、移動時は壁沿いに滑るよう解決します。 |
 | 建物内探索 | City Hubに加え、すべての手続き生成建物に発光する入口と屋内テンプレートを関連付けます。入口の近くで`E`または「使う」を選ぶと入室でき、出口ゲートから安全に街へ戻れます。 |
 | 車両と公共交通 | クルーザー、スポーツカー、ホバーバイク、配達バン、シティバイク、タクシーに加え、**シティバスと路面電車**が道路グリッドの循環路線を走行します。操作車両は操舵角、加速、制動、惰性を持ち、カメラ相対の前進方向を徒歩と統一しています。 |
-| 都市と車両の表現 | 遠景はインスタンシングで軽く保ち、近傍はPBR系マテリアル、独自生成のガラス・金属ファサード、屋上縁、屋上設備、発光する入口、立体的な幹と葉冠、独立した車輪、ガラス、バンパー、フードなどを加えています。 |
+| CC0外部3Dモデル | KenneyのCar KitとCity Kit (Suburban)から、CC0表示を確認したスポーツカー、配達バン、タクシー、住宅・商業建物をGLBで読み込みます。車両は既存の物理・乗降・交通処理と組み合わせ、近傍建物だけをアクセント表示します。出典、ファイル、ライセンスは[`assets/models/kenney/LICENSE-AND-SOURCES.md`](assets/models/kenney/LICENSE-AND-SOURCES.md)に保存しています。[10] [11] |
+| 都市と車両の表現 | 遠景はインスタンシングで軽く保ち、近傍はPBR系マテリアル、独自生成のガラス・金属ファサード、CC0 GLB車両、屋上縁、屋上設備、発光する入口、立体的な幹と葉冠、独立した車輪、ガラス、バンパー、フードなどを加えています。 |
 | Build Belt | 画面下中央の独自クイックバーで、五つの建築素材、回転、削除、Field Packを即時に操作できます。既存作品のUI・名称・アセットには依存しません。 |
 | Field Pack | `Tab`またはBuild Beltから開く創作インベントリです。Turf Deck、Stone Core、Timber Stack、Clear Prism、Alloy Moduleを選択できます。 |
 | 建築 | グリッドにスナップするゴースト表示を使い、左クリックで素材別モジュールを配置します。`R`で90度回転し、右クリックまたはRemoveモードで除去できます。セッションごとに最大240個を配置できます。 |
@@ -83,11 +84,12 @@ ES Modulesを使うため、`file://`ではなくHTTPサーバーで確認して
 python3 -m http.server 4173
 ```
 
-起動後、[http://localhost:4173/](http://localhost:4173/) を開きます。検証用には、JavaScript構文、DOM参照、Bootstrap Iconsスプライト、WebLLMモジュールURLを確認する`validate_refresh.py`に加え、ワールド参加、共通視点入力、モバイル同等操作、Atlas、HUD整理を確認する`validate_phase10.py`も用意しています。
+起動後、[http://localhost:4173/](http://localhost:4173/) を開きます。検証用には、JavaScript構文、DOM参照、Bootstrap Iconsスプライト、WebLLMモジュールURLを確認する`validate_refresh.py`に加え、ワールド参加、共通視点入力、モバイル同等操作、Atlas、HUD整理を確認する`validate_phase10.py`、CC0 GLB・テクスチャ・GLTFLoader統合を確認する`validate_phase11_external_models.py`も用意しています。
 
 ```bash
 python3 validate_refresh.py
 python3 validate_phase10.py
+python3 validate_phase11_external_models.py
 ```
 
 ## Cloudflare Pages
@@ -122,3 +124,7 @@ python3 validate_phase10.py
 [8] [Chrome for Developers — Cache models in the browser](https://developer.chrome.com/docs/ai/cache-models)
 
 [9] [MDN — Cache](https://developer.mozilla.org/en-US/docs/Web/API/Cache)
+
+[10] [Kenney — Car Kit](https://kenney.nl/assets/car-kit)
+
+[11] [Kenney — City Kit (Suburban)](https://kenney.nl/assets/city-kit-suburban)

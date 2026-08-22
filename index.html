@@ -828,6 +828,7 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { Sky } from 'three/addons/objects/Sky.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
         let scene, renderer, character, orbitControls, playerGroup, sky, sun, labelRenderer, buildingMaterial;
         let cameras = {}, currentCamera, currentCameraIndex = 0;
@@ -907,6 +908,15 @@
         let activeLookPointerId = null, freeCamYaw = 0, freeCamPitch = -0.18, firstPersonPitch = 0;
         const freeCamDirection = new THREE.Vector3(), freeCamLookTarget = new THREE.Vector3();
         let selectedWorldId = 'harbor';
+        const externalModelTemplates = new Map();
+        let externalModelsReady = false;
+        const EXTERNAL_MODEL_SOURCES = {
+            hatchback: 'assets/models/kenney/car/hatchback-sports.glb',
+            delivery: 'assets/models/kenney/car/delivery.glb',
+            taxi: 'assets/models/kenney/car/taxi.glb',
+            buildingA: 'assets/models/kenney/city/building-type-a.glb',
+            buildingF: 'assets/models/kenney/city/building-type-f.glb'
+        };
 
         const NPC_MESSAGES = [
             "こんにちは！", "やあ！", "いい天気だね。", "元気？", "調子はどう？", "また会ったね！", "今日は何を？", "どこへ行くの？", "良い一日を！", "こんばんは。",
@@ -1010,6 +1020,7 @@
 
             createCityMap();
             createSandboxWorld();
+            loadExternalModelLibrary();
             drawMapBackground();
             updateTime(parseFloat(document.getElementById('time-slider').value));
 
@@ -1242,7 +1253,7 @@
             const entryMesh=new THREE.InstancedMesh(chunkAssets.entryGeometry,chunkAssets.entryMaterial,Math.max(specs.length,1));specs.forEach((spec,index)=>{helper.position.set(spec.entrance.x,1.35,spec.entrance.z+.1);helper.rotation.set(0,0,0);helper.scale.set(Math.min(2.3,spec.size*.38),2.7,1);helper.updateMatrix();entryMesh.setMatrixAt(index,helper.matrix);});entryMesh.count=specs.length;entryMesh.instanceMatrix.needsUpdate=true;entryMesh.userData.dynamicShadowCaster=true;group.add(entryMesh);
             const treeLocations=[];for(let index=0;index<9;index++){const x=origin.x+5+hash2D(cx+index,cz,151)*(CHUNK_SIZE-10),z=origin.z+5+hash2D(cx,cz-index,173)*(CHUNK_SIZE-10);if(!isRoadCoordinate(x)&&!isRoadCoordinate(z)&&!specs.some(spec=>Math.abs(spec.x-x)<spec.size&&Math.abs(spec.z-z)<spec.size))treeLocations.push({x,z,s:.75+hash2D(cx,cz,index)*.62});}
             if(treeLocations.length){const trunks=new THREE.InstancedMesh(chunkAssets.trunkGeometry,chunkAssets.barkMaterial,treeLocations.length),crowns=new THREE.InstancedMesh(chunkAssets.crownGeometry,chunkAssets.leafMaterial,treeLocations.length*3),highlights=new THREE.InstancedMesh(chunkAssets.crownGeometry,chunkAssets.leafLightMaterial,treeLocations.length*2);let crownIndex=0,lightIndex=0;treeLocations.forEach((tree,index)=>{helper.position.set(tree.x,1.2*tree.s,tree.z);helper.rotation.set(0,hash2D(cx,cz,index+191)*Math.PI*2,0);helper.scale.set(tree.s,2.4*tree.s,tree.s);helper.updateMatrix();trunks.setMatrixAt(index,helper.matrix);[[-.42,.35,.42],[.42,.42,.35],[0,.78,.52]].forEach((offset,j)=>{helper.position.set(tree.x+offset[0]*tree.s,2.25*tree.s+offset[1]*tree.s,tree.z+offset[2]*tree.s);helper.scale.set(1.15*tree.s,1.05*tree.s,1.05*tree.s);helper.updateMatrix();crowns.setMatrixAt(crownIndex++,helper.matrix);if(j<2){helper.position.y+=.22*tree.s;helper.scale.multiplyScalar(.72);helper.updateMatrix();highlights.setMatrixAt(lightIndex++,helper.matrix);}});});trunks.instanceMatrix.needsUpdate=true;crowns.instanceMatrix.needsUpdate=true;highlights.instanceMatrix.needsUpdate=true;[trunks,crowns,highlights].forEach(mesh=>{mesh.receiveShadow=true;mesh.userData.dynamicShadowCaster=true;});group.add(trunks,crowns,highlights);}
-            const entries=specs.map(spec=>({position:spec.entrance.clone(),label:spec.label,spec,chunkKey:chunkKey(cx,cz),visible:true}));buildings.push(...entries);const colliders=specs.map(spec=>({minX:spec.x-spec.size*.53,maxX:spec.x+spec.size*.53,minZ:spec.z-spec.size*.53,maxZ:spec.z+spec.size*.53,kind:'building'}));let hub=null;if(cx===0&&cz===0){hub=createCityHubExterior(new THREE.Vector3(20,0,20));group.add(hub.group);colliders.push(...hub.colliders);activeCityHub=hub;}mapObjects.add(group);loadedChunks.set(chunkKey(cx,cz),{cx,cz,group,ground,specs,entries,colliders,hub});sandboxGround=ground;chunkLoadCount++;
+            const entries=specs.map(spec=>({position:spec.entrance.clone(),label:spec.label,spec,chunkKey:chunkKey(cx,cz),visible:true}));buildings.push(...entries);const colliders=specs.map(spec=>({minX:spec.x-spec.size*.53,maxX:spec.x+spec.size*.53,minZ:spec.z-spec.size*.53,maxZ:spec.z+spec.size*.53,kind:'building'}));let hub=null;if(cx===0&&cz===0){hub=createCityHubExterior(new THREE.Vector3(20,0,20));group.add(hub.group);colliders.push(...hub.colliders);activeCityHub=hub;}mapObjects.add(group);const chunkRecord={cx,cz,group,ground,specs,entries,colliders,hub,buildingVisuals:{buildingMesh,roofMesh,roofUnits,facadeMesh,entryMesh},externalBuildingAdded:false};loadedChunks.set(chunkKey(cx,cz),chunkRecord);if(externalModelsReady)decorateChunkWithExternalBuilding(chunkRecord);sandboxGround=ground;chunkLoadCount++;
         }
 
         function createCityHubExterior(center) {
@@ -1409,6 +1420,114 @@
             return label;
         }
 
+        function prepareExternalTemplate(root) {
+            root.traverse(node => {
+                if (!node.isMesh) return;
+                node.castShadow = false;
+                node.receiveShadow = true;
+                if (node.material) {
+                    node.material = node.material.clone();
+                    node.material.needsUpdate = true;
+                }
+            });
+            return root;
+        }
+
+        function normalizeExternalObject(root, targetFootprint, targetHeight = Infinity) {
+            root.updateMatrixWorld(true);
+            const before = new THREE.Box3().setFromObject(root);
+            const size = before.getSize(new THREE.Vector3());
+            const horizontal = Math.max(size.x, size.z, 0.001);
+            const vertical = Math.max(size.y, 0.001);
+            const scale = Math.min(targetFootprint / horizontal, targetHeight / vertical);
+            root.scale.setScalar(scale);
+            root.updateMatrixWorld(true);
+            const after = new THREE.Box3().setFromObject(root);
+            root.position.y -= after.min.y;
+            return root;
+        }
+
+        function vehicleExternalModelKey(type) {
+            if (type === 'van') return 'delivery';
+            if (type === 'taxi') return 'taxi';
+            if (type === 'car' || type === 'sports') return 'hatchback';
+            return null;
+        }
+
+        function attachExternalVehicleModel(vehicle) {
+            const key = vehicleExternalModelKey(vehicle.userData.type);
+            const template = key && externalModelTemplates.get(key);
+            if (!template || vehicle.userData.externalVisual) return;
+            const visual = normalizeExternalObject(template.clone(true), vehicle.userData.type === 'van' ? 4.0 : 3.55, 2.15);
+            visual.position.y += 0.08;
+            visual.name = `cc0-${key}-visual`;
+            visual.traverse(node => { if (node.isMesh) { node.castShadow = !vehicle.userData.traffic; node.receiveShadow = true; } });
+            vehicle.add(visual);
+            vehicle.userData.proceduralChildren.forEach(child => { child.visible = false; });
+            vehicle.userData.externalVisual = visual;
+        }
+
+        function applyExternalVehicleModels() {
+            [...vehicles, ...trafficVehicles].forEach(attachExternalVehicleModel);
+        }
+
+        function hideProceduralBuilding(chunk, index) {
+            const visual = chunk.buildingVisuals;
+            if (!visual) return;
+            const zero = new THREE.Matrix4().makeScale(0, 0, 0);
+            [visual.buildingMesh, visual.roofMesh, visual.roofUnits, visual.entryMesh].forEach(mesh => {
+                mesh.setMatrixAt(index, zero);
+                mesh.instanceMatrix.needsUpdate = true;
+            });
+            for (let facadeIndex = index * 12; facadeIndex < index * 12 + 12; facadeIndex++) {
+                visual.facadeMesh.setMatrixAt(facadeIndex, zero);
+            }
+            visual.facadeMesh.instanceMatrix.needsUpdate = true;
+        }
+
+        function decorateChunkWithExternalBuilding(chunk) {
+            if (!externalModelsReady || chunk.externalBuildingAdded || !chunk.specs.length) return;
+            const center = new THREE.Vector3(chunk.cx * CHUNK_SIZE + CHUNK_SIZE / 2, 0, chunk.cz * CHUNK_SIZE + CHUNK_SIZE / 2);
+            if (center.distanceToSquared(playerGroup.position) > (CHUNK_SIZE * 2.15) ** 2) return;
+            const index = Math.floor(hash2D(chunk.cx, chunk.cz, 611) * chunk.specs.length);
+            const key = (chunk.cx + chunk.cz) % 2 === 0 ? 'buildingA' : 'buildingF';
+            const template = externalModelTemplates.get(key);
+            if (!template) return;
+            const spec = chunk.specs[index];
+            const visual = normalizeExternalObject(template.clone(true), spec.size * 1.02, spec.height * 0.94);
+            visual.position.x += spec.x;
+            visual.position.z += spec.z;
+            visual.name = `cc0-${key}-landmark`;
+            visual.traverse(node => { if (node.isMesh) { node.castShadow = qualityMode === 'visual'; node.receiveShadow = true; } });
+            hideProceduralBuilding(chunk, index);
+            chunk.group.add(visual);
+            chunk.externalBuildingAdded = true;
+        }
+
+        function decorateExternalBuildings() {
+            loadedChunks.forEach(decorateChunkWithExternalBuilding);
+        }
+
+        function loadExternalModelLibrary() {
+            const loader = new GLTFLoader();
+            const entries = Object.entries(EXTERNAL_MODEL_SOURCES);
+            Promise.all(entries.map(([key, url]) => new Promise((resolve, reject) => {
+                loader.load(url, gltf => {
+                    const root = gltf.scene || gltf.scenes?.[0];
+                    if (!root) { reject(new Error(`No scene in ${url}`)); return; }
+                    externalModelTemplates.set(key, prepareExternalTemplate(root));
+                    resolve(key);
+                }, undefined, reject);
+            }))).then(() => {
+                externalModelsReady = true;
+                applyExternalVehicleModels();
+                decorateExternalBuildings();
+                if (gameStarted) setSandboxMessage('CC0外部モデルを読み込み、近傍の車両と建物へ適用しました。');
+            }).catch(error => {
+                console.warn('CC0モデルは読み込めなかったため、標準モデルを使用します。', error);
+            });
+        }
+
         function createVehicleModel(type, traffic = false) {
             const group = new THREE.Group();
             const specs = {
@@ -1457,11 +1576,13 @@
                 if(type==='sports') box([1.25,.10,.22],[0,1.32,-1.38],trimMat);
                 if(type==='taxi') { box([.86,.2,.42],[0,1.46,-.12],new THREE.MeshBasicMaterial({color:0xf5fbff})); box([.52,.08,.46],[0,1.59,-.12],lampMat); }
             }
+            const proceduralChildren = group.children.slice();
             const ring = new THREE.Mesh(new THREE.RingGeometry(Math.max(1.35, type==='bus'||type==='tram'?2.1:1.35), Math.max(1.48, type==='bus'||type==='tram'?2.24:1.48), 32), new THREE.MeshBasicMaterial({ color:traffic?0xffd66d:0x86f4ff,transparent:true,opacity:0,side:THREE.DoubleSide }));
             ring.rotation.x=-Math.PI/2; ring.position.y=.025; group.add(ring);
             const prompt=addVehicleProximityLabel(group); prompt.position.y = (type==='bus'||type==='tram') ? 3.0 : 2.55;
             group.traverse(node=>{ if(node.isMesh){node.castShadow=node.castShadow && !traffic;node.receiveShadow=true;} });
-            group.userData={...palette,type,traffic,boardable:traffic && ['bus','tram','taxi'].includes(type),transit:['bus','tram'].includes(type),speed:traffic?palette.cruise*(.84+Math.random()*.18):0,steer:0,ring,active:false,axis:Math.random()>.5?'x':'z',direction:Math.random()>.5?1:-1,wheels,prompt,route:null,routeIndex:0,stopTimer:0,stopIndices:[],rolling:0};
+            group.userData={...palette,type,traffic,boardable:traffic && ['bus','tram','taxi'].includes(type),transit:['bus','tram'].includes(type),speed:traffic?palette.cruise*(.84+Math.random()*.18):0,steer:0,ring,active:false,axis:Math.random()>.5?'x':'z',direction:Math.random()>.5?1:-1,wheels,prompt,route:null,routeIndex:0,stopTimer:0,stopIndices:[],rolling:0,proceduralChildren,externalVisual:null};
+            if (externalModelsReady) attachExternalVehicleModel(group);
             return group;
         }
 
