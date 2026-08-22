@@ -101,3 +101,69 @@ W3C Pointer Events仕様は、`pointerdown`、`pointermove`、`pointerup`をマ�
 合計配信サイズは約840 KiBである。各ファイルは`file`コマンドでglTF binary model version 2として確認した。採用ファイルと出典は`assets/models/kenney/LICENSE-AND-SOURCES.md`に記録する。全車両・建物を無条件に外部モデルへ置換せず、GLTFLoaderによる非同期読込後、プレイヤー近傍とガレージ出現車両へ優先適用する。これにより無限チャンクのインスタンシングを維持し、初期描画とモバイル性能への影響を限定する。
 
 参照: [Kenney Car Kit](https://kenney.nl/assets/car-kit)、[Kenney City Kit (Suburban)](https://kenney.nl/assets/city-kit-suburban)、[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)。
+
+## 2026-08-22 — Galaxy S26風ゲーム内スマホの参照方針
+
+Samsungの公式製品ページおよび公式発表を確認した。Galaxy S26は6.3インチ表示、7.2mm厚、4,300mAh、Android 16／One UI 8.5を示し、S26シリーズは統一された角丸、半透明のカメラアイランド、120Hz適応リフレッシュレート、カメラ・AI・プライバシーを重視する設計として紹介されている。[19] [20]
+
+本ゲームではSamsungロゴ、One UIの画面、公式アプリアイコン、商標固有のUIを複製しない。代わりに、上記の一般的な製品特性を参考にした独自名称の**City Link S26**を実装する。薄い角丸の3D端末モデル、半透明の3レンズ風カメラ島、120Hz風の滑らかな独自UI、バッテリー、天候、地図、写真、設定、建築パックへのショートカットをゲーム内機能として提供する。端末は実在のAndroid、One UI、Galaxy AI、Samsungアカウント、通信機能を実装・模倣するものではない。
+
+[19] [Samsung — Galaxy S26 | S26+](https://www.samsung.com/us/smartphones/galaxy-s26/)
+
+[20] [Samsung Newsroom — Galaxy S26 Series announcement](https://news.samsung.com/uk/samsung-unveils-galaxy-s26-series-the-most-intuitive-galaxy-ai-phone-yet)
+
+## 2026-08-22 — キャラクター、モーション、天候音のフリーアセット候補
+
+QuaterniusのUniversal Animation Libraryは、ユニバーサルなヒューマノイドリグ向けの120種類以上のアニメーションをGLB・FBX・Blendで提供し、8方向移動、ジョグ、スプリント、押す、泳ぐ、座る、死亡などを含むCC0パックである。[21] 同作者のAnimated Platformer Characterは、可愛い低ポリのアニメーション付きキャラクターとしてPoly PizzaにGLTF形式・CC0で掲載されている。[22] KenneyのAnimated Characters Protagonistsは8個の3DキャラクターアセットをCC0として配布している。[23]
+
+プレイヤーとNPCのモデルには、GLTFLoaderで読み込めるCC0のキャラクターを優先し、歩行・走行・待機をAnimationMixerで切り替える。まずは既存の操作・衝突・カメラの根本を保持し、既存の球体キャラクターから視覚モデルを置換する。複数NPCへの高価なスケルトンアニメーションは品質設定に応じて間引く。
+
+雨・雪・風の環境音は、まずCC0条件を明示するOpenGameArtまたは同じく権利条件の明確な配布元から個別に取得し、雨、雪、強風、雷、端末／UI、乗降、足音を個別の音量チャンネルとして実装する。音源候補の個別ライセンスとファイルは取得時に別途記録する。[24]
+
+[21] [Quaternius — Universal Animation Library](https://quaternius.com/packs/universalanimationlibrary.html)
+
+[22] [Poly Pizza — Animated Platformer Character](https://poly.pizza/m/kKtL4zvS3n)
+
+[23] [Kenney — Animated Characters Protagonists](https://www.kenney.nl/assets/animated-characters-protagonists)
+
+[24] [OpenGameArt — rain and thunders](https://opengameart.org/content/rain-and-thunders)
+
+## 2026-08-22 — 操作と近接インタラクションの整理
+
+Roblox Creator Hubは、近くのドアや物体などの3Dオブジェクトに対する操作を近接プロンプトとして文脈表示する仕組みを説明している。[25] Minecraft公式のコントロールガイドは、モバイルの走行を移動側の明確なトグルで操作する例を示している。[26] 本作は固有のUI意匠・名称を複製せず、一般的な慣習として、対象名・行為・入力（PC `E`、モバイル「使う」）を一つの文脈プロンプトに集約する。
+
+同時に車両と建物の候補が近い場合は、最も近い対象だけでなく、画面中央へ近い視線方向、明示的に優先すべき車両操作、距離を組み合わせた選択スコアを使う。車両が操作半径内で正面方向にある場合は、建物の入口より車両を優先する。これにより、車の近くで`E`を押して誤って入室する問題を防ぐ。
+
+カメラはマウスホイール・トラックパッド・2本指ピンチを共通の滑らかな目標ズームへ接続する。三人称では追従距離、第一人称とFree CamではFOVを補間して扱い、Free Camは上下移動を含む独立した6自由度移動を維持する。
+
+[25] [Roblox Creator Hub — Proximity prompts](https://create.roblox.com/docs/ui/proximity-prompts)
+
+[26] [Minecraft — Controls](https://www.minecraft.net/en-us/article/minecraft-controls)
+
+## 2026-08-22 — 都市・植生・雲・天候音のフリーアセット
+
+Kenney Nature Kitは330個の3D自然アセットをCC0で提供し、City Kit (Roads)は道路、街灯、標識、バリア等をCC0で提供する。[27] [28] 本作は手続き生成の無限チャンクを維持しつつ、プレイヤー近傍へ`tree_detailed`、`tree_oak`、`tree_pine`、詳細な茂み、岩、街路灯、道路標識、バリアのGLBを限定して追加する。遠景の描画負荷を避けるため、同時表示数を品質設定に応じて制限する。
+
+Poly PizzaのCloudsモデルはPublic Domain (CC0)として掲載されているため、雲層の一部を外部GLBへ置換する候補にする。[29] 雲は風向・天候・時間に応じて移動、濃度、色、影の強さを変える。ゲームの視認性を壊さないため、雲の3Dモデルは空の遠景レイヤーだけに使い、雨雪の粒子は別管理する。
+
+天候音では、OpenGameArtのRain in the Gutter LoopはCC0のループ用雨音である。[30] Strong Wind BlowingはCC-BY 3.0／4.0で、作者名Flixberry Entertainmentのクレジットが必要である。[31] 本作は雨音をCC0音源として採用し、風音を採用する場合にはゲーム内Creditsと`LICENSE-AND-SOURCES.md`へ作者名・CC-BYを記載する。GPLの音源は静的サイトへ同梱する対象から外す。
+
+[27] [Kenney — Nature Kit](https://kenney.nl/assets/nature-kit)
+
+[28] [Kenney — City Kit (Roads)](https://kenney.nl/assets/city-kit-roads)
+
+[29] [Poly Pizza — Clouds by hat_my_guy](https://poly.pizza/m/gEm9CjnS9l)
+
+[30] [OpenGameArt — Rain in the Gutter Loop](https://opengameart.org/content/rain-gutter-loop)
+
+[31] [OpenGameArt — Strong Wind Blowing](https://opengameart.org/content/strong-wind-blowing)
+
+## 2026-08-22 — Phase 14／15 実装結果
+
+CC0確認済みの`Animated Platformer Character`をGLTFLoaderで読み込み、Three.jsの`AnimationMixer`で`Idle`、`Walk`、`Run`をプレイヤーとNPCへ割り当てた。外部モデルの読込に失敗した場合は既存の手続きキャラクターを維持するため、探索、衝突、会話、無限チャンクの既存機能を止めない。[22] 近傍チャンクだけにはKenneyの樹木、茂み、岩、街路灯、標識、道路バリアを追加し、外側のチャンクには既存の軽量インスタンシングを残した。[27] [28]
+
+雲はCC0のClouds GLBを既存の雲層へ追加し、晴れ、くもり、雨、雪の各プロファイルで不透明度と風による移動量を変える。雨と雪はカメラ周辺だけでパーティクルを更新し、空の散乱、霧、周辺光、PBR道路の粗さ・金属感、地面色を同時に切り替える。雨天にはCC0の雨音を、くもり・雪にはクレジット表示済みの風音をループし、UI操作と地面状態に応じた足音にもCC0音源を使用する。[29] [30] [31]
+
+スマートフォンはQuaterniusのCC0 Phone GLBを読み込み、実在のSamsung、Galaxy、One UI、ロゴ、固有UIを複製しない独自の**CityLink S26 / CityLink OS**として実装した。`F`キー、デスクトップの端末ボタン、モバイルの端末ボタンから開け、時刻、天候、座標、NPC数、移動状態、品質を読み取れる。Atlas、天候、会話、設定への導線を持ち、端末内の天候表示とゲーム状態を同じ値から更新する。[32]
+
+[32] [Poly Pizza — Phone by Quaternius](https://poly.pizza/m/k2kgBepoMU)

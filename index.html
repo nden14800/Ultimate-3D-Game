@@ -617,6 +617,52 @@
         #mobile-action-rail { display:none !important; } @media (pointer:coarse),(max-width:760px) { #world-readout { width:142px; } #world-readout .readout-row { grid-template-columns:1fr; } #world-readout .readout-chip:nth-child(2) { display:none; } #build-status { top:calc(63px + env(safe-area-inset-top)); max-width:calc(100vw - 166px); font-size:9px; } #city-desk-button { right:calc(66px + env(safe-area-inset-right)); min-width:44px; padding:0 8px; font-size:0; } #city-desk-button .bi-icon { margin:0; } #map-container { right:calc(10px + env(safe-area-inset-right)); bottom:calc(94px + env(safe-area-inset-bottom)); width:126px; height:126px; } #context-actions { display:none; } #chat-ui.conversation-dock { left:calc(10px + env(safe-area-inset-left)); bottom:calc(15px + env(safe-area-inset-bottom)); width:min(330px,calc(100vw - 152px)); } #chat-ui.conversation-dock.collapsed { transform:translateY(calc(100% - 42px)); } #build-belt { bottom:calc(10px + env(safe-area-inset-bottom)); left:50%; width:calc(100vw - 24px); max-width:none; padding:4px; border-radius:16px; } #build-belt .belt-slot { min-width:44px; min-height:47px; padding:4px; font-size:7px; } #build-belt .slot-key { display:none; } #mobile-action-rail { position:fixed; z-index:43; right:calc(10px + env(safe-area-inset-right)); bottom:calc(236px + env(safe-area-inset-bottom)); display:grid !important; grid-template-columns:repeat(2,52px); gap:7px; pointer-events:auto; } #mobile-action-rail .mobile-action { display:none; width:52px; min-height:48px; border-radius:14px; font-size:8px; } #mobile-action-rail #mobile-interact-button,#mobile-action-rail #mobile-camera-button,#mobile-action-rail #mobile-map-button,#mobile-action-rail #mobile-pause-button { display:flex; } #joystick-container { bottom:calc(14px + env(safe-area-inset-bottom)); left:calc(12px + env(safe-area-inset-left)); transform:scale(.84); transform-origin:bottom left; } #run-button { right:calc(16px + env(safe-area-inset-right)); bottom:calc(22px + env(safe-area-inset-bottom)); width:64px; height:64px; } }
         @media (max-width:820px) { .world-browser-shell,.join-setup-shell { grid-template-columns:1fr; max-width:620px; } .world-browser-intro { padding:24px; } .world-browser-intro h2,.join-setup-intro h2 { font-size:clamp(40px,12vw,60px); } .world-card-grid { grid-template-columns:1fr; } .world-card { min-height:142px; } .world-browser-primary { grid-column:auto; } .join-setting { grid-template-columns:1fr; gap:7px; } #title-screen { align-items:start; padding:calc(14px + env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom)); } }
 
+
+        /* Phase 12: stable input, explicit interaction priority, and mobile-first overlays. */
+        html, body { width:100%; height:100%; min-height:100%; overflow:hidden; overscroll-behavior:none; background:#071323; }
+        body { position:fixed; inset:0; touch-action:manipulation; }
+        input, textarea, select, #chat-log, .scroll-surface, .ui-container, #field-pack, .atlas-toolbar { overscroll-behavior:contain; }
+        #chat-ui.conversation-dock { left:18px; bottom:112px; z-index:44; }
+        #pause-screen { position:fixed; inset:0; z-index:150; width:100vw; height:100dvh; background:linear-gradient(130deg,rgba(3,12,28,.98),rgba(10,56,101,.92)); backdrop-filter:blur(18px); }
+        #pause-screen .pause-hub { min-height:100dvh; box-sizing:border-box; }
+        #city-atlas-screen { position:fixed; inset:0; z-index:170; width:100vw; height:100dvh; overflow:hidden; background:linear-gradient(140deg,#061a35,#0b3b68); }
+        #city-atlas-screen .atlas-shell { display:grid; grid-template-columns:1fr; grid-template-rows:minmax(0,1fr); width:min(1440px,100%); height:100%; min-height:0; max-width:none; margin:0 auto; padding:72px 26px 24px; box-sizing:border-box; gap:0; }
+        #city-atlas-screen .atlas-intro { display:none; }
+        #city-atlas-screen .atlas-workbench { display:grid; grid-template-rows:auto minmax(0,1fr) auto; min-height:0; height:100%; gap:11px; }
+        #city-atlas-screen .atlas-toolbar { flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; padding:2px 1px 7px; scrollbar-width:thin; }
+        #city-atlas-screen .atlas-tool, #city-atlas-screen .atlas-chip { flex:0 0 auto; }
+        #city-atlas-screen .atlas-map-frame { min-height:0; height:100%; border-radius:20px; }
+        #city-atlas-screen #city-atlas-canvas { width:100%; height:100%; min-height:0; }
+        #city-atlas-screen .atlas-footer { justify-content:space-between; min-height:48px; }
+        @media (pointer:coarse),(max-width:760px) {
+            #chat-ui.conversation-dock { left:calc(9px + env(safe-area-inset-left)); bottom:calc(88px + env(safe-area-inset-bottom)); width:min(360px,calc(100vw - 150px)); max-height:min(250px,calc(100dvh - 164px)); }
+            #chat-ui.conversation-dock.collapsed { bottom:calc(80px + env(safe-area-inset-bottom)); }
+            #city-atlas-screen .atlas-shell { padding:60px 10px 10px; }
+            #city-atlas-screen .atlas-workbench { gap:8px; }
+            #city-atlas-screen .atlas-toolbar { gap:6px; min-height:43px; }
+            #city-atlas-screen .atlas-map-frame { border-width:2px; border-radius:16px; }
+            #city-atlas-screen .atlas-footer { display:grid; grid-template-columns:1fr auto; gap:7px; }
+            #city-atlas-screen #atlas-destination-readout { grid-column:1/-1; width:auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+            #city-atlas-screen #atlas-back { display:none; }
+            #pause-screen .pause-hub { min-height:100dvh; padding-top:calc(70px + env(safe-area-inset-top)); }
+        }
+
+
+        /* Phase 14: CC0 character, atmosphere, city props, and CityLink device. */
+        #city-phone { position:fixed; z-index:181; right:calc(20px + env(safe-area-inset-right)); bottom:calc(18px + env(safe-area-inset-bottom)); width:min(372px,calc(100vw - 32px)); max-height:calc(100dvh - 36px); color:#eaf8ff; pointer-events:auto; transition:opacity .18s ease,transform .18s ease; }
+        #city-phone.hidden { opacity:0; pointer-events:none; transform:translateY(24px) scale(.96); visibility:hidden; }
+        .city-phone-shell { position:relative; overflow:hidden; border:4px solid #07131f; border-radius:38px; background:radial-gradient(circle at 20% 0%,rgba(72,188,255,.38),transparent 30%),linear-gradient(155deg,#082746,#0c5075 46%,#07182d); box-shadow:0 14px 0 rgba(0,0,0,.46),0 35px 80px rgba(0,0,0,.5),inset 0 0 0 2px rgba(182,239,255,.22); }
+        .city-phone-shell::after { position:absolute; z-index:0; inset:0; background:linear-gradient(110deg,rgba(255,255,255,.12),transparent 23%,transparent 76%,rgba(126,218,255,.10)); content:''; pointer-events:none; }
+        .city-phone-top { position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; min-height:31px; padding:8px 42px 4px 16px; color:#d8f7ff; font-size:10px; font-weight:900; letter-spacing:.06em; } .city-phone-sensors { position:absolute; z-index:2; top:9px; left:50%; width:92px; height:18px; transform:translateX(-50%); border-radius:999px; background:#02080f; box-shadow:inset 0 1px 2px rgba(255,255,255,.08); }
+        #city-phone-close { position:absolute; z-index:3; top:7px; right:8px; width:29px; height:29px; border:1px solid rgba(215,248,255,.5); border-radius:10px; color:#eafaff; background:rgba(2,21,39,.54); font-size:18px; line-height:1; }
+        .city-phone-main { position:relative; z-index:1; display:grid; gap:10px; padding:8px 13px 14px; } .city-phone-brand { display:flex; align-items:end; justify-content:space-between; gap:8px; padding:4px 3px; } .city-phone-brand b { display:block; color:#fff; font-size:22px; letter-spacing:-.06em; } .city-phone-brand small { display:block; color:#8fe3ff; font-size:8px; font-weight:900; letter-spacing:.13em; }
+        .phone-weather-card { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; min-height:66px; padding:11px; border:1px solid rgba(181,237,255,.35); border-radius:19px; background:linear-gradient(135deg,rgba(73,177,246,.3),rgba(6,46,82,.72)); box-shadow:inset 0 1px 0 rgba(255,255,255,.13); } .phone-weather-icon { display:grid; width:42px; height:42px; place-items:center; border-radius:14px; background:rgba(183,242,255,.17); font-size:24px; } .phone-weather-card b { display:block; font-size:13px; } .phone-weather-card span { display:block; margin-top:3px; color:#b6eaff; font-size:10px; font-weight:700; } .phone-weather-card strong { color:#fff; font-size:17px; }
+        .city-phone-apps { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; } .phone-app { display:flex; min-height:64px; flex-direction:column; align-items:center; justify-content:center; gap:4px; border:1px solid rgba(213,249,255,.34); border-radius:16px; color:#effbff; background:rgba(4,33,59,.62); box-shadow:inset 0 1px 0 rgba(255,255,255,.11); font-size:8px; font-weight:900; } .phone-app .bi-icon { width:19px; height:19px; color:#8fe6ff; } .phone-app:active { transform:scale(.96); background:rgba(57,163,222,.56); }
+        .phone-live-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; } .phone-live-cell { min-width:0; padding:8px; border-radius:12px; background:rgba(0,12,27,.35); } .phone-live-cell small { display:block; color:#8fc9e2; font-size:8px; font-weight:850; letter-spacing:.1em; } .phone-live-cell b { display:block; overflow:hidden; margin-top:4px; color:#f3fcff; font-size:10px; text-overflow:ellipsis; white-space:nowrap; }
+        .city-phone-note { margin:0; color:#a5d8ed; font-size:8px; font-weight:700; line-height:1.45; text-align:center; } .asset-credit { margin:10px 0 0; color:#7aa3bf; font-size:9px; line-height:1.5; }
+        #quick-phone { color:#174e83; } #quick-phone .bi-icon { color:#176db0; }
+        @media (pointer:coarse),(max-width:760px) { #city-phone { right:calc(8px + env(safe-area-inset-right)); bottom:calc(8px + env(safe-area-inset-bottom)); width:min(350px,calc(100vw - 16px)); } .city-phone-shell { border-radius:32px; } #mobile-action-rail #mobile-phone-button { display:flex; } }
+
         </style>
 </head>
 <body>
@@ -658,7 +704,7 @@
             <div class="world-settings-grid">
                 <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cloud-sun-fill"></use></svg>WORLD ATMOSPHERE</h3><div class="settings-field"><label for="weather-select">天気</label><select id="weather-select"><option value="sunny">晴れ</option><option value="cloudy">くもり</option><option value="rainy">雨</option><option value="snowy">雪</option></select></div><div class="settings-field"><label for="time-slider">時間 <span id="time-label">12:00</span></label><input type="range" id="time-slider" min="0" max="23.99" value="12" step="0.01"></div></section>
                 <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#speedometer2"></use></svg>RENDER PROFILE</h3><div class="settings-field"><label for="quality-select">品質プリセット <span id="perf-readout">最適化モード</span></label><select id="quality-select"><option value="performance">軽量</option><option value="balanced" selected>プレミアム（推奨）</option><option value="visual">ウルトラ画質</option></select></div><div class="settings-field"><label for="draw-distance-slider">描画チャンク <span id="draw-distance-label">2 chunks</span></label><input type="range" id="draw-distance-slider" min="1" max="3" value="2" step="1"></div></section>
-                <section class="world-settings-card soundtrack"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#music-note-beamed"></use></svg>ORIGINAL SOUNDTRACK</h3><label class="settings-toggle"><input type="checkbox" id="bgm-toggle" checked>探索BGMを再生する</label><div class="settings-field"><label for="bgm-volume">音量 <span id="bgm-volume-label">42%</span></label><input type="range" id="bgm-volume" min="0" max="100" value="42" step="1"></div><div class="track-readout"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#soundwave"></use></svg><span><b>Neon City Drift</b><br>完全オリジナル・インストゥルメンタル</span></div></section>
+                <section class="world-settings-card soundtrack"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#music-note-beamed"></use></svg>ORIGINAL SOUNDTRACK</h3><label class="settings-toggle"><input type="checkbox" id="bgm-toggle" checked>探索BGMを再生する</label><div class="settings-field"><label for="bgm-volume">音量 <span id="bgm-volume-label">42%</span></label><input type="range" id="bgm-volume" min="0" max="100" value="42" step="1"></div><div class="track-readout"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#soundwave"></use></svg><span><b>Neon City Drift</b><br>完全オリジナル・インストゥルメンタル</span></div><p class="asset-credit">環境音クレジット: Strong Wind Blowing — Flixberry Entertainment (CC BY 3.0/4.0)</p></section>
                 <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#buildings-fill"></use></svg>CITY ACTIVITY</h3><label class="settings-toggle"><input type="checkbox" id="traffic-toggle" checked>交通車両を動かす</label><div class="button-grid" style="margin-top:15px"><button class="action-button warm" id="place-prop-btn" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>ブロック配置</button><button class="action-button danger" id="clear-props-btn" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#trash3-fill"></use></svg>配置を消す</button></div></section>
                 <section class="world-settings-card"><h3><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cpu-fill"></use></svg>LOCAL AI PROFILE</h3><div class="settings-field"><label for="local-ai-model">会話モデル</label><select id="local-ai-model"><option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">省メモリ · Qwen 0.5B</option><option value="Hermes-3-Llama-3.2-3B-q4f16_1-MLC">高品質 · Hermes 3B</option><option value="Llama-3.1-8B-Instruct-q4f16_1-MLC">最高品質 · Llama 8B</option></select></div><p id="local-ai-storage-status" class="ai-model-status">モデルは開始時にのみ読み込みます。選択状態はこの端末に保存されます。</p></section>
                 <div class="world-settings-actions"><button id="world-settings-back" class="world-settings-back" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg>ゲームへ戻る</button></div>
@@ -672,7 +718,7 @@
             <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#person-walking"></use></svg>MOVE & LOOK</h3><p><kbd>WASD</kbd> / 矢印キー またはジョイスティックで移動。</p><p><kbd>Shift</kbd> または走るボタンで加速。ドラッグ／スワイプで視点操作。</p></article>
             <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg>VEHICLES & TRANSIT</h3><p>車両・建物・NPCの近くで <kbd>E</kbd> または「使う」。バス、路面電車、タクシーにも乗車できます。</p><p>City Atlasで目的地を置き、徒歩または車の自動運転を開始できます。</p></article>
             <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>BUILD BELT</h3><p><kbd>1–5</kbd> で素材、<kbd>B</kbd> で建築、<kbd>R</kbd> で回転、<kbd>7</kbd> で削除。</p><p>タッチではBuild Belt・Field Pack・建築ボタンで同じ操作を行います。</p></article>
-            <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>CAMERA & MAP</h3><p>視点ボタンで三人称、第一人称、Free Camを切替。</p><p>マップはCity Atlasで拡大、パン、レイヤー表示、目的地設定ができます。</p></article>
+            <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>CAMERA & MAP</h3><p>視点ボタンで三人称、第一人称、Free Camを切替。</p><p>マップはCity Atlasで拡大、パン、レイヤー表示、目的地設定ができます。<kbd>F</kbd> または端末ボタンでCityLinkを開き、天候、位置、住民数、各ツールへアクセスできます。</p></article>
             <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg>NPC & LOCAL AI</h3><p>会話ドックでは街の会話を確認。NPCに近づくと個別会話を開けます。</p><p>LOCAL AIは明示的に開始したときだけ端末上へ読み込まれます。</p></article>
             <article class="guide-card"><h3><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#gear-fill"></use></svg>FULL-SCREEN HUBS</h3><p><kbd>Esc</kbd> / <kbd>P</kbd> またはポーズでCity Pauseを開きます。</p><p>ガイド、地図、設定はすべて全画面で表示され、探索中のHUDを覆います。</p></article>
             <div class="guide-foot"><button id="guide-back" class="screen-primary" type="button"><svg class="bi-icon"><use href="assets/bootstrap-icons.svg#play-fill"></use></svg>ゲームへ戻る</button></div>
@@ -705,8 +751,21 @@
         <button id="belt-remove" class="belt-slot utility" type="button" aria-label="削除モード"><span class="slot-key">7</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#eraser-fill"></use></svg>Remove</button>
         <button id="field-pack-button" class="belt-slot utility" type="button" aria-label="Field Packを開く"><span class="slot-key">Tab</span><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg>Pack</button>
     </nav>
-    <aside id="context-actions" aria-label="すばやいアクション"><button id="quick-camera" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg><span class="context-label">視点</span></button><button id="quick-car" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg><span class="context-label">乗り物</span></button><button id="quick-map" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg><span class="context-label">マップ</span></button></aside>
-    <aside id="mobile-action-rail" class="mobile-ui" aria-label="モバイル追加操作"><button id="mobile-interact-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>使う</button><button id="mobile-build-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>建築</button><button id="mobile-chat-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg>会話</button><button id="mobile-map-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg>地図</button><button id="mobile-camera-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点</button><button id="mobile-zoom-in-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#zoom-in"></use></svg>拡大</button><button id="mobile-zoom-out-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#zoom-out"></use></svg>縮小</button><button id="mobile-pack-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg>パック</button><button id="mobile-pause-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#pause-fill"></use></svg>ポーズ</button></aside>
+    <aside id="context-actions" aria-label="すばやいアクション"><button id="quick-camera" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg><span class="context-label">視点</span></button><button id="quick-car" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#car-front-fill"></use></svg><span class="context-label">乗り物</span></button><button id="quick-map" class="context-action"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg><span class="context-label">マップ</span></button><button id="quick-phone" class="context-action" type="button" aria-label="CityLink端末を開く"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#phone-fill"></use></svg><span class="context-label">端末</span></button></aside>
+    <aside id="mobile-action-rail" class="mobile-ui" aria-label="モバイル追加操作"><button id="mobile-interact-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-arrow-in-right"></use></svg>使う</button><button id="mobile-build-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#box-seam-fill"></use></svg>建築</button><button id="mobile-chat-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg>会話</button><button id="mobile-map-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg>地図</button><button id="mobile-camera-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#camera-reels-fill"></use></svg>視点</button><button id="mobile-zoom-in-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#zoom-in"></use></svg>拡大</button><button id="mobile-zoom-out-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#zoom-out"></use></svg>縮小</button><button id="mobile-pack-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#backpack4-fill"></use></svg>パック</button><button id="mobile-pause-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#pause-fill"></use></svg>ポーズ</button><button id="mobile-phone-button" class="mobile-action" type="button"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#phone-fill"></use></svg>端末</button></aside>
+    <section id="city-phone" class="hidden" aria-label="CityLink端末" role="dialog" aria-modal="true">
+        <div class="city-phone-shell">
+            <div class="city-phone-sensors" aria-hidden="true"></div><button id="city-phone-close" type="button" aria-label="端末を閉じる">×</button>
+            <div class="city-phone-top"><span id="phone-time">12:00</span><span id="phone-status">CITYLINK · LOCAL</span></div>
+            <div class="city-phone-main"><div class="city-phone-brand"><div><small>CITYLINK OS · SANDBOX EDITION</small><b>CityLink S26</b></div><small>IN-GAME DEVICE</small></div>
+                <div class="phone-weather-card"><span id="phone-weather-icon" class="phone-weather-icon">☀</span><div><b id="phone-weather-label">晴れ</b><span id="phone-weather-detail">街の探索に適した空模様</span></div><strong id="phone-weather-temp">22°</strong></div>
+                <div class="city-phone-apps"><button class="phone-app" type="button" data-phone-action="map"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#map-fill"></use></svg>ATLAS</button><button class="phone-app" type="button" data-phone-action="weather"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#cloud-sun-fill"></use></svg>WEATHER</button><button class="phone-app" type="button" data-phone-action="social"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#chat-square-text-fill"></use></svg>PEOPLE</button><button class="phone-app" type="button" data-phone-action="settings"><svg class="bi-icon" aria-hidden="true"><use href="assets/bootstrap-icons.svg#gear-fill"></use></svg>SETTINGS</button></div>
+                <div class="phone-live-grid"><div class="phone-live-cell"><small>POSITION</small><b id="phone-coords">X 0 · Z 0</b></div><div class="phone-live-cell"><small>RESIDENTS</small><b id="phone-npcs">0 ACTIVE</b></div><div class="phone-live-cell"><small>MODE</small><b id="phone-mode">ON FOOT</b></div><div class="phone-live-cell"><small>QUALITY</small><b id="phone-quality">PREMIUM</b></div></div>
+                <p class="city-phone-note">Galaxy S26風のサイズ感を採用した、ブランド非提携・独自設計のゲーム内端末です。</p>
+            </div>
+        </div>
+    </section>
+
     <div id="zoom-readout" class="zoom-readout" aria-live="polite">視点 1.0×</div>
 
     <div class="ui-container" aria-label="ゲームコントロール">
@@ -829,6 +888,7 @@
         import { Sky } from 'three/addons/objects/Sky.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { clone as cloneSkeleton } from 'three/addons/utils/SkeletonUtils.js';
 
         let scene, renderer, character, orbitControls, playerGroup, sky, sun, labelRenderer, buildingMaterial;
         let cameras = {}, currentCamera, currentCameraIndex = 0;
@@ -852,6 +912,9 @@
         let interiorState = null, interiorGroup = null, genericInteriorGroup = null, activeCityHub = null, buildingEntryPrompt = null;
 
         let weatherParticles, cloudLayer = null, directionalLight, ambientLight, hemisphereLight, sandboxGround;
+        let activeWeather = 'sunny';
+        const weatherAudio = { rain:null, wind:null };
+        const sfxAudio = new Map();
         let destination = null, path = [], isAutoDriving = false;
         let vehicles = [], trafficVehicles = [], placedProps = [];
         let selectedVehicle = null, controlledVehicle = null, ridingTransit = null, nearestVehicle = null;
@@ -898,6 +961,7 @@
         const WALK_SPEED_KMH = 16;
         const RUN_SPEED_KMH = 64;
         let isRunning = false;
+        let touchRunActive = false;
 
         let isPointerDown = false;
         let pointerPosition = new THREE.Vector2();
@@ -909,13 +973,28 @@
         const freeCamDirection = new THREE.Vector3(), freeCamLookTarget = new THREE.Vector3();
         let selectedWorldId = 'harbor';
         const externalModelTemplates = new Map();
+        const externalModelAnimations = new Map();
         let externalModelsReady = false;
+        let playerMixer = null, currentPlayerAnimation = null, phoneVisual = null, cityPhoneOpen = false;
+        const npcMixers = new Map();
+        let lastFootstepAt = 0;
         const EXTERNAL_MODEL_SOURCES = {
             hatchback: 'assets/models/kenney/car/hatchback-sports.glb',
             delivery: 'assets/models/kenney/car/delivery.glb',
             taxi: 'assets/models/kenney/car/taxi.glb',
             buildingA: 'assets/models/kenney/city/building-type-a.glb',
-            buildingF: 'assets/models/kenney/city/building-type-f.glb'
+            buildingF: 'assets/models/kenney/city/building-type-f.glb',
+            character: 'assets/models/cc0-characters/animated-platformer-character.glb',
+            cloudCluster: 'assets/models/cc0-weather/cloud-cluster.glb',
+            treeDetailed: 'assets/models/kenney/nature/tree-detailed.glb',
+            treeOak: 'assets/models/kenney/nature/tree-oak.glb',
+            treePine: 'assets/models/kenney/nature/tree-pine.glb',
+            bushDetailed: 'assets/models/kenney/nature/bush-detailed.glb',
+            rockLarge: 'assets/models/kenney/nature/rock-large.glb',
+            streetlight: 'assets/models/kenney/roads/streetlight.glb',
+            streetSign: 'assets/models/kenney/roads/street-sign.glb',
+            roadBarrier: 'assets/models/kenney/roads/road-barrier.glb',
+            smartphone: 'assets/models/cc0-props/smartphone.glb'
         };
 
         const NPC_MESSAGES = [
@@ -1044,7 +1123,22 @@
             for(let i=0;i<15;i++){const cloud=new THREE.Group();const scale=7+hash2D(i,17,211)*10;for(let puff=0;puff<5;puff++){const mesh=new THREE.Mesh(geo,cloudMat);const a=puff/5*Math.PI*2;mesh.position.set(Math.cos(a)*scale*.38,(hash2D(i,puff,233)-.35)*scale*.16,Math.sin(a)*scale*.26);mesh.scale.set(scale*(.42+hash2D(i,puff,241)*.28),scale*(.15+hash2D(i,puff,251)*.14),scale*(.25+hash2D(i,puff,257)*.22));cloud.add(mesh);}cloud.position.set((hash2D(i,3,263)-.5)*150,28+hash2D(i,9,269)*22,(hash2D(i,7,271)-.5)*150);cloud.userData.phase=hash2D(i,11,277)*Math.PI*2;cloudLayer.add(cloud);}scene.add(cloudLayer);
         }
         function updateCloudLayer(time, focus) {
-            if(!cloudLayer)return;cloudLayer.position.set(Math.floor(focus.x/96)*96,0,Math.floor(focus.z/96)*96);const weather=document.getElementById('weather-select')?.value||'sunny';const targetOpacity=weather==='sunny'?.28:weather==='cloudy'?.64:.78;cloudLayer.visible=qualityMode!=='performance'||weather!=='sunny';cloudLayer.children.forEach((cloud,index)=>{cloud.position.x+=Math.sin(time*.000018+cloud.userData.phase)*.012;cloud.position.z+=Math.cos(time*.000014+cloud.userData.phase)*.008;cloud.traverse(node=>{if(node.isMesh)node.material.opacity=targetOpacity*(qualityMode==='visual'?1:.76);});});
+            if (!cloudLayer) return;
+            cloudLayer.position.set(Math.floor(focus.x / 96) * 96, 0, Math.floor(focus.z / 96) * 96);
+            const weather = activeWeather || document.getElementById('weather-select')?.value || 'sunny';
+            const profile = { sunny:{ opacity:.30, drift:.008 }, cloudy:{ opacity:.68, drift:.016 }, rainy:{ opacity:.84, drift:.043 }, snowy:{ opacity:.78, drift:.034 } }[weather];
+            cloudLayer.visible = qualityMode !== 'performance' || weather !== 'sunny';
+            cloudLayer.children.forEach((cloud, index) => {
+                const phase = cloud.userData.phase || index;
+                cloud.position.x += Math.sin(time * .000018 + phase) * profile.drift;
+                cloud.position.z += Math.cos(time * .000014 + phase) * profile.drift * .62;
+                cloud.traverse(node => {
+                    if (!node.isMesh || !node.material) return;
+                    node.material.transparent = true;
+                    node.material.opacity = profile.opacity * (qualityMode === 'visual' ? 1 : .78);
+                    node.material.needsUpdate = true;
+                });
+            });
         }
 
         function setupEventListeners() {
@@ -1054,14 +1148,17 @@
                 Object.keys(keys).forEach(key => { keys[key] = false; });
                 mobileInput.x = 0;
                 mobileInput.z = 0;
+                touchRunActive = false;
                 isRunning = false;
             };
             document.addEventListener('keydown', (e) => {
                 setInputMethod('keyboard');
                 const key = normalizedKey(e.key);
                 const editable = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+                if (!e.repeat && key === 'Escape' && cityPhoneOpen) { e.preventDefault(); setCityPhoneOpen(false); return; }
                 if (!e.repeat && (key === 'Escape' || key === 'p') && gameStarted && !editable) { e.preventDefault(); togglePause(); return; }
                 if (!gameStarted || gamePaused || editable) return;
+                if (!e.repeat && key === 'f') { e.preventDefault(); toggleCityPhone(); return; }
                 if (!e.repeat && key === 'Tab') { e.preventDefault(); toggleFieldPack(); return; }
                 if (!e.repeat && ['1', '2', '3', '4', '5'].includes(key)) { e.preventDefault(); selectBuildMaterial(['turf', 'stone', 'timber', 'glass', 'alloy'][Number(key) - 1]); return; }
                 if (!e.repeat && key === '7') { e.preventDefault(); toggleRemoveMode(); return; }
@@ -1073,7 +1170,13 @@
                 if (!e.repeat && (key === '=' || key === '+')) adjustCameraZoom(1);
                 if (!e.repeat && key === '-') adjustCameraZoom(-1);
             });
-            document.addEventListener('keyup', (e) => { keys[normalizedKey(e.key)] = false; });
+            document.addEventListener('keyup', (e) => {
+                const key = normalizedKey(e.key);
+                keys[key] = false;
+                if (key === 'Shift') isRunning = false;
+            });
+            document.addEventListener('pointerup', () => { touchRunActive = false; isRunning = false; }, { passive: true });
+            document.addEventListener('pointercancel', () => { touchRunActive = false; isRunning = false; }, { passive: true });
             window.addEventListener('blur', clearMovementInput);
             document.addEventListener('visibilitychange', () => { if (document.hidden) clearMovementInput(); });
             document.getElementById('change-camera-btn').addEventListener('click', changeCamera);
@@ -1097,6 +1200,7 @@
             document.getElementById('quick-camera').addEventListener('click', changeCamera);
             document.getElementById('quick-car').addEventListener('click', () => { spawnVehicle(); setSandboxMessage('乗り物を近くに出しました。Eキーまたはモバイルの「使う」で乗車できます。'); });
             document.getElementById('quick-map').addEventListener('click', () => { document.getElementById('map-container').classList.toggle('map-emphasis'); setSandboxMessage('ミニマップをクリックして目的地を決められます。'); });
+            document.getElementById('quick-phone').addEventListener('click', toggleCityPhone);
             document.getElementById('mobile-interact-button').addEventListener('click', handlePrimaryInteract);
             document.getElementById('mobile-build-button').addEventListener('click', togglePlaceMode);
             document.getElementById('mobile-chat-button').addEventListener('click', () => { const npc=getConversationNpc(); if(npc&&npc.position.distanceTo(getControlledObject().position)<9) openNpcDialog(npc); else { document.getElementById('chat-ui').classList.remove('collapsed'); document.getElementById('chat-input').focus(); } });
@@ -1106,6 +1210,10 @@
             document.getElementById('mobile-zoom-out-button').addEventListener('click', () => adjustCameraZoom(-1));
             document.getElementById('mobile-pack-button').addEventListener('click', () => toggleFieldPack(true));
             document.getElementById('mobile-pause-button').addEventListener('click', togglePause);
+            document.getElementById('mobile-phone-button').addEventListener('click', toggleCityPhone);
+            document.getElementById('city-phone-close').addEventListener('click', () => setCityPhoneOpen(false));
+            document.querySelectorAll('[data-phone-action]').forEach(button => button.addEventListener('click', () => handlePhoneAction(button.dataset.phoneAction)));
+            document.addEventListener('click', event => { const button = event.target.closest('button'); if (button && !button.closest('#city-phone')) playSfx(button.id?.includes('close') || button.id?.includes('back') ? 'back' : 'tap', .16); }, { passive:true });
             document.querySelectorAll('[data-build-material]').forEach(button => button.addEventListener('click', () => selectBuildMaterial(button.dataset.buildMaterial)));
             document.getElementById('belt-rotate').addEventListener('click', rotateBuildModule);
             document.getElementById('belt-remove').addEventListener('click', toggleRemoveMode);
@@ -1235,6 +1343,7 @@
             loadedChunks.forEach((chunk, key) => {
                 const visible = wanted.has(key);
                 chunk.group.visible = visible;
+                if (visible && externalModelsReady) { decorateChunkWithExternalBuilding(chunk); decorateChunkWithExternalScenery(chunk); }
                 if (!visible && Math.max(Math.abs(chunk.cx - focus.cx), Math.abs(chunk.cz - focus.cz)) > retainRadius) unloadChunk(key);
             });
             applyChunkDrawDistance();
@@ -1253,7 +1362,7 @@
             const entryMesh=new THREE.InstancedMesh(chunkAssets.entryGeometry,chunkAssets.entryMaterial,Math.max(specs.length,1));specs.forEach((spec,index)=>{helper.position.set(spec.entrance.x,1.35,spec.entrance.z+.1);helper.rotation.set(0,0,0);helper.scale.set(Math.min(2.3,spec.size*.38),2.7,1);helper.updateMatrix();entryMesh.setMatrixAt(index,helper.matrix);});entryMesh.count=specs.length;entryMesh.instanceMatrix.needsUpdate=true;entryMesh.userData.dynamicShadowCaster=true;group.add(entryMesh);
             const treeLocations=[];for(let index=0;index<9;index++){const x=origin.x+5+hash2D(cx+index,cz,151)*(CHUNK_SIZE-10),z=origin.z+5+hash2D(cx,cz-index,173)*(CHUNK_SIZE-10);if(!isRoadCoordinate(x)&&!isRoadCoordinate(z)&&!specs.some(spec=>Math.abs(spec.x-x)<spec.size&&Math.abs(spec.z-z)<spec.size))treeLocations.push({x,z,s:.75+hash2D(cx,cz,index)*.62});}
             if(treeLocations.length){const trunks=new THREE.InstancedMesh(chunkAssets.trunkGeometry,chunkAssets.barkMaterial,treeLocations.length),crowns=new THREE.InstancedMesh(chunkAssets.crownGeometry,chunkAssets.leafMaterial,treeLocations.length*3),highlights=new THREE.InstancedMesh(chunkAssets.crownGeometry,chunkAssets.leafLightMaterial,treeLocations.length*2);let crownIndex=0,lightIndex=0;treeLocations.forEach((tree,index)=>{helper.position.set(tree.x,1.2*tree.s,tree.z);helper.rotation.set(0,hash2D(cx,cz,index+191)*Math.PI*2,0);helper.scale.set(tree.s,2.4*tree.s,tree.s);helper.updateMatrix();trunks.setMatrixAt(index,helper.matrix);[[-.42,.35,.42],[.42,.42,.35],[0,.78,.52]].forEach((offset,j)=>{helper.position.set(tree.x+offset[0]*tree.s,2.25*tree.s+offset[1]*tree.s,tree.z+offset[2]*tree.s);helper.scale.set(1.15*tree.s,1.05*tree.s,1.05*tree.s);helper.updateMatrix();crowns.setMatrixAt(crownIndex++,helper.matrix);if(j<2){helper.position.y+=.22*tree.s;helper.scale.multiplyScalar(.72);helper.updateMatrix();highlights.setMatrixAt(lightIndex++,helper.matrix);}});});trunks.instanceMatrix.needsUpdate=true;crowns.instanceMatrix.needsUpdate=true;highlights.instanceMatrix.needsUpdate=true;[trunks,crowns,highlights].forEach(mesh=>{mesh.receiveShadow=true;mesh.userData.dynamicShadowCaster=true;});group.add(trunks,crowns,highlights);}
-            const entries=specs.map(spec=>({position:spec.entrance.clone(),label:spec.label,spec,chunkKey:chunkKey(cx,cz),visible:true}));buildings.push(...entries);const colliders=specs.map(spec=>({minX:spec.x-spec.size*.53,maxX:spec.x+spec.size*.53,minZ:spec.z-spec.size*.53,maxZ:spec.z+spec.size*.53,kind:'building'}));let hub=null;if(cx===0&&cz===0){hub=createCityHubExterior(new THREE.Vector3(20,0,20));group.add(hub.group);colliders.push(...hub.colliders);activeCityHub=hub;}mapObjects.add(group);const chunkRecord={cx,cz,group,ground,specs,entries,colliders,hub,buildingVisuals:{buildingMesh,roofMesh,roofUnits,facadeMesh,entryMesh},externalBuildingAdded:false};loadedChunks.set(chunkKey(cx,cz),chunkRecord);if(externalModelsReady)decorateChunkWithExternalBuilding(chunkRecord);sandboxGround=ground;chunkLoadCount++;
+            const entries=specs.map(spec=>({position:spec.entrance.clone(),label:spec.label,spec,chunkKey:chunkKey(cx,cz),visible:true}));buildings.push(...entries);const colliders=specs.map(spec=>({minX:spec.x-spec.size*.53,maxX:spec.x+spec.size*.53,minZ:spec.z-spec.size*.53,maxZ:spec.z+spec.size*.53,kind:'building'}));let hub=null;if(cx===0&&cz===0){hub=createCityHubExterior(new THREE.Vector3(20,0,20));group.add(hub.group);colliders.push(...hub.colliders);activeCityHub=hub;}mapObjects.add(group);const chunkRecord={cx,cz,group,ground,specs,entries,colliders,hub,buildingVisuals:{buildingMesh,roofMesh,roofUnits,facadeMesh,entryMesh},externalBuildingAdded:false,externalSceneryAdded:false};loadedChunks.set(chunkKey(cx,cz),chunkRecord);if(externalModelsReady)decorateChunkWithExternalBuilding(chunkRecord);if(externalModelsReady)decorateChunkWithExternalScenery(chunkRecord);sandboxGround=ground;chunkLoadCount++;
         }
 
         function createCityHubExterior(center) {
@@ -1376,10 +1485,34 @@
         }
         function getNearestBuildingEntry(position) { const candidates=buildings.filter(entry=>entry.visible);return candidates.reduce((best,entry)=>{const distanceSq=entry.position.distanceToSquared(position);return(!best||distanceSq<best.distanceSq)?{entry,distanceSq}:best;},null); }
         function ensureBuildingEntryPrompt() { if(buildingEntryPrompt)return buildingEntryPrompt;const div=document.createElement('div');div.className='building-proximity';div.innerHTML='<b>E</b><span>建物に入る</span><small>BUILDING ENTRY</small>';buildingEntryPrompt=new CSS2DObject(div);buildingEntryPrompt.visible=false;scene.add(buildingEntryPrompt);return buildingEntryPrompt; }
-        function updateInteractionPrompts() { const prompt=ensureBuildingEntryPrompt();if(interiorState||controlledVehicle||ridingTransit){prompt.visible=false;return;}const nearest=getNearestBuildingEntry(playerGroup.position);const hub=getNearestCityHub(playerGroup.position);const target=hub&&(!nearest||hub.distanceSq<nearest.distanceSq)?{position:hub.hub.entrance,label:'CITY HUB',distanceSq:hub.distanceSq}:{position:nearest?.entry.position,label:nearest?.entry.label,distanceSq:nearest?.distanceSq};if(target?.position&&target.distanceSq<7.4*7.4){prompt.position.copy(target.position).add(new THREE.Vector3(0,2.45,0));prompt.visible=true;prompt.element.innerHTML=`<b>E / 使う</b><span>${target.label} に入る</span><small>BUILDING ENTRY</small>`;labelRenderUntil=Math.max(labelRenderUntil,performance.now()+240);}else prompt.visible=false; }
+        function getVehicleInteractionCandidate(position = playerGroup.position) {
+            const nearby = getNearestVehicle();
+            if (!nearby || nearby.distance > 5.5 * 5.5) return null;
+            const toVehicle = nearby.vehicle.position.clone().sub(position); toVehicle.y = 0;
+            const cameraDirection = new THREE.Vector3(); currentCamera.getWorldDirection(cameraDirection); cameraDirection.y = 0;
+            const facing = toVehicle.lengthSq() > .001 && cameraDirection.lengthSq() > .001 ? cameraDirection.normalize().dot(toVehicle.normalize()) : 0;
+            return { ...nearby, facing };
+        }
+        function shouldPrioritizeVehicleInteraction(position = playerGroup.position) {
+            const candidate = getVehicleInteractionCandidate(position);
+            // 車は至近距離、または画面正面寄りにあるとき、建物入口より先に扱う。
+            return Boolean(candidate && (candidate.distance < 3.55 * 3.55 || candidate.facing > -0.12));
+        }
+        function updateInteractionPrompts() {
+            const prompt = ensureBuildingEntryPrompt();
+            if (interiorState || controlledVehicle || ridingTransit || shouldPrioritizeVehicleInteraction()) { prompt.visible = false; return; }
+            const nearest = getNearestBuildingEntry(playerGroup.position);
+            const hub = getNearestCityHub(playerGroup.position);
+            const target = hub && (!nearest || hub.distanceSq < nearest.distanceSq) ? { position:hub.hub.entrance,label:'CITY HUB',distanceSq:hub.distanceSq } : { position:nearest?.entry.position,label:nearest?.entry.label,distanceSq:nearest?.distanceSq };
+            if (target?.position && target.distanceSq < 7.4 * 7.4) {
+                prompt.position.copy(target.position).add(new THREE.Vector3(0,2.45,0)); prompt.visible=true;
+                prompt.element.innerHTML=`<b>E / 使う</b><span>${target.label} に入る</span><small>BUILDING ENTRY</small>`;
+                labelRenderUntil=Math.max(labelRenderUntil,performance.now()+240);
+            } else prompt.visible=false;
+        }
         function tryEnterOrExitInterior() {
             if(interiorState){const origin=interiorState.origin;const exit=origin.clone().add(new THREE.Vector3(0,0,8.2));if(playerGroup.position.distanceToSquared(exit)>30){setSandboxMessage('出口ゲートに近づいて「使う」を押してください。');return true;}playerGroup.position.copy(interiorState.exitPosition.clone().add(new THREE.Vector3(0,0,-1.8)));interiorState=null;cameraOffsetSpherical.radius=Math.max(cameraOffsetSpherical.radius,8);updateChunkStreaming(playerGroup.position,true);setSandboxMessage('街の外へ戻りました。');return true;}
-            if(controlledVehicle||ridingTransit){setSandboxMessage('建物へ入る前に乗り物を降りてください。');return true;}const hub=getNearestCityHub(playerGroup.position);const building=getNearestBuildingEntry(playerGroup.position);const useHub=hub&&(!building||hub.distanceSq<building.distanceSq);if(!useHub&&(!building||building.distanceSq>7.4*7.4))return false;
+            if(controlledVehicle||ridingTransit){setSandboxMessage('建物へ入る前に乗り物を降りてください。');return true;}if(shouldPrioritizeVehicleInteraction()){return false;}const hub=getNearestCityHub(playerGroup.position);const building=getNearestBuildingEntry(playerGroup.position);const useHub=hub&&(!building||hub.distanceSq<building.distanceSq);if(!useHub&&(!building||building.distanceSq>7.4*7.4))return false;
             if(useHub){ensureCityHubInterior();interiorState={kind:'hub',origin:INTERIOR_ORIGIN,exitPosition:hub.hub.entrance.clone(),colliders:[{minX:INTERIOR_ORIGIN.x-10,maxX:INTERIOR_ORIGIN.x+10,minZ:INTERIOR_ORIGIN.z-10,maxZ:INTERIOR_ORIGIN.z-9.45,kind:'interior-wall'},{minX:INTERIOR_ORIGIN.x-10,maxX:INTERIOR_ORIGIN.x+10,minZ:INTERIOR_ORIGIN.z+9.45,maxZ:INTERIOR_ORIGIN.z+10,kind:'interior-wall'},{minX:INTERIOR_ORIGIN.x-10,maxX:INTERIOR_ORIGIN.x-9.45,minZ:INTERIOR_ORIGIN.z-10,maxZ:INTERIOR_ORIGIN.z+10,kind:'interior-wall'},{minX:INTERIOR_ORIGIN.x+9.45,maxX:INTERIOR_ORIGIN.x+10,minZ:INTERIOR_ORIGIN.z-10,maxZ:INTERIOR_ORIGIN.z+10,kind:'interior-wall'},{minX:INTERIOR_ORIGIN.x-2.8,maxX:INTERIOR_ORIGIN.x+2.8,minZ:INTERIOR_ORIGIN.z-2.8,maxZ:INTERIOR_ORIGIN.z-1.1,kind:'interior-desk'}]};playerGroup.position.copy(INTERIOR_ORIGIN.clone().add(new THREE.Vector3(0,0,6.4)));playerGroup.rotation.y=Math.PI;cameraOffsetSpherical.radius=Math.min(cameraOffsetSpherical.radius,5.2);cameraOffsetSpherical.theta=Math.PI;setSandboxMessage('City Hubへ入館しました。出口ゲートで「使う」を押すと街へ戻れます。');return true;}
             createGenericInterior();const o=GENERIC_INTERIOR_ORIGIN;interiorState={kind:'building',origin:o,exitPosition:building.entry.position.clone(),label:building.entry.label,colliders:[{minX:o.x-9,maxX:o.x+9,minZ:o.z-9,maxZ:o.z-8.6,kind:'interior-wall'},{minX:o.x-9,maxX:o.x+9,minZ:o.z+8.6,maxZ:o.z+9,kind:'interior-wall'},{minX:o.x-9,maxX:o.x-8.6,minZ:o.z-9,maxZ:o.z+9,kind:'interior-wall'},{minX:o.x+8.6,maxX:o.x+9,minZ:o.z-9,maxZ:o.z+9,kind:'interior-wall'},{minX:o.x-2.9,maxX:o.x+2.9,minZ:o.z-2.5,maxZ:o.z-.8,kind:'interior-counter'}]};playerGroup.position.copy(o.clone().add(new THREE.Vector3(0,0,6.2)));playerGroup.rotation.y=Math.PI;cameraOffsetSpherical.radius=Math.min(cameraOffsetSpherical.radius,5.2);cameraOffsetSpherical.theta=Math.PI;setSandboxMessage(`${building.entry.label}へ入りました。出口ゲートで「使う」を押すと街へ戻れます。`);return true;
         }
@@ -1508,24 +1641,102 @@
             loadedChunks.forEach(decorateChunkWithExternalBuilding);
         }
 
+        function cloneExternalTemplate(key) {
+            const template = externalModelTemplates.get(key);
+            return template ? cloneSkeleton(template) : null;
+        }
+
+        function createExternalCloudClusters() {
+            if (!cloudLayer || cloudLayer.userData.externalCloudsAdded || !externalModelTemplates.has('cloudCluster')) return;
+            cloudLayer.userData.externalCloudsAdded = true;
+            for (let index = 0; index < 8; index++) {
+                const cloud = normalizeExternalObject(cloneExternalTemplate('cloudCluster'), 20 + hash2D(index, 9, 701) * 13, 7.5);
+                cloud.name = 'cc0-cloud-cluster';
+                cloud.position.set((hash2D(index, 13, 709) - .5) * 160, 30 + hash2D(index, 17, 719) * 26, (hash2D(index, 21, 727) - .5) * 160);
+                cloud.rotation.y = hash2D(index, 23, 733) * Math.PI * 2;
+                cloud.userData.phase = hash2D(index, 29, 739) * Math.PI * 2;
+                cloud.traverse(node => { if (node.isMesh) { node.castShadow = false; node.receiveShadow = false; } });
+                cloudLayer.add(cloud);
+            }
+        }
+
+        function decorateChunkWithExternalScenery(chunk) {
+            if (!externalModelsReady || chunk.externalSceneryAdded) return;
+            const center = new THREE.Vector3(chunk.cx * CHUNK_SIZE + CHUNK_SIZE / 2, 0, chunk.cz * CHUNK_SIZE + CHUNK_SIZE / 2);
+            if (center.distanceToSquared(playerGroup.position) > (CHUNK_SIZE * 2.15) ** 2) return;
+            const addProp = (key, x, z, footprint, height, colliderRadius = 0, rotation = 0) => {
+                const visual = cloneExternalTemplate(key);
+                if (!visual) return;
+                normalizeExternalObject(visual, footprint, height);
+                visual.position.x += x; visual.position.z += z; visual.rotation.y = rotation;
+                visual.name = `cc0-${key}-scenery`;
+                visual.traverse(node => { if (node.isMesh) { node.castShadow = qualityMode === 'visual'; node.receiveShadow = true; } });
+                chunk.group.add(visual);
+                if (colliderRadius > 0) chunk.colliders.push({ minX:x-colliderRadius, maxX:x+colliderRadius, minZ:z-colliderRadius, maxZ:z+colliderRadius, kind:'cc0-scenery' });
+            };
+            for (let index = 0; index < 4; index++) {
+                const x = chunk.cx * CHUNK_SIZE + 6 + hash2D(chunk.cx, chunk.cz, 801 + index) * (CHUNK_SIZE - 12);
+                const z = chunk.cz * CHUNK_SIZE + 6 + hash2D(chunk.cx, chunk.cz, 811 + index) * (CHUNK_SIZE - 12);
+                if (isRoadCoordinate(x) || isRoadCoordinate(z) || chunk.specs.some(spec => Math.abs(spec.x - x) < spec.size + 1.7 && Math.abs(spec.z - z) < spec.size + 1.7)) continue;
+                const key = ['treeDetailed', 'treeOak', 'treePine'][index % 3];
+                addProp(key, x, z, 2.5 + hash2D(chunk.cx, chunk.cz, 821 + index) * 1.5, 7, 1.05, hash2D(chunk.cx, chunk.cz, 831 + index) * Math.PI * 2);
+                if (index % 2 === 0) addProp('bushDetailed', x + 2.2, z - 1.3, 1.3, 1.35, .44, hash2D(chunk.cx, chunk.cz, 841 + index) * Math.PI * 2);
+            }
+            const origin = chunkOrigin(chunk.cx, chunk.cz);
+            for (let n = 0; n < 2; n++) {
+                const road = n === 0 ? Math.ceil(origin.x / ROAD_INTERVAL) * ROAD_INTERVAL : Math.ceil(origin.z / ROAD_INTERVAL) * ROAD_INTERVAL;
+                const side = n === 0 ? (hash2D(chunk.cx, chunk.cz, 851) > .5 ? 1 : -1) : (hash2D(chunk.cx, chunk.cz, 853) > .5 ? 1 : -1);
+                const x = n === 0 ? road + side * (ROAD_WIDTH * .5 + .7) : origin.x + 16;
+                const z = n === 0 ? origin.z + 16 : road + side * (ROAD_WIDTH * .5 + .7);
+                addProp('streetlight', x, z, .8, 7.5, .32, n === 0 ? 0 : Math.PI / 2);
+                if ((chunk.cx + chunk.cz + n) % 2 === 0) addProp('streetSign', x + (n === 0 ? 1.3 : 0), z + (n === 0 ? 0 : 1.3), .8, 2.4, .25, n === 0 ? 0 : Math.PI / 2);
+                if ((chunk.cx - chunk.cz + n) % 3 === 0) addProp('roadBarrier', x + (n === 0 ? 2.5 : 0), z + (n === 0 ? 0 : 2.5), 1.5, 1.1, .5, n === 0 ? 0 : Math.PI / 2);
+            }
+            chunk.externalSceneryAdded = true;
+        }
+
+        function decorateExternalScenery() { loadedChunks.forEach(decorateChunkWithExternalScenery); }
+
+        function initializePhoneVisual() {
+            if (phoneVisual || !externalModelTemplates.has('smartphone')) return;
+            phoneVisual = normalizeExternalObject(cloneExternalTemplate('smartphone'), .62, 1.15);
+            phoneVisual.name = 'cc0-citylink-s26-device';
+            phoneVisual.position.set(.59, -.46, -1.12);
+            phoneVisual.rotation.set(.07, Math.PI, -.16);
+            phoneVisual.visible = false;
+            phoneVisual.traverse(node => { if (node.isMesh) { node.castShadow = false; node.receiveShadow = false; } });
+        }
+
+        function syncPhoneVisual() {
+            if (!phoneVisual || !currentCamera) return;
+            if (cityPhoneOpen && phoneVisual.parent !== currentCamera) currentCamera.add(phoneVisual);
+            phoneVisual.visible = cityPhoneOpen;
+        }
+
         function loadExternalModelLibrary() {
             const loader = new GLTFLoader();
             const entries = Object.entries(EXTERNAL_MODEL_SOURCES);
-            Promise.all(entries.map(([key, url]) => new Promise((resolve, reject) => {
+            Promise.allSettled(entries.map(([key, url]) => new Promise((resolve, reject) => {
                 loader.load(url, gltf => {
                     const root = gltf.scene || gltf.scenes?.[0];
                     if (!root) { reject(new Error(`No scene in ${url}`)); return; }
                     externalModelTemplates.set(key, prepareExternalTemplate(root));
+                    externalModelAnimations.set(key, gltf.animations || []);
                     resolve(key);
                 }, undefined, reject);
-            }))).then(() => {
-                externalModelsReady = true;
+            }))).then(results => {
+                const loaded = results.filter(result => result.status === 'fulfilled').map(result => result.value);
+                const failed = results.filter(result => result.status === 'rejected');
+                externalModelsReady = loaded.length > 0;
                 applyExternalVehicleModels();
                 decorateExternalBuildings();
-                if (gameStarted) setSandboxMessage('CC0外部モデルを読み込み、近傍の車両と建物へ適用しました。');
-            }).catch(error => {
-                console.warn('CC0モデルは読み込めなかったため、標準モデルを使用します。', error);
-            });
+                decorateExternalScenery();
+                createExternalCloudClusters();
+                applyExternalCharacterModels();
+                initializePhoneVisual();
+                if (failed.length) console.warn('一部のCC0モデルを読み込めなかったため、標準モデルを維持します。', failed);
+                if (gameStarted) setSandboxMessage(`CC0外部モデル ${loaded.length}/${entries.length} 件を適用しました。`);
+            }).catch(error => console.warn('CC0モデルの初期化に失敗したため、標準モデルを使用します。', error));
         }
 
         function createVehicleModel(type, traffic = false) {
@@ -1906,7 +2117,80 @@
         function reconstructPath() { return []; }
         function worldToGrid(worldVec) { return { x: Math.floor(worldVec.x / ROAD_INTERVAL), y: Math.floor(worldVec.z / ROAD_INTERVAL) }; }
         function gridToWorld(gridNode) { return new THREE.Vector3(gridNode.x * ROAD_INTERVAL, 0, gridNode.y * ROAD_INTERVAL); }
+        function installCharacterAnimation(group, visual, isNpc) {
+            const clips = externalModelAnimations.get('character') || [];
+            if (!clips.length) return;
+            const mixer = new THREE.AnimationMixer(visual);
+            const actions = {};
+            ['Idle', 'Walk', 'Run'].forEach(name => {
+                const clip = clips.find(candidate => candidate.name.endsWith(`|${name}`) || candidate.name === name);
+                if (clip) { const action = mixer.clipAction(clip); action.enabled = true; action.setLoop(THREE.LoopRepeat, Infinity); actions[name] = action; }
+            });
+            if (!actions.Idle) return;
+            group.userData.animationController = { mixer, actions, active:null, isNpc };
+            if (isNpc) npcMixers.set(group, mixer); else playerMixer = mixer;
+            setCharacterAnimation(group, 'Idle', true);
+        }
+
+        function setCharacterAnimation(group, requested, force = false) {
+            const controller = group?.userData?.animationController;
+            if (!controller) return;
+            const actionName = controller.actions[requested] ? requested : 'Idle';
+            if (!force && controller.active === actionName) return;
+            const next = controller.actions[actionName];
+            const previous = controller.active && controller.actions[controller.active];
+            if (previous && previous !== next) previous.fadeOut(.16);
+            next.reset().setEffectiveWeight(1).fadeIn(.16).play();
+            controller.active = actionName;
+            if (!controller.isNpc) currentPlayerAnimation = actionName;
+        }
+
+        function createExternalCharacter(type, isNpc) {
+            const visual = cloneExternalTemplate('character');
+            if (!visual) return null;
+            const group = new THREE.Group();
+            normalizeExternalObject(visual, isNpc ? 1.12 : 1.18, 2.15);
+            visual.rotation.y = Math.PI;
+            visual.traverse(node => { if (node.isMesh) { node.castShadow = !isNpc || qualityMode === 'visual'; node.receiveShadow = true; } });
+            group.add(visual);
+            installCharacterAnimation(group, visual, isNpc);
+            return group;
+        }
+
+        function applyExternalCharacterModels() {
+            if (!externalModelTemplates.has('character')) return;
+            if (playerGroup && character) {
+                playerGroup.remove(character);
+                if (playerMixer) { playerMixer.stopAllAction(); playerMixer = null; }
+                character = createCharacter(currentCharacterType, false);
+                playerGroup.add(character);
+            }
+            npcs.slice().forEach((npc, index) => {
+                const modern = createCharacter(index % 6, true);
+                if (!modern) return;
+                modern.position.copy(npc.position); modern.quaternion.copy(npc.quaternion);
+                modern.userData = { ...modern.userData, ...npc.userData };
+                npcMixers.delete(npc);
+                scene.remove(npc); scene.add(modern); npcs[index] = modern;
+            });
+        }
+
+        function updateCharacterMotion(delta) {
+            if (character) {
+                const action = (controlledVehicle || ridingTransit || currentSpeedMs < .15) ? 'Idle' : (currentSpeedMs > 7.2 ? 'Run' : 'Walk');
+                setCharacterAnimation(character, action);
+                character.userData?.animationController?.mixer.update(delta);
+            }
+            npcMixers.forEach((mixer, npc) => mixer.update(delta));
+        }
+
         function createCharacter(type, isNpc = false) {
+            const externalCharacter = createExternalCharacter(type, isNpc);
+            if (externalCharacter) {
+                const chatDiv = document.createElement('div'); chatDiv.className = 'chat-bubble';
+                const chatLabel = new CSS2DObject(chatDiv); chatLabel.position.set(0, 2.2, 0); chatLabel.visible = false; externalCharacter.add(chatLabel);
+                return externalCharacter;
+            }
             const group = new THREE.Group();
             const shadowCaster = (obj) => {
                 if (!isNpc) obj.castShadow = true;
@@ -1987,7 +2271,7 @@
             while (npcs.length < newCount) {
                 const npc = changeCharacter(false);
                 const npcIndex = npcs.length;
-                npc.userData = { name: "NPC " + (npcIndex + 1), id: 1000 + npcIndex + 1, persona: NPC_PERSONAS[npcIndex % NPC_PERSONAS.length] };
+                npc.userData = { ...npc.userData, name: "NPC " + (npcIndex + 1), id: 1000 + npcIndex + 1, persona: NPC_PERSONAS[npcIndex % NPC_PERSONAS.length] };
                 resetNpcPosition(npc);
                 createNpcBrain(npc);
                 npcs.push(npc);
@@ -1995,6 +2279,7 @@
             }
             while (npcs.length > newCount) {
                 const npcToRemove = npcs.pop();
+                npcMixers.delete(npcToRemove);
                 scene.remove(npcToRemove);
             }
             updateNpcActivityReadout();
@@ -2089,11 +2374,11 @@
                     chooseNpcDestination(npc, time, true);
                     continue;
                 }
-                if ((brain.state === 'wait' || brain.state === 'talk') && time < brain.stateUntil) continue;
+                if ((brain.state === 'wait' || brain.state === 'talk') && time < brain.stateUntil) { setCharacterAnimation(npc, 'Idle'); continue; }
                 if (brain.state === 'wait' || brain.state === 'talk') chooseNpcDestination(npc, time);
                 const toTarget = npc.targetPosition.clone().sub(npc.position);
                 toTarget.y = 0;
-                if (toTarget.lengthSq() < 2.25) { enterNpcWait(npc, time); continue; }
+                if (toTarget.lengthSq() < 2.25) { enterNpcWait(npc, time); setCharacterAnimation(npc, 'Idle'); continue; }
                 const desired = toTarget.normalize();
                 const avoidance = getNpcAvoidance(npc, index, playerPos);
                 if (avoidance.lengthSq() > 0.005) {
@@ -2103,6 +2388,7 @@
                     brain.state = Math.random() < 0.65 ? 'patrol' : 'wander';
                 }
                 npc.position.addScaledVector(desired, brain.speed * delta * stride);
+                setCharacterAnimation(npc, brain.speed > 1.6 ? 'Run' : 'Walk');
                 const targetAngle = Math.atan2(desired.x, desired.z);
                 npc.rotation.y += THREE.MathUtils.euclideanModulo(targetAngle - npc.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
             }
@@ -2446,6 +2732,69 @@
             document.getElementById('destination-info').textContent = `距離: ${distance.toFixed(0)}m, 到着予測: ${timeString}`;
         }
 
+
+        const SFX_ASSETS = { tap:'assets/audio/sfx/ui-tap.ogg', confirm:'assets/audio/sfx/ui-confirm.ogg', back:'assets/audio/sfx/ui-back.ogg', error:'assets/audio/sfx/ui-error.ogg', concrete:'assets/audio/sfx/footstep-concrete.ogg', grass:'assets/audio/sfx/footstep-grass.ogg', snow:'assets/audio/sfx/footstep-snow.ogg' };
+        function playSfx(name, volume = .34) {
+            const source = SFX_ASSETS[name]; if (!source) return;
+            const base = sfxAudio.get(name) || new Audio(source); base.preload = 'auto'; sfxAudio.set(name, base);
+            const instance = base.paused ? base : base.cloneNode(true);
+            instance.volume = Math.max(0, Math.min(1, volume));
+            instance.currentTime = 0;
+            instance.play().catch(() => {});
+        }
+        function ensureWeatherAudio(kind, source, volume) {
+            if (!weatherAudio[kind]) { const audio = new Audio(source); audio.loop = true; audio.preload = 'metadata'; audio.volume = volume; weatherAudio[kind] = audio; }
+            return weatherAudio[kind];
+        }
+        function syncWeatherAudio(weather = document.getElementById('weather-select')?.value) {
+            const rain = ensureWeatherAudio('rain', 'assets/audio/weather/rain-gutter-loop.mp3', .23);
+            const wind = ensureWeatherAudio('wind', 'assets/audio/weather/strong-wind-blowing.mp3', .12);
+            const wanted = { rain: weather === 'rainy', wind: weather === 'snowy' || weather === 'cloudy' };
+            Object.entries(weatherAudio).forEach(([kind, audio]) => {
+                if (!audio) return;
+                if (wanted[kind] && gameStarted && !gamePaused) audio.play().catch(() => {});
+                else audio.pause();
+            });
+        }
+        function pauseWeatherAudio() { Object.values(weatherAudio).forEach(audio => audio?.pause()); }
+        function updateFootsteps(time) {
+            if (controlledVehicle || ridingTransit || currentSpeedMs < .25 || !characterDirection || characterDirection.lengthSq() < .001) return;
+            const cadence = currentSpeedMs > 7.2 ? 270 : 420;
+            if (time - lastFootstepAt < cadence) return;
+            lastFootstepAt = time;
+            const weather = document.getElementById('weather-select')?.value;
+            const key = weather === 'snowy' ? 'snow' : (isRoadCoordinate(playerGroup.position.x) || isRoadCoordinate(playerGroup.position.z) ? 'concrete' : 'grass');
+            playSfx(key, .18);
+        }
+        function updateCityPhoneUi() {
+            const phone = document.getElementById('city-phone'); if (!phone) return;
+            const weather = document.getElementById('weather-select')?.value || 'sunny';
+            const meta = { sunny:['☀','晴れ','澄んだ都市の空','22°'], cloudy:['☁','くもり','穏やかな雲の流れ','18°'], rainy:['☔','雨','雨音と路面の反射','15°'], snowy:['❄','雪','静かな降雪と風','-1°'] }[weather];
+            const target = getControlledObject?.() || playerGroup;
+            const time = document.getElementById('world-time-readout')?.textContent || document.getElementById('time-label')?.textContent || '12:00';
+            document.getElementById('phone-time').textContent = time;
+            document.getElementById('phone-weather-icon').textContent = meta[0]; document.getElementById('phone-weather-label').textContent = meta[1]; document.getElementById('phone-weather-detail').textContent = meta[2]; document.getElementById('phone-weather-temp').textContent = meta[3];
+            document.getElementById('phone-coords').textContent = target ? `X ${target.position.x.toFixed(0)} · Z ${target.position.z.toFixed(0)}` : 'X 0 · Z 0';
+            document.getElementById('phone-npcs').textContent = `${npcs.length} ACTIVE`;
+            document.getElementById('phone-mode').textContent = controlledVehicle ? 'DRIVING' : ridingTransit ? 'TRANSIT' : 'ON FOOT';
+            document.getElementById('phone-quality').textContent = ({ performance:'LIGHT', balanced:'PREMIUM', visual:'ULTRA' })[qualityMode] || 'PREMIUM';
+        }
+        function setCityPhoneOpen(value) {
+            if (!gameStarted && value) return;
+            cityPhoneOpen = Boolean(value); Object.keys(keys).forEach(key => { keys[key] = false; }); mobileInput.x = mobileInput.z = 0;
+            document.getElementById('city-phone').classList.toggle('hidden', !cityPhoneOpen);
+            if (cityPhoneOpen) { updateCityPhoneUi(); syncWeatherAudio(); playSfx('tap', .25); }
+            else { syncWeatherAudio(); playSfx('back', .23); }
+            syncPhoneVisual();
+        }
+        function toggleCityPhone() { setCityPhoneOpen(!cityPhoneOpen); }
+        function handlePhoneAction(action) {
+            if (action === 'map') { setCityPhoneOpen(false); openCityAtlas(); return; }
+            if (action === 'weather') { const values=['sunny','cloudy','rainy','snowy']; const field=document.getElementById('weather-select'); field.value=values[(values.indexOf(field.value)+1)%values.length]; changeWeather(field.value); updateCityPhoneUi(); playSfx('confirm'); return; }
+            if (action === 'social') { setCityPhoneOpen(false); document.getElementById('chat-ui').classList.remove('collapsed'); document.getElementById('chat-input').focus(); return; }
+            if (action === 'settings') { setCityPhoneOpen(false); openWorldSettings(); }
+        }
+
         function updateTime(hour) {
             const timeLabel = document.getElementById('time-label');
             const h = Math.floor(hour);
@@ -2480,11 +2829,55 @@
                 buildingMaterial.needsUpdate = true;
             }
         }
-        function changeWeather(weather) {
-            if(weatherParticles){scene.remove(weatherParticles);weatherParticles.geometry.dispose();weatherParticles.material.dispose();weatherParticles=null;}updateTime(parseFloat(document.getElementById('time-slider').value));const uniforms=sky.material.uniforms;if(weather==='cloudy'){uniforms['turbidity'].value=13;uniforms['rayleigh'].value=.9;}else if(weather==='rainy'||weather==='snowy'){uniforms['turbidity'].value=18;uniforms['rayleigh'].value=.42;const count=weather==='rainy'?qualityConfig().weatherCount:Math.floor(qualityConfig().weatherCount*.65),positions=new Float32Array(count*3),velocities=new Float32Array(count*3),geometry=new THREE.BufferGeometry();for(let i=0;i<count*3;i+=3){positions[i]=(Math.random()-.5)*110;positions[i+1]=Math.random()*48;positions[i+2]=(Math.random()-.5)*110;velocities[i]=weather==='snowy'?(Math.random()-.5)*.05:0;velocities[i+1]=weather==='rainy'?-Math.random()*.8-.5:-Math.random()*.05-.02;}geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));geometry.setAttribute('velocity',new THREE.BufferAttribute(velocities,3));const material=new THREE.PointsMaterial({color:weather==='rainy'?0xa8bad4:0xffffff,size:weather==='rainy'?.045:.15,transparent:true,opacity:weather==='rainy'?.65:.72,sizeAttenuation:true});weatherParticles=new THREE.Points(geometry,material);scene.add(weatherParticles);}if(cloudLayer)cloudLayer.visible=weather!=='sunny'||qualityMode==='visual';
+        function applyWeatherSurfaceProfile(weather) {
+            if (!chunkAssets) return;
+            const profiles = {
+                sunny: { turf:0x5e8b6d, road:0x202c35, groundRoughness:.86, roadRoughness:.49, roadMetalness:.24, fog:0xbde9ff, near:58 },
+                cloudy: { turf:0x557c68, road:0x26343f, groundRoughness:.82, roadRoughness:.42, roadMetalness:.32, fog:0xaebdca, near:48 },
+                rainy: { turf:0x355d55, road:0x162733, groundRoughness:.48, roadRoughness:.17, roadMetalness:.64, fog:0x829bb2, near:31 },
+                snowy: { turf:0xb8cbd2, road:0x72808b, groundRoughness:.72, roadRoughness:.52, roadMetalness:.20, fog:0xdcecf6, near:38 }
+            };
+            const profile = profiles[weather] || profiles.sunny;
+            chunkAssets.groundMaterial.color.setHex(profile.turf); chunkAssets.groundMaterial.roughness = profile.groundRoughness;
+            chunkAssets.roadMaterial.color.setHex(profile.road); chunkAssets.roadMaterial.roughness = profile.roadRoughness; chunkAssets.roadMaterial.metalness = profile.roadMetalness;
+            chunkAssets.groundMaterial.needsUpdate = true; chunkAssets.roadMaterial.needsUpdate = true;
+            if (scene.fog) { scene.fog.color.setHex(profile.fog); scene.fog.near = profile.near; }
         }
 
-        function drawMapBackground() {
+        function changeWeather(weather) {
+            activeWeather = weather;
+            if (weatherParticles) { scene.remove(weatherParticles); weatherParticles.geometry.dispose(); weatherParticles.material.dispose(); weatherParticles = null; }
+            updateTime(parseFloat(document.getElementById('time-slider').value));
+            const profiles = {
+                sunny:{ turbidity:7.5, rayleigh:1.85, mie:.005, light:1, ambient:1, hemi:1, cloud:false },
+                cloudy:{ turbidity:13.5, rayleigh:.86, mie:.010, light:.74, ambient:.92, hemi:.91, cloud:true },
+                rainy:{ turbidity:18.5, rayleigh:.36, mie:.018, light:.58, ambient:.78, hemi:.78, cloud:true },
+                snowy:{ turbidity:15.5, rayleigh:.72, mie:.014, light:.76, ambient:1.10, hemi:1.06, cloud:true }
+            };
+            const profile = profiles[weather] || profiles.sunny;
+            const uniforms = sky.material.uniforms;
+            uniforms['turbidity'].value = profile.turbidity; uniforms['rayleigh'].value = profile.rayleigh; uniforms['mieCoefficient'].value = profile.mie;
+            const hour = parseFloat(document.getElementById('time-slider').value); const isNight = hour >= 17 || hour < 6;
+            if (!isNight) { directionalLight.intensity *= profile.light; ambientLight.intensity *= profile.ambient; hemisphereLight.intensity *= profile.hemi; }
+            applyWeatherSurfaceProfile(weather);
+            if (weather === 'rainy' || weather === 'snowy') {
+                const count = weather === 'rainy' ? qualityConfig().weatherCount : Math.floor(qualityConfig().weatherCount * .68);
+                const positions = new Float32Array(count * 3), velocities = new Float32Array(count * 3), geometry = new THREE.BufferGeometry();
+                const lateral = weather === 'rainy' ? .24 : .075;
+                for (let i = 0; i < count * 3; i += 3) {
+                    positions[i] = (Math.random() - .5) * 112; positions[i + 1] = Math.random() * 52; positions[i + 2] = (Math.random() - .5) * 112;
+                    velocities[i] = (Math.random() - .5) * lateral; velocities[i + 1] = weather === 'rainy' ? -(.82 + Math.random() * .62) : -(.045 + Math.random() * .055); velocities[i + 2] = weather === 'rainy' ? .14 : (Math.random() - .5) * .035;
+                }
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3)); geometry.setAttribute('velocity', new THREE.BufferAttribute(velocities, 3));
+                const material = new THREE.PointsMaterial({ color:weather === 'rainy' ? 0xb8d7ef : 0xffffff, size:weather === 'rainy' ? .075 : .17, transparent:true, opacity:weather === 'rainy' ? .74 : .86, depthWrite:false, sizeAttenuation:true });
+                weatherParticles = new THREE.Points(geometry, material); weatherParticles.name = `weather-${weather}-particles`; weatherParticles.renderOrder = 2; scene.add(weatherParticles);
+            }
+            if (cloudLayer) cloudLayer.visible = profile.cloud || qualityMode === 'visual';
+            syncWeatherAudio(weather); updateCityPhoneUi();
+        }
+
+
+                function drawMapBackground() {
             const center = getControlledObject ? getControlledObject().position : new THREE.Vector3();
             const range = (getActiveChunkRadius() + 0.35) * CHUNK_SIZE;
             const toMap = (x, z) => ({ x: (x - center.x) / range * mapCanvas.width + mapCanvas.width / 2, z: (z - center.z) / range * mapCanvas.height + mapCanvas.height / 2 });
@@ -2567,9 +2960,11 @@
             base.addEventListener('touchmove', (e) => { setInputMethod('touch'); e.preventDefault(); setInputFromTouch(e.touches[0]); }, { passive: false });
             base.addEventListener('touchend', releaseJoystick);
             base.addEventListener('touchcancel', releaseJoystick);
-            runButton.addEventListener('touchstart', (e) => { e.preventDefault(); isRunning = true; }, { passive: false });
-            runButton.addEventListener('touchend', (e) => { e.preventDefault(); isRunning = false; }, { passive: false });
-            runButton.addEventListener('touchcancel', () => { isRunning = false; });
+            const releaseRun = () => { touchRunActive = false; isRunning = false; };
+            runButton.addEventListener('pointerdown', (e) => { e.preventDefault(); touchRunActive = true; isRunning = true; runButton.setPointerCapture?.(e.pointerId); });
+            runButton.addEventListener('pointerup', releaseRun);
+            runButton.addEventListener('pointercancel', releaseRun);
+            runButton.addEventListener('lostpointercapture', releaseRun);
         }
 
         function onPointerDown(event) {
@@ -2664,8 +3059,12 @@
         }
 
         function handlePrimaryInteract() {
-            if(tryEnterOrExitInterior?.())return;
-            if(!controlledVehicle&&!ridingTransit){const npc=getConversationNpc();if(npc&&npc.position.distanceToSquared(playerGroup.position)<5.5*5.5){openNpcDialog(npc);return;}}
+            // 室内の出口は常に最優先。街では、近くの車両を入口より先に選択する。
+            if (interiorState && tryEnterOrExitInterior?.()) return;
+            if (controlledVehicle || ridingTransit || shouldPrioritizeVehicleInteraction()) { toggleVehicleControl(); return; }
+            const npc = getConversationNpc();
+            if (npc && npc.position.distanceToSquared(playerGroup.position) < 5.5 * 5.5) { openNpcDialog(npc); return; }
+            if (tryEnterOrExitInterior?.()) return;
             toggleVehicleControl();
         }
 
@@ -2825,7 +3224,8 @@
             document.getElementById('world-settings-screen').classList.add('hidden');
             toggleDrawer(false);
             playBgm();
-            setSandboxMessage('街へようこそ。好きなように遊ぼう！');
+            syncWeatherAudio();
+            setSandboxMessage('街へようこそ。Fキーまたは端末ボタンでCityLinkを開けます。');
         }
 
         function setPaused(value) {
@@ -2836,6 +3236,7 @@
             mobileInput.z = 0;
             document.getElementById('pause-screen').classList.toggle('hidden', !value || !document.getElementById('world-settings-screen').classList.contains('hidden'));
             duckBgm(value);
+            if (value) { pauseWeatherAudio(); if (cityPhoneOpen) setCityPhoneOpen(false); } else syncWeatherAudio();
             if (value) {
                 toggleDrawer(false);
                 const world = document.getElementById('pause-status-world');
@@ -2854,6 +3255,8 @@
             document.getElementById('pause-screen').classList.add('hidden');
             document.getElementById('world-settings-screen').classList.add('hidden');
             pauseBgm();
+            pauseWeatherAudio();
+            if (cityPhoneOpen) setCityPhoneOpen(false);
             document.getElementById('title-screen').classList.remove('hidden');
             openWorldBrowser();
             toggleDrawer(false);
@@ -2983,7 +3386,8 @@
             const delta = lastAnimationTime ? Math.min((time - lastAnimationTime) / 1000, 0.05) : 1 / 60;
             lastAnimationTime = time;
 
-            if (!gameStarted || gamePaused) {
+            if (!gameStarted || gamePaused || cityPhoneOpen) {
+                syncPhoneVisual();
                 renderer.render(scene, currentCamera);
                 return;
             }
@@ -2992,7 +3396,8 @@
             if (!driving && currentCamera === cameras.freeLook) {
                 updateFreeCam(delta);
             } else if (!driving) {
-                isRunning = keys['Shift'] || isRunning;
+                // キーボードはShiftを押しているフレームだけ、タッチは走るボタンを保持している間だけ加速する。
+                isRunning = Boolean(keys['Shift'] || touchRunActive);
                 const isMoving = (keys.w || keys.s || keys.a || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || Math.abs(mobileInput.x) > 0.04 || Math.abs(mobileInput.z) > 0.04) || isAutoDriving;
                 const autoRun = document.getElementById('auto-drive-run').checked;
                 let targetSpeedKmh = 0;
@@ -3054,6 +3459,9 @@
             updateVehicleUi();
             updateInteractionPrompts();
             updateCloudLayer(time, controlledObject.position);
+            updateCharacterMotion(delta);
+            updateFootsteps(time);
+            syncPhoneVisual();
             handleNpcChat(time);
             if (weatherParticles && frameCounter % qualityConfig().weatherStride === 0) {
                 weatherParticles.position.copy(controlledObject.position);
