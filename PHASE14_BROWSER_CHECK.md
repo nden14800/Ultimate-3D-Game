@@ -22,3 +22,4 @@
 | 雨天起動 | 要詳細確認 | Join Setupで「雨」を選択して参加できた。画面の確認時点では明確な降雨筋が目立たないため、次にDOM状態とWebGLの降水ポイント数を確認する。 |
 | 雨天プロファイル同期 | 合格 | ゲーム内の `weather-select` とJoin Setupの値はいずれも `rainy`。雨音・風音の音源読込も確認でき、CityLinkには「雨」「雨音と路面の反射」「15°」が表示された。 |
 | CityLinkショートカット | 合格 | `F`キーで雨天表示中の端末を閉じ、再度`F`キーで正常に開き直せた。 |
+| Cloudflare Pages本番確認 | 合格 | `https://ultimate-3d-game.pages.dev/` で最新のCity Worldsタイトル画面とJoin Setupが正常に表示・操作できた。Cloudflare API上でもコミット `50fafa1` のproduction deploymentは `success` である。 |
